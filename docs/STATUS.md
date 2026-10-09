@@ -35,3 +35,10 @@ Continuation after M0: branch published to `origin/m0-recon`, preserving `6e21f4
 - A passive paired run (`Start-Integration.ps1`, Apply=False, 45 seconds) launched both real processes, each with a responding window, and exited with code 0. No Mario coin pickup event or resulting Crash jump occurred or was witnessed. **Real gameplay interaction, jump/landing, shared worlds/collisions/camera remain NOT_TESTED**. Native startup is VERIFIED_REAL only for boot/window/readiness, not gameplay.
 - Windows host reported no usable audio endpoint for both runtimes; runtime audio remains unverified. Mesa llvmpipe is a testing fallback, not proof of acceptable gameplay performance.
 - `--smoke` can return success while graphics initialization failed; do not use its exit code alone as a graphics oracle. Next: instrument coin pickup + Crash grounded/jump/landing in a controlled real-game interactive session, with actual footage/observations; only then mark VERIFIED_REAL gameplay.
+
+## Latest M2 gate — 2026-10-09 (supersedes earlier M0 statuses)
+
+- VERIFIED_REAL Windows: native Mario yellow-coin pickups were delivered to native Crash runtime by CMJ1 UDP; in apply/keyboard-arm mode real Crash logged `input_applied seq=1`, with the next sequence correctly suppressed by single-use authorization.
+- VERIFIED_SYNTHETIC Windows: 25/25 bridge/probe assertions and 6/6 Python regression tests passed. New diagnostic reads the native Crash player position/velocity/state/air/ground flags for 3.5 seconds after a pulse, with no game memory writes. See EVIDENCE and WINDOWS for exact fields and oracle.
+- NOT_VERIFIED: Crash actually leaving the floor and landing in reaction to Mario, shared world/physics/collisions/camera, audio and overall playability. Do not mark the fusion playable or publish Releases.
+- Next: one real keyboard-armed paired run; correlate `coin`, `received`, `input_applied`, `motion_sample`, `motion_summary`, plus direct visual movement. Only then plan the minimal shared-world prototype.

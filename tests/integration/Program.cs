@@ -90,9 +90,39 @@ try {
     Send(10); Thread.Sleep(5); Pad(0xffff);
     Check(KeyboardApplied()==0,"keyboard mode cannot act before W is tapped");
     Pad(allowed); Pad(0xffff); // W key pressed and released, then focus moves to Mario.
+    // The native monitor only reads the pinned NTSC-U player pointer and fields.
+    const uint playerObject=0x80070000u;
+    memory.WriteU32(0x800566B4u,playerObject);
+    memory.WriteU32(playerObject+0x84u,100000u); // position Y, signed raw
+    memory.WriteU32(playerObject+0xA8u,0); // velocity Y
+    memory.WriteU32(playerObject+0x2Cu,2); // walk
+    memory.WriteU32(playerObject+0x120u,0); // not air
+    memory.WriteU32(playerObject+0xC8u,1); // GROUNDLAND
     Send(11); Thread.Sleep(5); var keyboardPad=Pad(0xffff);
     Check(KeyboardApplied()==1 && (keyboardPad & Controller.Cross)==0,
         "one W tap permits the first later coin with no R1 held");
+    var sampleAt=type.GetField("nextMotionSample",BindingFlags.NonPublic|BindingFlags.Instance)!;
+    var motionEnd=type.GetField("motionUntil",BindingFlags.NonPublic|BindingFlags.Instance)!;
+    int Samples()=>(int)type.GetField("motionSamples",BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(keyboard)!;
+    bool MotionFlag(string field)=>(bool)type.GetField(field,BindingFlags.NonPublic|BindingFlags.Instance)!.GetValue(keyboard)!;
+    Check(Samples()==1,"motion probe captures the native pre-jump baseline");
+    memory.WriteU32(playerObject+0x84u,106000u);
+    memory.WriteU32(playerObject+0xA8u,350u);
+    memory.WriteU32(playerObject+0x120u,8u); // AIR
+    memory.WriteU32(playerObject+0xC8u,0u);
+    sampleAt.SetValue(keyboard,Environment.TickCount64-1); Pad(0xffff);
+    memory.WriteU32(playerObject+0x84u,100000u);
+    memory.WriteU32(playerObject+0xA8u,0u);
+    memory.WriteU32(playerObject+0x120u,0u);
+    memory.WriteU32(playerObject+0xC8u,1u); // GROUNDLAND after AIR
+    sampleAt.SetValue(keyboard,Environment.TickCount64-1); Pad(0xffff);
+    Check(Samples()==3 && MotionFlag("motionAirSeen") && MotionFlag("motionGroundAfterAir"),
+        "motion samples capture simulated rise, AIR flag and ground-after-air");
+    Check(memory.ReadU32(playerObject+0x84u)==100000u && memory.ReadU32(playerObject+0xC8u)==1u,
+        "diagnostic observer never writes to native player motion fields");
+    motionEnd.SetValue(keyboard,Environment.TickCount64-1); Pad(0xffff);
+    Check(((long)motionEnd.GetValue(keyboard)!) == 0,
+        "motion sampling stops after its bounded observation window");
     Check((Pad(0xffff)&Controller.Cross)==0,"armed pulse stays active after keyboard arming is consumed");
     Send(12); Thread.Sleep(5); Pad(0xffff);
     Check(KeyboardApplied()==1,"one keyboard arm never applies a second coin");
@@ -118,4 +148,4 @@ try {
     Environment.SetEnvironmentVariable("CM64_PORT",null);
     Environment.SetEnvironmentVariable("CM64_KEYBOARD_ARM",null);
 }
-Console.WriteLine("VERIFIED_SYNTHETIC: 21 checks; fixture RAM, no original gameplay or shared-world validation.");
+Console.WriteLine("VERIFIED_SYNTHETIC: 25 checks; fixture RAM, no original gameplay or shared-world validation.");

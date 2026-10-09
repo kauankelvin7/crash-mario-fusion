@@ -19,6 +19,15 @@ public sealed class CoinJumpMod : IMod
     private bool apply;
     private bool keyboardArm, previousR1, armConsumed;
     private long armedUntil;
+    // NTSC-U SCUS-94900: addresses/offsets corroborated in pinned FramePacing.cs.
+    // Diagnostic only: never writes Crash RAM, changes speed, or alters physics.
+    private const uint CrashPointer = 0x800566B4u;
+    private const uint TranslationY = 0x84u, VelocityY = 0xA8u;
+    private const uint State = 0x2Cu, StateFlags = 0x120u, StatusA = 0xC8u;
+    private long motionUntil, nextMotionSample;
+    private uint motionSequence, motionObject;
+    private int motionSamples, motionStartY, motionMinY, motionMaxY, motionEndY;
+    private bool motionAirSeen, motionGroundAfterAir;
     public int AppliedCount { get; private set; }
     public int ObservedCount { get; private set; }
     public void OnLoad()
@@ -43,6 +52,7 @@ public sealed class CoinJumpMod : IMod
     public void OnUnload()
     {
         Event.RemoveListener<PadReadEvent>(OnPad);
+        if (motionUntil != 0) FinishMotion("unloaded");
         socket?.Dispose(); socket = null; pulseUntil = releaseUntil = armedUntil = 0;
         armConsumed = previousR1 = false;
     }
@@ -54,6 +64,8 @@ public sealed class CoinJumpMod : IMod
         uint currentLevel = e.Memory.ReadU32(Catalog.LevelIdAddr);
         bool gameplay = Catalog.Levels.TryGet(currentLevel, out var info) && info.Kind == LevelKind.Gameplay;
         bool safeContext = apply && gameplay && (e.Buttons & Controller.Start) != 0;
+        if (motionUntil != 0 && (level != currentLevel || !safeContext))
+            FinishMotion("level_changed_or_paused");
         bool r1Down = (e.Buttons & Controller.R1) == 0;
         if (level != currentLevel || !safeContext)
         {
@@ -101,10 +113,62 @@ public sealed class CoinJumpMod : IMod
             pulseUntil = now + 100; releaseUntil = now + 200;
             if (keyboardArm) { armConsumed = true; mayApplyEvent = false; }
             AppliedCount++;
-            Console.WriteLine($"[cm64] input_applied seq={sequence}; native jump/landing NOT_VERIFIED");
+            if (motionUntil != 0) FinishMotion("superseded");
+            motionSequence = sequence;
+            motionUntil = now + 3500; nextMotionSample = now;
+            motionObject = 0; motionSamples = 0;
+            motionAirSeen = motionGroundAfterAir = false;
+            Console.WriteLine($"[cm64] input_applied seq={sequence}; collecting native motion for 3500ms; jump/landing NOT_VERIFIED");
         }
         if (permitted && now < pulseUntil) e.Buttons = (ushort)(e.Buttons & ~Controller.Cross);
         // At expiry original physical input is restored; never force-release a user's button.
+        if (motionUntil != 0)
+        {
+            if (!gameplay || level != currentLevel) FinishMotion("level_or_menu");
+            else SampleMotion(e, now);
+        }
+    }
+    private void SampleMotion(PadReadEvent e, long now)
+    {
+        if (now >= motionUntil) { FinishMotion("window_complete"); return; }
+        if (now < nextMotionSample) return;
+        nextMotionSample = now + 120;
+        try
+        {
+            uint obj = e.Memory.ReadU32(CrashPointer);
+            // Reject pointers outside retail PS1 RAM, or objects too close to its end.
+            if (obj < 0x80000000u || obj > 0x801FFE00u)
+            { FinishMotion("invalid_player_pointer"); return; }
+            if (motionSamples != 0 && obj != motionObject)
+            { FinishMotion("player_replaced"); return; }
+            int y = unchecked((int)e.Memory.ReadU32(obj + TranslationY));
+            int vy = unchecked((int)e.Memory.ReadU32(obj + VelocityY));
+            uint state = e.Memory.ReadU32(obj + State);
+            uint flags = e.Memory.ReadU32(obj + StateFlags);
+            uint status = e.Memory.ReadU32(obj + StatusA);
+            if (motionSamples == 0)
+            {
+                motionObject = obj; motionStartY = motionMinY = motionMaxY = y;
+            }
+            motionSamples++; motionEndY = y;
+            motionMinY = Math.Min(motionMinY, y); motionMaxY = Math.Max(motionMaxY, y);
+            bool air = (flags & 0x8u) != 0;
+            motionAirSeen |= air;
+            if (motionAirSeen && !air && (status & 0x1u) != 0)
+                motionGroundAfterAir = true;
+            Console.WriteLine($"[cm64] motion_sample seq={motionSequence} n={motionSamples} y_raw={y} vy_raw={vy} state={state} air_flag={air} groundland_flag={((status & 1u) != 0)}");
+        }
+        catch (Exception ex)
+        {
+            FinishMotion("memory_error_" + ex.GetType().Name);
+        }
+    }
+    private void FinishMotion(string reason)
+    {
+        if (motionUntil == 0) return;
+        bool riseAndLandingCandidate = motionSamples >= 3 && motionMaxY > motionStartY && motionAirSeen && motionGroundAfterAir;
+        Console.WriteLine($"[cm64] motion_summary seq={motionSequence} reason={reason} samples={motionSamples} y_start={motionStartY} y_min={motionMinY} y_max={motionMaxY} y_last={motionEndY} air_flag_seen={motionAirSeen} ground_after_air={motionGroundAfterAir} rise_and_landing_candidate={riseAndLandingCandidate} interpretation=OBSERVATION_ONLY");
+        motionUntil = nextMotionSample = 0;
     }
     private static float ReadFloat(byte[] data, int offset) =>
         BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32BigEndian(data.AsSpan(offset)));
