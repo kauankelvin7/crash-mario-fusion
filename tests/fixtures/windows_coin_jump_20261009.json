@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "record_kind": "SANITIZED_OPERATOR_TRANSCRIBED_REAL_TRACE",
+  "date": "2026-10-09",
+  "session_label": "20261009-151351-877",
+  "verification_note": "Transcribed from private Windows runtime logs. Replaying this fixture in CI checks trace consistency only; it is not a fresh native-game execution, independent visual review, or proof of causal exclusivity.",
+  "upstream": {
+    "sm64ex": "d7ca2c04364a6dd0dac58b47151e04e26887e6f0",
+    "crash_launcher": "224da7757920a817de2d9242416f657ab95782ea"
+  },
+  "event_trace": {
+    "keyboard_arm": true,
+    "apply": true,
+    "crash_level": 9,
+    "mario_coins_sent": [
+      {
+        "seq": 1,
+        "native_tick": 4520,
+        "coin_count": 1,
+        "bytes": 52
+      },
+      {
+        "seq": 2,
+        "native_tick": 4529,
+        "coin_count": 2,
+        "bytes": 52
+      }
+    ],
+    "crash_events": [
+      {
+        "seq": 1,
+        "mario_tick": 4520,
+        "coin_count": 1,
+        "received": true,
+        "input_applied": true
+      },
+      {
+        "seq": 2,
+        "mario_tick": 4529,
+        "coin_count": 2,
+        "received": true,
+        "input_applied": false,
+        "observe_only": true
+      }
+    ]
+  },
+  "motion": {
+    "sequence": 1,
+    "read_only": true,
+    "source": "Real Crash guest player object sampled by author mod after guarded native Cross pulse",
+    "samples": [
+      {
+        "n": 1,
+        "y_raw": 1387515,
+        "vy_raw": -136000,
+        "state": 1,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 2,
+        "y_raw": 1423215,
+        "vy_raw": 939200,
+        "state": 4,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 3,
+        "y_raw": 1481067,
+        "vy_raw": 667200,
+        "state": 4,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 4,
+        "y_raw": 1503220,
+        "vy_raw": 531200,
+        "state": 4,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 5,
+        "y_raw": 1533978,
+        "vy_raw": 259200,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 6,
+        "y_raw": 1546674,
+        "vy_raw": -12800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 7,
+        "y_raw": 1546249,
+        "vy_raw": -148800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 8,
+        "y_raw": 1541309,
+        "vy_raw": -284800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 9,
+        "y_raw": 1517882,
+        "vy_raw": -556800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 10,
+        "y_raw": 1499395,
+        "vy_raw": -692800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 11,
+        "y_raw": 1448874,
+        "vy_raw": -964800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 12,
+        "y_raw": 1416840,
+        "vy_raw": -1100800,
+        "state": 11,
+        "air_flag": true,
+        "groundland_flag": false
+      },
+      {
+        "n": 13,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 14,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 15,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 16,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 17,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 18,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 19,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 13,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 20,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 1,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 21,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 1,
+        "air_flag": false,
+        "groundland_flag": true
+      },
+      {
+        "n": 22,
+        "y_raw": 1387507,
+        "vy_raw": -136000,
+        "state": 1,
+        "air_flag": false,
+        "groundland_flag": true
+      }
+    ],
+    "reported_summary": {
+      "reason": "window_complete",
+      "samples": 22,
+      "y_start": 1387515,
+      "y_min": 1387507,
+      "y_max": 1546674,
+      "y_last": 1387507,
+      "air_flag_seen": true,
+      "ground_after_air": true,
+      "rise_and_landing_candidate": true
+    }
+  },
+  "human_observation": "Tester stated they visually witnessed Crash jumping concurrently with Mario coin pickup; statement is not a video capture.",
+  "not_verified": [
+    "causal isolation from an idle no-Apply control run",
+    "shared geometry",
+    "shared collision",
+    "shared rendering or camera",
+    "production performance",
+    "cross-engine latency measurement"
+  ]
+}
