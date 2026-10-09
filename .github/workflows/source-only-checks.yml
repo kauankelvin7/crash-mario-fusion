@@ -4,7 +4,7 @@ on:
   push:
     branches: [m0-recon]
   pull_request:
-    branches: [m0-recon]
+    branches: [m0-recon, feat/m3-coordinate-contract]
   workflow_dispatch:
 
 permissions:
@@ -31,9 +31,18 @@ jobs:
           ref: d7ca2c04364a6dd0dac58b47151e04e26887e6f0
           path: .cache/native-sm64ex
           persist-credentials: false
-      - name: Test source-only code, recorded trace, and live loopback C sender
+      # Public reference source only; no game data or full c1 runtime build.
+      - name: Checkout pinned c1 collision reference
+        uses: actions/checkout@v4
+        with:
+          repository: wurlyfox/c1
+          ref: 256fdcef59f15a190290cc19db3fa9a707843b69
+          path: .cache/native-c1
+          persist-credentials: false
+      - name: Test source-only code, recorded trace, and original collision queries
         env:
           CM64_SM64EX_ROOT: ${{ github.workspace }}/.cache/native-sm64ex
+          CM64_C1_ROOT: ${{ github.workspace }}/.cache/native-c1
         run: python -m unittest discover -s tests -v
       - name: Explicitly report verification level
         run: |

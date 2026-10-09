@@ -109,3 +109,15 @@ M3.1 PARTIAL, may advance to Crash continuous pose work: user executed the newly
 ## M3.2 diagnostic continuous Crash pose increment — 2026-10-09
 Codex authored a separate opt-in Crash CMW1 diagnostic emitter plus read-only private Windows localhost collector; an independent reviewer completed testing and private build. M3.2 is **VERIFIED_SYNTHETIC/native-build**, NOT yet tested in the actual Crash game. Source C# mod integration/crash_pose/CrashPoseMod.cs is disabled by default, has bounded nonblocking local UDP emission (<=10 Hz, <=300 s, <=3000 attempts), emits signed native XYZ and rotation and level, validates player pointer/context/paused flags and invalidates observer-local epochs at level, object-lifecycle or pause changes. It NEVER writes guest RAM or input. Critically it samples from PadReadEvent, not a proven post-physics seam: CMW1 phase=0 UNKNOWN_DIAGNOSTIC and callback count are **NOT** a native physics tick. Calibration remains blocked.
 Windows QA: 7/7 new Python pose tests PASS; full Python suite 49/49 PASS; native Crash mod compiler with actual pinned RecompOne event bus and fixture RAM 58/58 assertions PASS, with unchanged RAM/inputs and no extra VBlank memory effects; original M2 regression 27/27 PASS; original geometry fixture oracle 17/17 PASS. Private generated Crash Windows launcher compiles with 0 errors/0 warnings, fixed-source pin verified and sealed collector manifest accepted. The original pinned Crash git checkout, original project worktree and M2 mod remain unchanged. No original game was launched for this increment, no new native pose packets yet. PR remains draft, no merging into main or m0-recon. See docs/EVIDENCE.md and docs/WINDOWS.md.
+# Latest source-only reference-box increment
+
+Branch `feat/m3-reference-box` derives from migration checkpoint `a43ee9b` on
+`feat/m3-coordinate-contract`; all existing M3.1/M3.2 work preserved.
+Authored c1 leaf-to-top-boundary converter and original-reference/native-Mario
+comparison implemented. **54 Python tests PASS, no skips**, **58 Crash pose
+fixture assertions PASS**, **27 original bridge checks PASS**, **13 PowerShell
+ASTs parsed** on Cloud Linux. All new evidence VERIFIED_SYNTHETIC.
+Overlapping support differs (c1 reference 40 vs Mario 48), blocking general
+equivalence. New Windows test script NOT_TESTED; no game/old PC executed.
+M3.2 actual Crash diagnostic packets remain pending on the new computer, then
+coherent post-physics sampling/geometry provenance/calibration/capacity gates.

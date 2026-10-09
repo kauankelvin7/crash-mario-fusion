@@ -80,3 +80,12 @@ private Windows observations; do not infer volume units from player XYZ.
 
 ## D007 (2026-10-09): Diagnostic Crash pad-polling pose is not postphysics
 Decision: implement the first Crash continuous CMW1 read-only observer via the separately-loaded pinned RecompOne PadReadEvent adapter, with phase=0 UNKNOWN_DIAGNOSTIC, native raw signed XYZ/rotation/level and explicit observer-only epoch/callback ordinal, never mislabel that callback as native physics completion or share-world calibration proof. Reason: available pinned launcher source does not establish a guaranteed callback after native Crash physics; editing upstream core or fabricating a POST_CRASH_PHYSICS contract would make evidence misleading. The private observer reads a direct RAM span to avoid PSMemory.ReadU32 runtime count-access/VBlank catchup; source-only fixture validates byte-identical RAM and input, 58 assertions. Built isolated private launcher instead of changing pinned original M0 or commercial assets. Alternate routes: implement source-proven real Crash physics-final hook in a reversible generated overlay later, or certify a strictly bounded pre-GPU seam with lifecycle evidence; both BLOCKED until native source/time ordering is independently demonstrated. Do not inject colliders or align coordinate spaces until actual real shared landmarks and verified native postphysics capture.
+# D006 follow-up — measured boundary limitation
+
+The existing conditional review is now exercised with an authored single-leaf
+reference box, exact c1 query functions and full-sm64ex native surfaces.
+Isolated top/perimeter cases agree; overlapping tops produce c1 40 vs Mario 48.
+Retain native solver ownership and source volume metadata. Do not generalize
+triangle replicas as equivalent Crash collision or infer retail material IDs.
+No repeated Astra review or live architecture change. Source-coordinate compact
+overflow is rejected before transformation, including compensated FrameMaps.
