@@ -1,13 +1,15 @@
-"""CMW1 observation protocol prototype. No pose writes, physics or live emitter.
+"""CMW1 read-only native pose wire contract; no physics or pose mutation.
 
-Frames are independently identified per engine/level/area/generation. Native
-ticks remain engine-local; sequence numbers order observations, not simulations.
+Mario phase 1 has a native post-update emitter. Crash phase 0 is diagnostic
+controller-poll sampling, NOT proven after physics, and its tick is a callback
+ordinal. Frames are observer-local; no shared spatial or temporal calibration.
 """
 from dataclasses import dataclass
 import math
 import struct
 
 CRASH, MARIO = 1, 2
+UNKNOWN_DIAGNOSTIC = 0
 POST_MARIO_UPDATE, POST_CRASH_PHYSICS, PRE_CRASH_GPU = 1, 2, 3
 HEADER = struct.Struct("!4sBBH16s16sII")
 PAYLOAD = {CRASH: struct.Struct("!3i3iII"), MARIO: struct.Struct("!3f3hII")}
@@ -36,7 +38,7 @@ class Snapshot:
 def encode(snapshot):
     if type(snapshot.engine) is not int or snapshot.engine not in PAYLOAD:
         raise ValueError("Unknown engine")
-    allowed = (POST_MARIO_UPDATE,) if snapshot.engine == MARIO else (POST_CRASH_PHYSICS, PRE_CRASH_GPU)
+    allowed = (POST_MARIO_UPDATE,) if snapshot.engine == MARIO else (UNKNOWN_DIAGNOSTIC, POST_CRASH_PHYSICS, PRE_CRASH_GPU)
     if type(snapshot.phase) is not int or snapshot.phase not in allowed:
         raise ValueError("Phase incompatible with native engine")
     for identity in (snapshot.session, snapshot.frame):
