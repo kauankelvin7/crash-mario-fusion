@@ -48,10 +48,28 @@ if ($Game -eq 'Crash') {
         -not (Test-Path -LiteralPath $marker -PathType Leaf)) {
         throw 'Mario private instrumented build is missing. Run Build-Integration.ps1 with your own verified ROM.'
     }
+    # The generated manifest protects the private instrumented source seam.
+    $manifest = Get-Content -LiteralPath $marker -Raw | ConvertFrom-Json
+    if ($manifest.pin -ne 'd7ca2c04364a6dd0dac58b47151e04e26887e6f0' -or
+        $null -eq $manifest.hashes) { throw 'Unrecognized Mario source pin/manifest.' }
+    $tracked = @('src/game/interaction.c','Makefile','src/pc/cm64_coin.c',
+                 'src/pc/cm64_coin.h','src/game/level_update.c','src/game/area.c',
+                 'src/pc/cm64_pose.c','src/pc/cm64_pose.h')
+    if (@($manifest.hashes.PSObject.Properties).Count -ne $tracked.Count) {
+        throw 'Unexpected Mario source manifest entries.'
+    }
+    foreach ($name in $tracked) {
+        $entry = $manifest.hashes.PSObject.Properties[$name]
+        $sourcePath = Join-Path $prepared $name
+        if ($null -eq $entry -or -not (Test-Path -LiteralPath $sourcePath -PathType Leaf) -or
+            (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $entry.Value) {
+            throw 'Mario instrumented source integrity differs from private manifest; preserve local changes.'
+        }
+    }
     $arguments = @('-m','tools.collect_pose','--mario-exe',$marioExe)
 }
 if ($CheckOnly) {
-    Write-Output "PREFLIGHT_OK game=$Game launcher_verified=true gameplay=NOT_TESTED"
+    Write-Output "PREFLIGHT_OK game=$Game source_preflight_verified=true gameplay=NOT_TESTED"
     exit 0
 }
 Write-Output "OPERATOR_GATE game=$Game read_only=true seconds=$Seconds max_samples=$MaxSamples"
