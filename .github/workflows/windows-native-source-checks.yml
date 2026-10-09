@@ -1,0 +1,88 @@
+name: Windows asset-free native checks
+
+on:
+  pull_request:
+    branches: [feat/m3-coordinate-contract]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-native-probes:
+    name: Windows x64 MinGW64 Python and public native source oracles
+    runs-on: windows-latest
+    timeout-minutes: 25
+
+    steps:
+      # Windows core.autocrlf can change shell fixture line endings during checkout.
+      - name: Preserve source line endings
+        shell: pwsh
+        run: git config --global core.autocrlf input
+
+      - name: Checkout project source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout pinned public Mario collision source
+        uses: actions/checkout@v4
+        with:
+          repository: sm64pc/sm64ex
+          ref: d7ca2c04364a6dd0dac58b47151e04e26887e6f0
+          path: .cache/native-sm64ex
+          persist-credentials: false
+
+      - name: Checkout pinned public Crash collision reference
+        uses: actions/checkout@v4
+        with:
+          repository: wurlyfox/c1
+          ref: 256fdcef59f15a190290cc19db3fa9a707843b69
+          path: .cache/native-c1
+          persist-credentials: false
+
+      # The user's documented native Windows source-only toolchain is MSYS2
+      # MINGW64. This is not a commercial game build or a graphics test.
+      - name: Install MSYS2 MinGW64 Python and GCC
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-python
+
+      - name: Parse all Windows PowerShell scripts without executing game commands
+        shell: pwsh
+        run: |
+          $scripts = @(Get-ChildItem -LiteralPath tools/windows -Filter '*.ps1' -File -Recurse)
+          if ($scripts.Count -lt 15) { throw "Unexpectedly missing Windows scripts: $($scripts.Count)" }
+          foreach ($script in $scripts) {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              $script.FullName, [ref]$tokens, [ref]$errors)
+            if ($errors) { throw "PowerShell syntax error in $($script.Name): $($errors -join '; ')" }
+          }
+          Write-Output "Parsed $($scripts.Count) Windows PowerShell scripts; none executed."
+
+      - name: Run complete Python suite and original C geometry probes on Windows
+        shell: msys2 {0}
+        env:
+          CM64_SM64EX_ROOT: ${{ github.workspace }}/.cache/native-sm64ex
+          CM64_C1_ROOT: ${{ github.workspace }}/.cache/native-c1
+        run: |
+          set -euo pipefail
+          echo "MSYSTEM=$MSYSTEM"
+          python --version
+          gcc --version
+          python -m unittest discover -s tests -v
+
+      - name: Mark exactly what Windows CI verified
+        shell: pwsh
+        run: |
+          Write-Output 'VERIFIED_SYNTHETIC only: native Windows source-only tests and compiled public fixture probes.'
+          Write-Output 'This runner did NOT launch retail Crash/Mario, validate GPU/OpenGL, build the private launcher,'
+          Write-Output 'validate real poses, certify engine post-physics callbacks, or test shared collisions.'
+          Write-Output 'No ROMs, discs, private runtime caches or telemetry are used or published.'
