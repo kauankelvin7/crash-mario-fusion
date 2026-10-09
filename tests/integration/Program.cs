@@ -78,4 +78,44 @@ Environment.SetEnvironmentVariable("CM64_SESSION",null);
 Environment.SetEnvironmentVariable("CM64_PORT",null);
 var passive = (IMod)Activator.CreateInstance(type)!;
 passive.OnLoad(); Check(Pad(allowed)==allowed,"unpaired native launcher has no injected input"); passive.OnUnload();
-Console.WriteLine("VERIFIED_SYNTHETIC: 14 checks; fixture RAM, no original gameplay or shared-world validation.");
+// Keyboard-only integration mode: a single R1/W tap arms one delayed coin pulse.
+Environment.SetEnvironmentVariable("CM64_SESSION",token);
+Environment.SetEnvironmentVariable("CM64_PORT",port.ToString());
+Environment.SetEnvironmentVariable("CM64_KEYBOARD_ARM","1");
+var keyboard = (IMod)Activator.CreateInstance(type)!;
+int KeyboardApplied() => (int)type.GetProperty("AppliedCount")!.GetValue(keyboard)!;
+keyboard.OnLoad();
+try {
+    memory.WriteU32(Catalog.LevelIdAddr,9);
+    Send(10); Thread.Sleep(5); Pad(0xffff);
+    Check(KeyboardApplied()==0,"keyboard mode cannot act before W is tapped");
+    Pad(allowed); Pad(0xffff); // W key pressed and released, then focus moves to Mario.
+    Send(11); Thread.Sleep(5); var keyboardPad=Pad(0xffff);
+    Check(KeyboardApplied()==1 && (keyboardPad & Controller.Cross)==0,
+        "one W tap permits the first later coin with no R1 held");
+    Check((Pad(0xffff)&Controller.Cross)==0,"armed pulse stays active after keyboard arming is consumed");
+    Send(12); Thread.Sleep(5); Pad(0xffff);
+    Check(KeyboardApplied()==1,"one keyboard arm never applies a second coin");
+    Thread.Sleep(220);
+    Check((Pad(0xffff)&Controller.Cross)!=0,"keyboard pulse releases to physical inputs");
+    Pad(allowed); Pad(0xffff);
+    Pad((ushort)(0xffff & ~Controller.Start)); Pad(0xffff);
+    Send(13); Thread.Sleep(5); Pad(0xffff);
+    Check(KeyboardApplied()==1,"pause/Start cancels keyboard arm");
+    Pad(allowed); Pad(0xffff);
+    type.GetField("armedUntil", BindingFlags.NonPublic|BindingFlags.Instance)!
+        .SetValue(keyboard, Environment.TickCount64 - 1);
+    Send(14); Thread.Sleep(5); Pad(0xffff);
+    Check(KeyboardApplied()==1,"expired keyboard arm cannot inject");
+    Pad(allowed); Pad(0xffff);
+    memory.WriteU32(Catalog.LevelIdAddr,25); Pad(0xffff);
+    memory.WriteU32(Catalog.LevelIdAddr,9); Pad(0xffff);
+    Send(15); Thread.Sleep(5); Pad(0xffff);
+    Check(KeyboardApplied()==1,"level transition cancels keyboard arm");
+} finally {
+    keyboard.OnUnload();
+    Environment.SetEnvironmentVariable("CM64_SESSION",null);
+    Environment.SetEnvironmentVariable("CM64_PORT",null);
+    Environment.SetEnvironmentVariable("CM64_KEYBOARD_ARM",null);
+}
+Console.WriteLine("VERIFIED_SYNTHETIC: 21 checks; fixture RAM, no original gameplay or shared-world validation.");

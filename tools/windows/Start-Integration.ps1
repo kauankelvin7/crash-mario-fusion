@@ -1,9 +1,10 @@
 #Requires -Version 7.0
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$CrashDisc, [switch]$Apply,
+param([Parameter(Mandatory)][string]$CrashDisc, [switch]$Apply, [switch]$KeyboardArm,
     [ValidateRange(30,3600)][int]$Seconds = 300, [string]$MsysRoot = 'C:/msys64')
 . "$PSScriptRoot/Common.ps1"
 Use-Dotnet
+if ($KeyboardArm -and -not $Apply) { throw '-KeyboardArm requires -Apply.' }
 $disc = (Resolve-Path -LiteralPath $CrashDisc).Path
 if ([IO.Path]::GetExtension($disc) -notin @('.cue','.chd')) { throw 'Crash needs your own CUE/BIN or CHD.' }
 $crashExe = Join-Path $TaskCache 'CrashBandicoot-Launcher/CrashBandicoot.Launcher/bin/Release/net10.0-windows/CrashBandicoot.exe'
@@ -16,6 +17,7 @@ $port = $probe.Client.LocalEndPoint.Port; $probe.Dispose()
 $env:CM64_SESSION = [Guid]::NewGuid().ToString('N')
 $env:CM64_PORT = [string]$port
 $env:CM64_APPLY = if ($Apply) { '1' } else { '0' }
+$env:CM64_KEYBOARD_ARM = if ($KeyboardArm) { '1' } else { '0' }
 $env:PATH = (Join-Path $MsysRoot 'mingw64/bin') + ';' + $env:PATH
 $crash = $null; $mario = $null
 try {
@@ -34,7 +36,11 @@ try {
     $mario = Start-Process -FilePath $marioExe -PassThru -WorkingDirectory (Split-Path $marioExe) `
         -RedirectStandardOutput (Join-Path $TaskLogs 'mario.stdout.log') `
         -RedirectStandardError (Join-Path $TaskLogs 'mario.stderr.log')
-    Write-Output "Both runtime commands started. Apply=$Apply. Hold Crash R1 only in unpaused gameplay; collect ONE yellow coin in Mario. Logs: $TaskLogs"
+    if ($KeyboardArm) {
+        Write-Output "Keyboard mode: in Crash gameplay tap W once, then switch to Mario and collect a coin within 60s. One pulse maximum per arm. Logs: $TaskLogs"
+    } else {
+        Write-Output "Both runtime commands started. Apply=$Apply. Hold Crash R1 only in unpaused gameplay; collect ONE yellow coin in Mario. Logs: $TaskLogs"
+    }
     $deadline = [DateTime]::UtcNow.AddSeconds($Seconds)
     while ([DateTime]::UtcNow -lt $deadline -and -not $crash.HasExited -and -not $mario.HasExited) {
         Start-Sleep -Milliseconds 200
@@ -49,11 +55,11 @@ try {
         }
     }
     @{
-        session=$env:CM64_SESSION; apply=[bool]$Apply; utc=[DateTime]::UtcNow.ToString('o')
+        session=$env:CM64_SESSION; apply=[bool]$Apply; keyboard_arm=[bool]$KeyboardArm; utc=[DateTime]::UtcNow.ToString('o')
         mario='d7ca2c04364a6dd0dac58b47151e04e26887e6f0'
         crash='224da7757920a817de2d9242416f657ab95782ea'
         gameplay='NOT_TESTED'; jump_landing='NOT_TESTED'; shared_world='NOT_TESTED'
         note='Review native event logs and actual Windows gameplay; readiness/input application do not prove a jump.'
     } | ConvertTo-Json | Set-Content (Join-Path $TaskLogs 'run.json')
-    Remove-Item Env:CM64_SESSION,Env:CM64_PORT,Env:CM64_APPLY -ErrorAction SilentlyContinue
+    Remove-Item Env:CM64_SESSION,Env:CM64_PORT,Env:CM64_APPLY,Env:CM64_KEYBOARD_ARM -ErrorAction SilentlyContinue
 }

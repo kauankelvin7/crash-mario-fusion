@@ -17,6 +17,8 @@ public sealed class CoinJumpMod : IMod
     private long pulseUntil, releaseUntil;
     private uint? level;
     private bool apply;
+    private bool keyboardArm, previousR1, armConsumed;
+    private long armedUntil;
     public int AppliedCount { get; private set; }
     public int ObservedCount { get; private set; }
     public void OnLoad()
@@ -29,16 +31,20 @@ public sealed class CoinJumpMod : IMod
         if (!int.TryParse(Environment.GetEnvironmentVariable("CM64_PORT"), out int port) || port < 1024 || port > 65535)
             throw new InvalidOperationException("Invalid CM64_PORT");
         apply = Environment.GetEnvironmentVariable("CM64_APPLY") == "1";
+        keyboardArm = apply && Environment.GetEnvironmentVariable("CM64_KEYBOARD_ARM") == "1";
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         try { socket.Bind(new IPEndPoint(IPAddress.Loopback, port)); socket.Blocking = false; }
         catch { socket.Dispose(); socket = null; throw; }
         Event.AddListener<PadReadEvent>(OnPad);
-        Console.WriteLine($"[cm64] receiver ready port={port} apply={apply}; HOLD R1 only during unpaused gameplay to permit a pulse");
+        Console.WriteLine($"[cm64] receiver ready port={port} apply={apply} keyboard_arm={keyboardArm}; " +
+            (keyboardArm ? "tap W (R1) in Crash gameplay to arm ONE jump for 60s" :
+                           "HOLD R1 only during unpaused gameplay to permit a pulse"));
     }
     public void OnUnload()
     {
         Event.RemoveListener<PadReadEvent>(OnPad);
-        socket?.Dispose(); socket = null; pulseUntil = releaseUntil = 0;
+        socket?.Dispose(); socket = null; pulseUntil = releaseUntil = armedUntil = 0;
+        armConsumed = previousR1 = false;
     }
     private void OnPad(PadReadEvent e)
     {
@@ -47,10 +53,24 @@ public sealed class CoinJumpMod : IMod
         long now = Environment.TickCount64;
         uint currentLevel = e.Memory.ReadU32(Catalog.LevelIdAddr);
         bool gameplay = Catalog.Levels.TryGet(currentLevel, out var info) && info.Kind == LevelKind.Gameplay;
-        bool permitted = apply && gameplay && (e.Buttons & Controller.R1) == 0
-            && (e.Buttons & Controller.Start) != 0;
-        if (level != currentLevel || !permitted) pulseUntil = releaseUntil = 0;
+        bool safeContext = apply && gameplay && (e.Buttons & Controller.Start) != 0;
+        bool r1Down = (e.Buttons & Controller.R1) == 0;
+        if (level != currentLevel || !safeContext)
+        {
+            pulseUntil = releaseUntil = armedUntil = 0;
+            armConsumed = true;
+        }
         level = currentLevel;
+        if (keyboardArm && safeContext && r1Down && !previousR1)
+        {
+            armedUntil = now + 60000;
+            armConsumed = false;
+            Console.WriteLine($"[cm64] keyboard armed crash_level={currentLevel} expires_in_ms=60000");
+        }
+        previousR1 = r1Down;
+        bool permitted = safeContext && (keyboardArm ? now < armedUntil : r1Down);
+        bool mayApplyEvent = permitted && (!keyboardArm || !armConsumed);
+        if (!permitted) pulseUntil = releaseUntil = 0;
         byte[] packet = new byte[256];
         // Bounded drain; no background thread, backlog or blocking game-loop work.
         for (int n = 0; n < 32; n++)
@@ -76,9 +96,10 @@ public sealed class CoinJumpMod : IMod
             uint tick = BinaryPrimitives.ReadUInt32BigEndian(packet.AsSpan(24));
             ObservedCount++;
             Console.WriteLine(FormattableString.Invariant($"[cm64] received seq={sequence} mario_tick={tick} coins={coins} pos={x},{y},{z} crash_level={currentLevel}"));
-            if (!permitted || now < releaseUntil || (e.Buttons & Controller.Cross) == 0)
+            if (!mayApplyEvent || now < releaseUntil || (e.Buttons & Controller.Cross) == 0)
             { Console.WriteLine($"[cm64] observe-only/drop seq={sequence}"); continue; }
             pulseUntil = now + 100; releaseUntil = now + 200;
+            if (keyboardArm) { armConsumed = true; mayApplyEvent = false; }
             AppliedCount++;
             Console.WriteLine($"[cm64] input_applied seq={sequence}; native jump/landing NOT_VERIFIED");
         }
