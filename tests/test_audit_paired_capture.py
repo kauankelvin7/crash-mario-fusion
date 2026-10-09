@@ -98,7 +98,15 @@ class CaptureAuditTests(unittest.TestCase):
             (folder / 'observations.jsonl').write_text('\n'.join(json.dumps(r) for r in rows))
             original = folder / 'original.json'
             original.write_text(json.dumps(summary))
-            (folder / 'summary.json').symlink_to(original)
+            link = folder / 'summary.json'
+            try:
+                link.symlink_to(original)
+            except OSError as exc:
+                # Windows without Developer Mode or elevated rights refuses symlink creation.
+                # In that environment the missing summary must still fail closed.
+                if getattr(exc, 'winerror', None) != 1314:
+                    raise
+                self.assertFalse(link.exists())
             with self.assertRaises(AuditError):
                 audit_folder(folder)
 
