@@ -7,7 +7,7 @@ Use-Dotnet
 $disc = (Resolve-Path -LiteralPath $CrashDisc).Path
 if ([IO.Path]::GetExtension($disc) -notin @('.cue','.chd')) { throw 'Crash needs your own CUE/BIN or CHD.' }
 $crashExe = Join-Path $TaskCache 'CrashBandicoot-Launcher/CrashBandicoot.Launcher/bin/Release/net10.0-windows/CrashBandicoot.exe'
-$marioExe = Join-Path $TaskCache 'sm64ex-cm64/build/us_pc/sm64.us.exe'
+$marioExe = Join-Path $TaskCache 'sm64ex-cm64/build/us_pc/sm64.us.f3dex2e.exe'
 foreach ($exe in @($crashExe,$marioExe)) {
     if (-not (Test-Path -LiteralPath $exe)) { throw 'Run Build-Integration.ps1 with your own ROM first.' }
 }
