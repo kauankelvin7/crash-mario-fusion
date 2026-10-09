@@ -109,3 +109,54 @@ M3.1 PARTIAL, may advance to Crash continuous pose work: user executed the newly
 ## M3.2 diagnostic continuous Crash pose increment — 2026-10-09
 Codex authored a separate opt-in Crash CMW1 diagnostic emitter plus read-only private Windows localhost collector; an independent reviewer completed testing and private build. M3.2 is **VERIFIED_SYNTHETIC/native-build**, NOT yet tested in the actual Crash game. Source C# mod integration/crash_pose/CrashPoseMod.cs is disabled by default, has bounded nonblocking local UDP emission (<=10 Hz, <=300 s, <=3000 attempts), emits signed native XYZ and rotation and level, validates player pointer/context/paused flags and invalidates observer-local epochs at level, object-lifecycle or pause changes. It NEVER writes guest RAM or input. Critically it samples from PadReadEvent, not a proven post-physics seam: CMW1 phase=0 UNKNOWN_DIAGNOSTIC and callback count are **NOT** a native physics tick. Calibration remains blocked.
 Windows QA: 7/7 new Python pose tests PASS; full Python suite 49/49 PASS; native Crash mod compiler with actual pinned RecompOne event bus and fixture RAM 58/58 assertions PASS, with unchanged RAM/inputs and no extra VBlank memory effects; original M2 regression 27/27 PASS; original geometry fixture oracle 17/17 PASS. Private generated Crash Windows launcher compiles with 0 errors/0 warnings, fixed-source pin verified and sealed collector manifest accepted. The original pinned Crash git checkout, original project worktree and M2 mod remain unchanged. No original game was launched for this increment, no new native pose packets yet. PR remains draft, no merging into main or m0-recon. See docs/EVIDENCE.md and docs/WINDOWS.md.
+# Latest source-only reference-box increment
+
+Branch `feat/m3-reference-box` derives from migration checkpoint `a43ee9b` on
+`feat/m3-coordinate-contract`; all existing M3.1/M3.2 work preserved.
+Authored c1 leaf-to-top-boundary converter and original-reference/native-Mario
+comparison implemented. **54 Python tests PASS, no skips**, **58 Crash pose
+fixture assertions PASS**, **27 original bridge checks PASS**, **13 PowerShell
+ASTs parsed** on Cloud Linux. All new evidence VERIFIED_SYNTHETIC.
+Overlapping support differs (c1 reference 40 vs Mario 48), blocking general
+equivalence. New Windows test script NOT_TESTED; no game/old PC executed.
+M3.2 actual Crash diagnostic packets remain pending on the new computer, then
+coherent post-physics sampling/geometry provenance/calibration/capacity gates.
+
+Implementation published in [draft PR #4](https://github.com/kauankelvin7/crash-mario-fusion/pull/4),
+base feat/m3-coordinate-contract. Source-only CI 37987762871 PASS for1571f25.
+Original main, m0-recon and base feature remain unmerged.
+
+## Issue #5 P1/P2 — Cloud implementation (2026-10-09)
+On existing `feat/m3-offline-preflight` from a43ee9b: delivered two-slot read-only
+CMW1 observation correlation with independent sessions/frames, explicit common
+receiver clock, typed rejection and lifecycle gates; delivered positive uniform
+scale/Y-yaw/origin least-squares FrameMap estimator with explicit landmark
+provenance, conditioning, holdout, numeric and residual gates. **VERIFIED_SYNTHETIC**:
+65/65 Python tests (16 new), 58/58 pinned Crash observer assertions, 27/27 M2
+fixtures, 13/13 PowerShell ASTs on Linux; independent QA approved the bounded
+P1/P2 scope. PR CI now also targets `feat/m3-coordinate-contract`.
+New Windows command: `./tools/windows/Test-OfflinePreflight.ps1`; native Windows
+execution of this increment is **NOT_TESTED**. No game was launched, no commercial
+files used, no physics/input/collision modifications. Physical synchronization
+and calibration remain **BLOCKED**. M3.2 remains diagnostic; no new VERIFIED_REAL
+evidence, native collider or shared playable world. PR #4 is separate and Issue
+#3 is not declared complete. Do not merge main or publish a playable Release.
+
+## M3.3 — consolidated integration and native observation preparation (2026-10-09)
+`feat/m3-integration-observer` starts at real base a43ee9b and contains complete
+PR #4 head 0cdc0ea and PR #6 head b74b6c7 by local branch merges. Both historical
+document sections survive conflicts; GitHub PRs remain unmerged. Main/m0-recon
+and original native physics/input adapters are unchanged. One discover-based CI
+runs both pinned sm64ex and c1 sources plus all CMW1/calibration tests.
+
+Implemented passive common-clock two-engine CMW1 collector with fixed counters,
+finite private logs, independent bindings and source-loss/age/continuity/frame/
+pause diagnostics; explicit geometry composition now checks estimation scope
+before applying the authored reference converter. Invalid descriptor sizes now
+raise controlled ValueError. No automatic transition matching, input writes,
+real collider or gameplay claim. **VERIFIED_SYNTHETIC**: 82/82 Python tests (all
+70 consolidated previous tests + 12 new), 58/58 Crash observer assertions,
+27/27 M2 fixtures, 15 PowerShell ASTs; both public collision oracles run with
+Linux ASan/UBSan. New Windows workflow/paired runtime collection **NOT_TESTED**.
+Physical synchronization/calibration remain **BLOCKED**. Next: operator-run
+three-terminal passive receipt experiment on new Windows PC, per WINDOWS.md.

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "max_error": 0.001,
+    "rms_error": 0.001,
+    "min_crash_xz_baseline": 10,
+    "min_mario_xz_baseline": 10,
+    "min_condition_ratio": 0.001,
+    "max_target_quantization_error": 0.001,
+    "require_holdout": true
+  },
+  "fit": [
+    {
+      "label": "SYNTHETIC-point-0",
+      "crash_raw": [
+        0,
+        0,
+        0
+      ],
+      "mario_position": [
+        10.0,
+        20.0,
+        -30.0
+      ],
+      "crash_level": 9,
+      "crash_epoch": 1,
+      "mario_level": 16,
+      "mario_area": 1,
+      "mario_epoch": 7,
+      "provenance": "SYNTHETIC",
+      "correspondence_declared": true
+    },
+    {
+      "label": "SYNTHETIC-point-1",
+      "crash_raw": [
+        25600,
+        5120,
+        0
+      ],
+      "mario_position": [
+        10.0,
+        60.0,
+        -230.0
+      ],
+      "crash_level": 9,
+      "crash_epoch": 1,
+      "mario_level": 16,
+      "mario_area": 1,
+      "mario_epoch": 7,
+      "provenance": "SYNTHETIC",
+      "correspondence_declared": true
+    },
+    {
+      "label": "SYNTHETIC-point-2",
+      "crash_raw": [
+        0,
+        -2560,
+        25600
+      ],
+      "mario_position": [
+        210.0,
+        0.0,
+        -30.0
+      ],
+      "crash_level": 9,
+      "crash_epoch": 1,
+      "mario_level": 16,
+      "mario_area": 1,
+      "mario_epoch": 7,
+      "provenance": "SYNTHETIC",
+      "correspondence_declared": true
+    }
+  ],
+  "holdout": [
+    {
+      "label": "SYNTHETIC-point-3",
+      "crash_raw": [
+        25600,
+        0,
+        25600
+      ],
+      "mario_position": [
+        210.0,
+        20.0,
+        -230.0
+      ],
+      "crash_level": 9,
+      "crash_epoch": 1,
+      "mario_level": 16,
+      "mario_area": 1,
+      "mario_epoch": 7,
+      "provenance": "SYNTHETIC",
+      "correspondence_declared": true
+    },
+    {
+      "label": "SYNTHETIC-point-4",
+      "crash_raw": [
+        6400,
+        12800,
+        19200
+      ],
+      "mario_position": [
+        160.0,
+        120.0,
+        -80.0
+      ],
+      "crash_level": 9,
+      "crash_epoch": 1,
+      "mario_level": 16,
+      "mario_area": 1,
+      "mario_epoch": 7,
+      "provenance": "SYNTHETIC",
+      "correspondence_declared": true
+    }
+  ]
+}

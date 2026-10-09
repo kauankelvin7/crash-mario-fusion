@@ -89,3 +89,14 @@ During actual Crash gameplay, stand, walk different directions, jump, pause ~5 s
 **GitHub has**: authored code, test harnesses, workflow scripts, pinned source revisions, engineering contracts, sanitized findings and this handoff.
 
 **GitHub does not have**: purchased game files (CUE/BIN/CHD/Z64), private Windows `%LOCALAPPDATA%` caches, compiled game exes, Mesa app-local binaries, environment variables/secrets/session IDs, full private traces, saved games, or currently open process states. A clean clone is a reproducible *source* checkpoint, **not a ready-to-run installed game**.
+
+## Independent source-only reference proof
+
+Branch `feat/m3-reference-box` adds `Test-ReferenceGeometry.ps1`: after the
+existing setup, test authored c1 single-leaf geometry against native Mario
+surface queries without launching either game. Five new tests passed in
+Cloud; this new Windows script still needs local execution. The two native
+support algorithms disagree on overlapping boxes; no solver was replaced.
+This does not resolve the M3.2 runtime packet/graphics gate above. The next
+real experiment remains a fresh authorized Crash diagnostic capture on the
+new PC, then proving a coherent post-physics seam and geometry/frame ownership.

@@ -4,6 +4,13 @@
 > `docs/STATUS.md`, `docs/EVIDENCE.md`, `docs/CONTRACT.md`, `docs/DECISIONS.md`
 > and `docs/WINDOWS.md` before editing. Continue the existing project, not a new implementation.
 
+**Source-only follow-up branch `feat/m3-reference-box`:** authored top-boundary
+converter and exact c1-reference/Mario query comparison implemented, based on
+latest migration checkpoint a43ee9b. 54 Cloud Python checks (no skips), 58 Crash
+pose fixtures and 27 bridge fixtures pass. Overlap counterexample 40 vs 48
+prevents a general collision-equivalence claim. M3.2 diagnostic real Crash gate
+still requires the new Windows PC; no games launched by this increment.
+
 **Latest M3 continuation:** read M3_GEOMETRY_GATE and D006. Native loader/query
 oracle now uses unchanged pinned full-sm64ex collision code with authored
 triangles and isolated pools; 34 Cloud tests pass, with Linux ASan/UBSan for
@@ -194,3 +201,52 @@ NEXT IMPLEMENTATION BY CODEX: add Crash-only opt-in bounded continuous read-only
 
 ## M3.2 private Crash diagnostic observer handoff — 2026-10-09
 Codex produced an isolated read-only CMW1 Crash mod using a byte-span native RAM observer from RecompOne's controller polling seam, not proven postphysics. Reviewer verified 7/7 new Python, 49/49 full suite, 58/58 pinned native mod compiler/RAM/event-bus fixtures, 27/27 M2 fixtures and 17/17 native geometry fixtures, repaired the safe incomplete-private-build resumption logic and built a separate sealed Crash launcher (0 errors/warnings); only asset-free source code/tests/docs in worktree. Original pinned launcher and original M2 mod left untouched. Actual new Crash diagnostic gameplay/packets STILL NOT_TESTED. Run local operator test from WINDOWS.md to validate it, then re-audit unchanged original gameplay. Do not reclassify diagnostic pad polling as a coherent physics frame, nor infer Crash-to-Mario coordinate transform from unrelated live XYZ clouds. Future postphysics read seam, genuine frame identity, source collision geometry and engine-local pool ownership/capacity remain gates. PR draft, unmerged until proven.
+
+## Issue #5 P1/P2 handoff — 2026-10-09
+Implemented on existing `feat/m3-offline-preflight`, not PR #4's geometry branch.
+See `integration/observation_alignment.py` and `tools/estimate_calibration.py`;
+contracts and exact Cloud evidence are appended to CONTRACT/EVIDENCE/STATUS.
+65 Python tests, 58 Crash observer assertions, 27 M2 fixtures and 13 PowerShell
+ASTs pass; only source/fixture/math verification. No physics or game-state edits.
+
+On the new Windows PC, first run `./tools/windows/Test-OfflinePreflight.ps1`
+(PowerShell 7 + existing MSYS2 setup) for asset-free checks. For operator-declared
+private landmark JSON, use `python -m tools.estimate_calibration --input
+"<private-landmarks.json>"` from the repository in the configured Python shell.
+Use the tracked SYNTHETIC fixture as schema only; choose your own correspondences
+and tolerances, never reuse its scale/offsets as game facts. Keep inputs/telemetry
+and owned game files outside Git. Output must remain not-runtime-verified.
+
+Next real experiment requires explicit operator authorization: bounded separate
+Crash diagnostic and Mario post-update collections with original movement,
+pause and area/level transitions; a **single receiver clock** must timestamp both
+streams to use P1 (existing independent collector timestamps are incompatible).
+Explicitly bind sessions/observer epochs, select >=3 real noncollinear XZ
+correspondence marks plus independent holdout marks with identity/provenance,
+and inspect fitted residuals. This still cannot clear physical gates: prove
+Crash postphysics sampling and native generation ownership before declaring
+calibration valid, then observe genuine geometry provenance/occupancy/lifetime
+before any shared-world collision work. Do not restart M0/M1/M2, merge PRs or
+publish Release/ZIP while the worlds and physics remain separate.
+
+## M3.3 continuation — integration branch, not merged PRs (2026-10-09)
+Continue `feat/m3-integration-observer`, containing both PR #4 and #6 heads and
+M3.3 collector/composition code. All 70 prior tests are retained; 82 combined
+Python tests, 58 observer assertions and 27 M2 fixtures passed in Cloud.
+Do not merge #2/#4/#6, main or m0-recon. Keep pins/solver ownership unchanged.
+
+The missing common clock now exists in `tools.collect_observations`: passive
+single localhost receiver, explicit sessions and frames, no game launch or
+input channel. See WINDOWS.md three-terminal procedure and
+`Start-PairedObservation.ps1`; `Test-ReferenceGeometry.ps1 -FullSuite` runs all
+asset-free checks with pinned source. These Windows additions are NOT_TESTED.
+Observe startup/area epoch rejections, absence/timeout, sequence continuity,
+pause and level/area transitions privately. CLI never auto-rebinds; restart a
+reviewed session with both emitters or use explicit API rebind. Silence does not
+prove pause and receipt proximity does not prove source/physics synchronization.
+
+Estimation-to-authored-geometry composition now verifies levels/area/epochs,
+retains all s16/material/capacity gates and never inserts a collider. Real
+calibration/geometry remain blocked until genuine correspondence, proven Crash
+postphysics/native-generation ownership and observed live collision provenance/
+occupancy/lifetime. No new commercial data, gameplay verification or Release.
