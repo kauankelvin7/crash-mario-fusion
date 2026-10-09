@@ -42,3 +42,7 @@ Continuation after M0: branch published to `origin/m0-recon`, preserving `6e21f4
 - VERIFIED_SYNTHETIC Windows: 25/25 bridge/probe assertions and 6/6 Python regression tests passed. New diagnostic reads the native Crash player position/velocity/state/air/ground flags for 3.5 seconds after a pulse, with no game memory writes. See EVIDENCE and WINDOWS for exact fields and oracle.
 - NOT_VERIFIED: Crash actually leaving the floor and landing in reaction to Mario, shared world/physics/collisions/camera, audio and overall playability. Do not mark the fusion playable or publish Releases.
 - Next: one real keyboard-armed paired run; correlate `coin`, `received`, `input_applied`, `motion_sample`, `motion_summary`, plus direct visual movement. Only then plan the minimal shared-world prototype.
+
+## Native Windows movement confirmed (2026-10-09)
+
+Real Windows session `20261009-151351-877`: Mario two native coin events reached Crash; first applied native controller Cross, second was observe-only. Live Crash guest player object provided 22 movement samples with raw vertical position climbing from 1387515 to 1546674 and returning to 1387507, AIR flag transitioning true then false and GROUNDLAND returning. Classification: VERIFIED_REAL for recorded guest jump and landing sequence following cross-game input. A control run and independent visual confirmation would strengthen causal attribution. Unified world, collisions, camera and final playable fusion are NOT IMPLEMENTED; no release. Full values in EVIDENCE.md.
