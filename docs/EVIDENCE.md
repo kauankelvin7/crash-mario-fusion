@@ -72,3 +72,9 @@ All game data stayed in an ignored private cache / local Downloads; none was cop
 - Both game runtimes reported missing WASAPI audio endpoint during the remote test. Actual sound, visible gameplay fidelity, physics, coin effects, Crash jump and landing remain NOT_TESTED. Software GL may be slow and is only a test fallback.
 
 The next precise test is a human-observed Mario yellow coin pickup, correlated to Crash's `received` log with distinct session sequence, followed by a guarded `-Apply` run and visual/native-state evidence of Crash jump and landing. Avoid inventing those results. See [WINDOWS.md](WINDOWS.md) and [STATUS.md](STATUS.md).
+
+## 2026-10-09 — Native Mario coin received by native Crash on Windows
+
+Session `20261009-142540-868`, real game runtimes, passive `Apply=False`: Mario recorded `coin seq=1` / `seq=2` at native ticks 6080/6081 and `coin seq=3` / `seq=4` at ticks 13483/13513. The live Crash runtime logged the corresponding `received seq=1..4` followed by `observe-only/drop` for every event. This is **VERIFIED_REAL for native coin observation and cross-runtime loopback receipt**, not for automated jump or shared-world rendering. Original game files and log transcripts remain local; no game data uploaded.
+
+Keyboard-only enhancement `5aac846`: `-Apply -KeyboardArm` arms one Cross pulse for up to 60 seconds after pressing and releasing Crash R1 (default keyboard W), with single-use, Start, level-change, and expiry guards. Windows native fixture tests **21/21 PASS**, Python tests **6/6 PASS**, script AST **0 errors**. A live Windows run logged `keyboard_arm=True` and multiple `keyboard armed crash_level=9` events. **No live `input_applied`, actual Crash jump or landing verified yet.**
