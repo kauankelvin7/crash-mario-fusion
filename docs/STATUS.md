@@ -121,3 +121,7 @@ Overlapping support differs (c1 reference 40 vs Mario 48), blocking general
 equivalence. New Windows test script NOT_TESTED; no game/old PC executed.
 M3.2 actual Crash diagnostic packets remain pending on the new computer, then
 coherent post-physics sampling/geometry provenance/calibration/capacity gates.
+
+Implementation published in [draft PR #4](https://github.com/kauankelvin7/crash-mario-fusion/pull/4),
+base feat/m3-coordinate-contract. Source-only CI 37987762871 PASS for1571f25.
+Original main, m0-recon and base feature remain unmerged.

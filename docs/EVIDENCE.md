@@ -317,3 +317,9 @@ No M0/M1/M2 restart, no games launched or commercial files downloaded.
 All new results **VERIFIED_SYNTHETIC**. New Windows script **NOT_TESTED**;
 real Crash pose/graphics/post-physics/geometry/capacity gates remain dependent
 on the new computer. No state/input writes or physics replacements implemented.
+
+Published commits `2dad120` and `1571f25`; [draft PR #4](https://github.com/kauankelvin7/crash-mario-fusion/pull/4)
+targets **feat/m3-coordinate-contract**, verified through GitHub API.
+[Hosted CI 37987762871](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37987762871)
+completed **success** for `1571f254c6803bb45e6962eace5dc5677cdc79d5`.
+No merge or original-game execution performed.
