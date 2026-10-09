@@ -226,3 +226,13 @@ pose synchronization and gameplay **NOT_TESTED/UNIMPLEMENTED**. Original
 commercial files and private Windows traces remain off Git; no remote PC used.
 Hosted workflow now checks pinned public sm64ex and runs the native oracle;
 explicitly configured missing sources/compiler fail rather than skip.
+
+Published code commit **857a6a13260678ac9cdeda3d290320177821d3e8**; draft
+[PR #2](https://github.com/kauankelvin7/crash-mario-fusion/pull/2) updated via
+REST after the local gh editor hit the deprecated Projects-classic query.
+[Hosted CI 37959761599](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37959761599)
+conclusion **success**, with public-source checkout and test steps successful
+according to the jobs API. Individual hosted logs could not be downloaded:
+proxy denied `results-receiver.actions.githubusercontent.com`; exact test
+counts above come from the Cloud-local log, not that unavailable archive.
+No merge, remote Windows execution or release performed.

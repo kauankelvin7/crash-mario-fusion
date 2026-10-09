@@ -86,3 +86,8 @@ D006 records fresh Crash octree-vs-Mario triangle evidence and conditional
 Astra recommendation. Live geometry/collisions/rendering remain unimplemented.
 Next: source-only authored box oracle, then authorized private Windows layout,
 XYZ/calibration and pool/lifecycle observations before a real collision slice.
+
+Published implementation `857a6a1`, draft PR #2 updated (base m0-recon).
+Hosted source-only CI [37959761599](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37959761599)
+passed; job/test-step success verified via API. Detailed hosted log download
+is proxy-blocked; local test evidence above is retained. No main merge.
