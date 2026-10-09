@@ -89,3 +89,14 @@ Retain native solver ownership and source volume metadata. Do not generalize
 triangle replicas as equivalent Crash collision or infer retail material IDs.
 No repeated Astra review or live architecture change. Source-coordinate compact
 overflow is rejected before transformation, including compensated FrameMaps.
+
+## D008 (2026-10-09): M3.3 passive receipt and scoped offline composition
+Consolidate PR #4/#6 unchanged heads into a separate integration branch. Receive
+both CMW1 emitters on one localhost socket with one receiver monotonic clock,
+independent sessions/descriptors, fixed counters and finite private output.
+No sender launch, inferred latency, native-tick alignment or auto-rebind. Preserve
+P1 physical gates and original native solvers. Passing an estimated FrameMap
+alone drops identity metadata, so the optional P2→authored-P3 composition checks
+complete observer scope and synthetic provenance, then reuses existing native
+numeric/material/capacity preflight. Operator estimates do not authorize real
+geometry. No new engine architectural decision or equivalent Astra review needed.

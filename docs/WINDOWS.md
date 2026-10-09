@@ -196,3 +196,76 @@ cache changes, and executes five authored reference-boundary checks against
 existing public sm64ex source. No ROM/disc or game process is used. Linux
 ASan/UBSan and PowerShell parsing do not certify this new Windows script;
 actual native execution remains NOT_TESTED until run locally.
+
+## M3.3: paired receiver on the new PC (not yet executed on Windows)
+
+Asset-free combined checks: PowerShell 7,
+`./tools/windows/Test-ReferenceGeometry.ps1 -FullSuite` (both pinned public source
+oracles; no retail files). `Test-OfflinePreflight.ps1` also includes new collector
+and composition tests. Native MinGW Python for capture is separate from source
+checks: if absent, install `mingw-w64-x86_64-python` with the existing MSYS2 package
+manager. No new private native game build is claimed by these scripts.
+
+Only when the operator chooses to run the original games locally, use **three
+PowerShell terminals**. Do not run either old individual collector concurrently:
+they bind their own ports, launch their own processes and timestamp different clocks.
+
+1. From the repo, start the passive receiver. Substitute operator-declared expected
+   native level/area/observer epochs; they are inputs, not automatically observed
+   facts. Choose receipt-age/gap tolerances explicitly; do not interpret them as
+   physical latency. These shell variables must be assigned before the call:
+
+   ```powershell
+   ./tools/windows/Start-PairedObservation.ps1 -CrashLevel $expectedCrashLevel -MarioLevel $expectedMarioLevel -MarioArea $expectedMarioArea -CrashEpoch $expectedCrashEpoch -MarioEpoch $expectedMarioEpoch -MaxAgeNs $receiptAgeLimitNs -MaxGapNs $receiptGapLimitNs -Port 39100 -Seconds 120
+   ```
+
+   The script prints the private JSON config path and `READY`. Copy **only that
+   path** to the other terminals; wait for READY before starting emitters. The
+   script creates independent fresh sessions and runs no game. Expect rejection
+   until the declared frames match; a native startup/area transition can change
+   the observer epoch. Inspect `observed.identity` and rejection/status rows
+   locally rather than trusting a hardcoded epoch.
+
+2. Mario terminal, from the repo, after inspecting the config:
+
+   ```powershell
+   $python = 'C:/msys64/mingw64/bin/python.exe'
+   $env:PATH = 'C:/msys64/mingw64/bin;' + $env:PATH
+   $cfg = Get-Content -Raw '<private-config-path>' | ConvertFrom-Json
+   Get-ChildItem Env:CM64_* | Remove-Item
+   $env:CM64_POSE_ENABLE = '1'
+   $env:CM64_POSE_SESSION = $cfg.sources.mario.session
+   $env:CM64_POSE_PORT = '39100'
+   & '<existing-private-instrumented-Mario.exe>'
+   ```
+
+3. Crash terminal, from the repo, using the existing sealed diagnostic build and
+   an owned local disc (no download or rebuild of retail data):
+
+   ```powershell
+   $python = 'C:/msys64/mingw64/bin/python.exe'
+   $env:PATH = 'C:/msys64/mingw64/bin;' + $env:PATH
+   $cfg = Get-Content -Raw '<private-config-path>' | ConvertFrom-Json
+   Get-ChildItem Env:CM64_* | Remove-Item
+   $env:CM64_CRASH_POSE_ENABLE = '1'
+   $env:CM64_CRASH_POSE_SESSION = $cfg.sources.crash.session
+   $env:CM64_CRASH_POSE_PORT = '39100'
+   $exe = & $python -c 'from tools.collect_crash_pose import checked_launcher; print(checked_launcher())'
+   if ($LASTEXITCODE -ne 0) { throw 'Diagnostic build validation failed.' }
+   & $exe --run '<owned-private-Crash.cue>'
+   ```
+
+Observe original movement and mark pause/resume/level-area transitions manually.
+Receiver stops at the time/packet budget or Ctrl+C; it does **not** terminate the
+separately launched games. Close them yourself. Local `observations.jsonl` and
+`summary.json` include sequence holes, receipt gap/age, independent identities,
+rejection reasons and `source_delay=UNKNOWN`. Frames/gaps/pauses invalidate one
+source; CLI never auto-rebinds. To recover, end the session and start a new
+explicitly configured receiver **and both emitters with its new sessions**; API
+users may instead perform a reviewed per-engine rebind. Do not edit config while
+capture is active. Never upload these logs, session config, executables or discs.
+
+This procedure is **NOT_TESTED on native Windows** for M3.3. Even comparable
+observations leave physical status BLOCKED. Proven Crash postphysics ownership,
+native frame generations, actual landmark correspondence and authentic geometry/
+material/pool lifecycle evidence are still required before shared collisions.

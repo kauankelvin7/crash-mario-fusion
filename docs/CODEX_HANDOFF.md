@@ -228,3 +228,25 @@ Crash postphysics sampling and native generation ownership before declaring
 calibration valid, then observe genuine geometry provenance/occupancy/lifetime
 before any shared-world collision work. Do not restart M0/M1/M2, merge PRs or
 publish Release/ZIP while the worlds and physics remain separate.
+
+## M3.3 continuation — integration branch, not merged PRs (2026-10-09)
+Continue `feat/m3-integration-observer`, containing both PR #4 and #6 heads and
+M3.3 collector/composition code. All 70 prior tests are retained; 82 combined
+Python tests, 58 observer assertions and 27 M2 fixtures passed in Cloud.
+Do not merge #2/#4/#6, main or m0-recon. Keep pins/solver ownership unchanged.
+
+The missing common clock now exists in `tools.collect_observations`: passive
+single localhost receiver, explicit sessions and frames, no game launch or
+input channel. See WINDOWS.md three-terminal procedure and
+`Start-PairedObservation.ps1`; `Test-ReferenceGeometry.ps1 -FullSuite` runs all
+asset-free checks with pinned source. These Windows additions are NOT_TESTED.
+Observe startup/area epoch rejections, absence/timeout, sequence continuity,
+pause and level/area transitions privately. CLI never auto-rebinds; restart a
+reviewed session with both emitters or use explicit API rebind. Silence does not
+prove pause and receipt proximity does not prove source/physics synchronization.
+
+Estimation-to-authored-geometry composition now verifies levels/area/epochs,
+retains all s16/material/capacity gates and never inserts a collider. Real
+calibration/geometry remain blocked until genuine correspondence, proven Crash
+postphysics/native-generation ownership and observed live collision provenance/
+occupancy/lifetime. No new commercial data, gameplay verification or Release.

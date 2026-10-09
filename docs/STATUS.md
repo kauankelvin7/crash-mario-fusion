@@ -141,3 +141,22 @@ files used, no physics/input/collision modifications. Physical synchronization
 and calibration remain **BLOCKED**. M3.2 remains diagnostic; no new VERIFIED_REAL
 evidence, native collider or shared playable world. PR #4 is separate and Issue
 #3 is not declared complete. Do not merge main or publish a playable Release.
+
+## M3.3 — consolidated integration and native observation preparation (2026-10-09)
+`feat/m3-integration-observer` starts at real base a43ee9b and contains complete
+PR #4 head 0cdc0ea and PR #6 head b74b6c7 by local branch merges. Both historical
+document sections survive conflicts; GitHub PRs remain unmerged. Main/m0-recon
+and original native physics/input adapters are unchanged. One discover-based CI
+runs both pinned sm64ex and c1 sources plus all CMW1/calibration tests.
+
+Implemented passive common-clock two-engine CMW1 collector with fixed counters,
+finite private logs, independent bindings and source-loss/age/continuity/frame/
+pause diagnostics; explicit geometry composition now checks estimation scope
+before applying the authored reference converter. Invalid descriptor sizes now
+raise controlled ValueError. No automatic transition matching, input writes,
+real collider or gameplay claim. **VERIFIED_SYNTHETIC**: 82/82 Python tests (all
+70 consolidated previous tests + 12 new), 58/58 Crash observer assertions,
+27/27 M2 fixtures, 15 PowerShell ASTs; both public collision oracles run with
+Linux ASan/UBSan. New Windows workflow/paired runtime collection **NOT_TESTED**.
+Physical synchronization/calibration remain **BLOCKED**. Next: operator-run
+three-terminal passive receipt experiment on new Windows PC, per WINDOWS.md.

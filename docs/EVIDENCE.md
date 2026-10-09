@@ -357,3 +357,49 @@ above remains historical and is not a new run. Local transient logs stay outside
 Git. Runtime frame/landmark provenance, true Crash postphysics ownership, pause
 causality/area transitions and shared gameplay remain **BLOCKED** pending an
 operator-controlled Windows experiment on the new PC.
+
+## M3.3 combined Cloud verification — 2026-10-09
+Real integration base a43ee9b. Local merge commits ca9e8fe (PR #4 head 0cdc0ea)
+and 44e4c32 (PR #6 head b74b6c7), implementation 659c12d. Conflicts only appended
+STATUS/EVIDENCE sections; retained both. `git merge-base --is-ancestor` confirms
+both heads and the base are ancestors. Original PR test modules and native
+fixture C sources are unchanged, retaining overlap counterexample c1=40/Mario=48.
+Pins remain sm64ex `d7ca2c04364a6dd0dac58b47151e04e26887e6f0` and
+c1 `256fdcef59f15a190290cc19db3fa9a707843b69`.
+
+Executed Linux checks (no commercial files or game launches):
+
+- `CM64_SM64EX_ROOT=/workspace/.cache/crash-mario-m0/sm64ex
+  CM64_C1_ROOT=/workspace/.cache/crash-mario-m0/c1
+  python -m unittest discover -s tests -v`: baseline consolidated **70 PASS**;
+  after M3.3 **82 PASS**, no skips. Original public collision source fixture
+  probes include ASan/UBSan. New tests use actual two-engine fixture UDP loopback
+  into one receiver clock plus deterministic failure/lifecycle/math composition.
+- Same cached .NET 10.0.401 observer fixture command documented in Issue #5:
+  **58 assertions PASS**; `bash tools/check_integration.sh`: **27 checks PASS**.
+  These compile real adapters around fixture RAM; never original gameplay.
+- PowerShell 7.5.4 parser on Linux: **15 ASTs PASS**, including passive
+  Start-PairedObservation and the optional combined FullSuite check. Native
+  Windows script execution is **NOT_TESTED**.
+- `git diff --check`: PASS. Combined workflow uses one full-suite invocation,
+  both unchanged pins, read-only permissions and PR target coordinate-contract.
+
+Identified integration gap: standalone FrameMap lacked epoch/area provenance
+at the geometry API boundary. New estimated_top_boundary checks complete scope,
+rejects operator/native interpretations, and preserves blocked gates. Valid
+pose math is deliberately rejected when s16 geometry collapses, padded heights
+or pool capacity fail. Descriptor size/engine validation now rejects malformed
+config/rebind values before struct unpack instead of leaking struct.error.
+
+New private receiver logs are <=300 seconds / 10,000 datagrams plus <=10 Hz
+status, with only two poses and fixed counters in memory. Sequence holes denote
+unaccepted sequences, not proven loss; source delay is UNKNOWN. Native Crash
+observer remains phase 0 / pad callback, not postphysics. All M3.3 outcomes are
+**VERIFIED_SYNTHETIC**; no new real-game evidence or calibrated shared world.
+
+Independent read-only M3.3 QA caught a Windows junction-path privacy gap in the
+new wrapper; both private root and checkout now use Python Path.resolve before
+any configuration write. Reviewer confirmed correction and final gate PASS.
+Full final suite again **82 PASS**, 15 PowerShell ASTs PASS. Full diff/ancestry/
+unchanged previous test sources checked; native Windows junction/runtime behavior
+remains NOT_TESTED. No Astra invocation or native physics change was needed.

@@ -159,3 +159,40 @@ holdouts recover zero float32 residuals. Output is
 Operator data instead returns `OPERATOR_SUPPLIED_NOT_RUNTIME_VERIFIED` with the
 same gates: Crash postphysics, native frame identity, runtime correspondence,
 and shared collisions/gameplay remain unverified. Keep operator inputs private.
+
+## M3.3 consolidation: paired observation and scope-preserving composition
+
+`tools.collect_observations` is a **passive**, finite IPv4 loopback receiver. Both
+native emitters send to the same explicitly chosen port. Each retains its own
+session and descriptor. The receiver uses exactly one `time.monotonic_ns()`
+clock, stamped immediately after `recvfrom`, before decoding or writing logs.
+It never launches a game, sends packets, forwards input or changes engine state.
+Config (<=4 KiB) declares `schema_version=1`, `sources.crash/mario.session` and
+`.frame` (16-byte hex), `max_age_ns` and `max_gap_ns`. No binding is inferred from
+UDP. Unknown/new frames are logged and invalidated, not automatically adopted.
+
+Two CMW1 pose slots and fixed per-engine/reason counters are retained. Capture
+is <=300 s / <=10,000 datagrams, with <=10 Hz status rows; rejected/oversized
+packets consume the budget. Logs and configuration are private, outside Git.
+Source disappearance/expiration is diagnosed even without new datagrams. Accepted
+sequence holes and interarrival gaps provide continuity diagnostics; a hole may
+mean dropped or **rejected** packets, not proven network loss. Receipt age/separation
+are not source delay: buffering or stalled senders cannot be measured with CMW1's
+local native ticks, so `source_delay=UNKNOWN`. Native ticks are recorded only with
+engine-local meaning (Crash callback ordinal), never compared or unwrapped.
+A long gap, pause flag, or frame transition still requires explicit P1 rebinding;
+the passive CLI stops comparisons for that source rather than silently resuming.
+API rebind preserves same-session sequence high-water marks; a fresh session
+resets only that engine's ordering/arrival baseline, retaining aggregate diagnostics.
+Native emitters normally suppress paused frames; silence cannot certify a pause.
+
+`tools.volume_boundary.estimated_top_boundary` composes P2 and the PR #4 authored
+boundary converter without discarding scope. It checks Crash level/epoch and
+Mario level/area/epoch against the estimate, and permits only explicitly synthetic
+math + authored c1 leaves. Operator/unverified real landmark estimates are not
+permission to convert live geometry. Legacy explicit FrameMap preview API remains
+available with its existing synthetic interpretation. A valid float32 pose fit
+can still fail native s16 truncation, normal/padded-height arithmetic or pool
+capacity; those P3 gates run again. No live surfaces, materials, full-volume
+semantics or physical alignment are certified. All composed output keeps
+`calibration_ready=false`, `physical_status=BLOCKED`, `live_collision_inserted=false`.

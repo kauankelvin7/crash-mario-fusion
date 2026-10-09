@@ -21,7 +21,9 @@ $env:PATH = (Join-Path $MsysRoot 'mingw64/bin') + ';' + $env:PATH
 $root = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/telemetry'))
 $root = & $python -c 'import sys; from pathlib import Path; print(Path(sys.argv[1]).resolve())' $root
 if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve private configuration directory.' }
-$relative = [IO.Path]::GetRelativePath($TaskRepo, $root)
+$canonicalRepo = & $python -c 'import sys; from pathlib import Path; print(Path(sys.argv[1]).resolve())' $TaskRepo
+if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve repository directory.' }
+$relative = [IO.Path]::GetRelativePath($canonicalRepo, $root)
 if ($relative -eq '.' -or (-not [IO.Path]::IsPathRooted($relative) -and $relative -ne '..' -and -not $relative.StartsWith('..\') -and -not $relative.StartsWith('../'))) {
     throw 'Keep private receiver configuration outside Git.'
 }
