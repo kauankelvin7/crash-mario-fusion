@@ -152,3 +152,18 @@ conditions pass; include a no-insertion control and reload cleanup when ready.
 `Test-Geometry.ps1` now passes **17/17** on the configured Windows 11 / MSYS2 MINGW64 machine. The first local run exposed a PE/COFF linker portability difference: unused full-game dependencies retained by MinGW caused undefined references despite `--gc-sections`. The isolated test harness now supplies **Windows-only abort-on-call stubs** for those unrelated paths. It continues to compile and exercise the **original pinned** sm64ex surface loader and `find_floor`; if an unrelated stub is called, the test aborts instead of reporting a fabricated result. The complete Python suite passed **34/34**, and `Test-Integration.ps1` passed **27/27** using fixture RAM. These are synthetic results, not a real-world collision test. The original checkout and game processes were left untouched.
 
 The real XYZ/calibration procedure above is still pending and requires a paired game session and operator-confirmed landmarks. Never use the authored synthetic oracle coordinates as live calibration anchors.
+
+## M3.1 private native Mario pose capture (first half of two-engine telemetry)
+Windows 11 x64: opt-in, rate-limited (at most 10 Hz), read-only **Mario** pose frames emitted from the post-update native gameplay seam. No Crash continuous pose emitter yet; M2 CMJ1 and existing Crash jump tests are independent. Native Mario level+area IDs and an observer-local epoch travel in the 16-byte CMW1 frame field; the epoch is NOT authoritative engine frame generation. The emitter invalidates its frame across pause/area changes and refuses unavailable states. Limit 300 seconds and 3000 samples per run, to UDP 127.0.0.1 only, with no network replay or gameplay modification. Logs and the authorized retail ROM stay in LOCALAPPDATA outside Git.
+
+From the isolated project worktree in **PowerShell 7**, after a successful Build-Integration.ps1 (on your own cached validated Mario ROM):
+
+```powershell
+cd 'C:/Users/Kauan/Projects/crash-mario-fusion-m3'
+$env:PATH = 'C:/msys64/mingw64/bin;' + $env:PATH
+$env:GALLIUM_DRIVER = 'llvmpipe' # only on the verified Intel-HD local Mesa software-GL setup
+$marioExe = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M0/sm64ex-cm64/build/us_pc/sm64.us.f3dex2e.exe'
+& 'C:/msys64/mingw64/bin/python.exe' -m tools.collect_pose --mario-exe $marioExe --seconds 90 --count 800
+```
+
+The collector launches exactly one Mario child with CM64_POSE_ENABLE=1 and a fresh random session, writes snapshots.jsonl/mario.log/summary.json into LOCALAPPDATA/CrashMarioFusion/telemetry/<random-folder>, and closes the child at timeout, count or Ctrl+C. This session has **not yet been run with the new emitter**; successful source/native compilation is NOT live-game proof. For a real gate the operator must move Mario while playing, confirm actual native level and area, pause/area transition behavior, and visually verify normal original gameplay. Never commit the retail files or telemetry. No calibration is automatic and no shared physics is implied. Original M2 session and runner remain separate.
