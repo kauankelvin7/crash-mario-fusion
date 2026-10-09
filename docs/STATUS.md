@@ -160,3 +160,7 @@ real collider or gameplay claim. **VERIFIED_SYNTHETIC**: 82/82 Python tests (all
 Linux ASan/UBSan. New Windows workflow/paired runtime collection **NOT_TESTED**.
 Physical synchronization/calibration remain **BLOCKED**. Next: operator-run
 three-terminal passive receipt experiment on new Windows PC, per WINDOWS.md.
+
+## M3.5 — local private paired-capture consistency audit (2026-10-09)
+
+Branch `feat/m35-capture-audit` from verified M3.4 source-only Windows CI head adds `tools/audit_paired_capture.py`, bounded self-consistency inspection of a finished private paired receiver JSONL + summary, and deterministic regression tests. It validates clock-domain monotonicity, two-engine admitted-sequence holes, receiver arrival gaps, counters, finite file/row budgets and fail-closed evidence labeling. Output contains anonymous aggregates only; it does NOT verify that packets originated from running games, measure source latency or validate postphysics/native area generations. Original adapters, game behavior, public pins and original private files remain unchanged. Local Windows original-game paired receiver experiment, authentic correspondences, and native collision/rendering remain BLOCKED. See docs/M35_CAPTURE_AUDIT.md. GitHub Actions CI for this increment must be checked separately before classifying regression status. Keep PR draft and unmerged.
