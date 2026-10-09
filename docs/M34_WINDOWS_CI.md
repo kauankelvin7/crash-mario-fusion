@@ -4,6 +4,8 @@ This is a **source-only compatibility gate**, not gameplay integration. The base
 
 The new workflow `.github/workflows/windows-native-source-checks.yml` runs on hosted Windows x64 when a PR targets `feat/m3-coordinate-contract`. It uses the documented MSYS2 MINGW64 toolchain (native Python and GCC), checks out pinned public `sm64ex` and `c1`, parses the existing Windows PowerShell scripts without executing them, and runs the complete `python -m unittest discover -s tests -v` suite. Python test modules compile and run their isolated original public-source C geometry oracles. No ROM, CUE/BIN, CHD, game executable, nonpublic assets or private telemetry are available in this runner.
 
+The workflow also checks out pinned public RecompOne Crash launcher sources (Matteo842/CrashBandicoot-Launcher at `224da775`) and uses .NET SDK `10.0.401` to compile/run the original event-bus/RAM mod fixture harness. A successful harness run confirms only source-only C# adapter behavior under Windows. It does not build or start the private launcher and cannot read a commercial game.
+
 **Evidence levels:**
 - A successful Windows Actions run establishes **VERIFIED_SYNTHETIC (Windows x64)** for the source fixtures and confirms relevant tools compile/run on Windows. It does *not* establish VERIFIED_REAL.
 - Linux ASan/UBSan results from PR #7 remain independent; the Windows GCC tests intentionally run without ASan/UBSan.
