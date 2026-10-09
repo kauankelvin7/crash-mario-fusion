@@ -49,8 +49,10 @@ def preflight_mesh(*, vertices, triangles, frame_map, crash_level, mario_frame,
         raise ValueError("Explicit Mario area/frame identity is required")
     if not isinstance(vertices, (list, tuple)) or not isinstance(triangles, (list, tuple)):
         raise ValueError("Vertex and triangle arrays are required")
-    if not 3 <= len(vertices) <= 65535 or not 1 <= len(triangles) <= 65535:
-        raise ValueError("Candidate mesh size outside conservative preflight limits")
+    # Defensive offline preview limits only, NOT an available native surface budget.
+    # The original sm64ex allocator has ineffective per-pool overrun checks.
+    if not 3 <= len(vertices) <= 4096 or not 1 <= len(triangles) <= 512:
+        raise ValueError("Candidate mesh size outside bounded offline preflight limits")
 
     source = tuple(vector(point) for point in vertices)
     target = tuple(frame_map.to_mario(point) for point in source)
@@ -72,6 +74,12 @@ def preflight_mesh(*, vertices, triangles, frame_map, crash_level, mario_frame,
 
         original_normal, source_double_area = _normal(tuple(source[i] for i in indices))
         mapped_normal, target_double_area = _normal(tuple(target[i] for i in indices))
+        # Native sm64ex Surface vertices are signed Vec3s, not f32. Simulate a
+        # conservative C-style truncation; a mapped f32 triangle might collapse
+        # once vertices become s16. This does NOT write or allocate a Surface.
+        quantized = tuple(tuple(math.trunc(component) for component in target[i])
+                          for i in indices)
+        quantized_normal, quantized_double_area = _normal(quantized)
         # Positive uniform scale and Y-axis rotation must preserve triangle
         # winding. No implied relationship to any native material/collision id.
         expected_normal = frame_map._rotate(original_normal)
@@ -80,17 +88,24 @@ def preflight_mesh(*, vertices, triangles, frame_map, crash_level, mario_frame,
         orientation_cosine = dot / (target_double_area * expected_magnitude)
         if not math.isfinite(orientation_cosine) or orientation_cosine <= 0:
             raise ValueError("Mapping changed triangle orientation or collapsed its normal")
+        quantized_dot = sum(a*b for a, b in zip(quantized_normal, expected_normal))
+        if not math.isfinite(quantized_dot) or quantized_dot <= 0:
+            raise ValueError("Native s16 vertex quantization changes orientation")
         previews.append({
             "indices": indices,
             "source_double_area": source_double_area,
             "mapped_double_area": target_double_area,
+            "s16_trunc_double_area": quantized_double_area,
             "orientation_cosine": min(1.0, orientation_cosine),
+            "s16_trunc_vertices": quantized,
         })
 
     return {
         "interpretation": "SYNTHETIC_GEOMETRY_PREFLIGHT_ONLY",
         "engine_collision_inserted": False,
         "engine_rendering_inserted": False,
+        "native_surface_pool_capacity_verified": False,
+        "native_material_and_room_verified": False,
         "frame_identity": "OPERATOR_SUPPLIED_NOT_RUNTIME_VERIFIED",
         "crash_level": crash_level,
         "mario_frame": mario_frame,
