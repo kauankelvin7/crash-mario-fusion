@@ -269,3 +269,7 @@ This procedure is **NOT_TESTED on native Windows** for M3.3. Even comparable
 observations leave physical status BLOCKED. Proven Crash postphysics ownership,
 native frame generations, actual landmark correspondence and authentic geometry/
 material/pool lifecycle evidence are still required before shared collisions.
+
+## M3.6 — guarded operator gameplay capture
+
+For the current Windows PC, `tools/windows/Run-PoseGate.ps1` provides an explicit one-game-at-a-time pose capture and a no-launch `-CheckOnly` preflight. Follow [M36_OPERATOR_GATE.md](M36_OPERATOR_GATE.md) for bounded commands, private data limits, real in-level movement steps, and strictly differentiated evidence labels. Source-only CI and successful OpenGL startup do **not** clear the live CMW1 frame, postphysics ownership, shared-coordinate or collision gates. Do not upload logs/game files or enable shared collision based on a successful preflight.
