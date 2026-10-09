@@ -1,5 +1,8 @@
 # PC migration / exact continuation checkpoint — 2026-10-09
 
+> **LATEST CONSOLIDATED SOURCE ON GITHUB (2026-10-09):** The chronological checkpoint below is M3.2 history, not the newest source checkout. M3.3 PR #7 combines both earlier geometry PR #4 and observation/calibration PR #6. M3.4 draft [PR #8](https://github.com/kauankelvin7/crash-mario-fusion/pull/8), branch `feat/m34-windows-source-ci`, builds on M3.3 and adds successful GitHub-hosted Windows x64 source-only checks (82 Python, 58 Crash native adapter assertions, 27 M2 native C sender/Crash bridge checks, 15 PowerShell parsed). **On the new PC, clone the newest branch if you want ALL of these unmerged changes:** `git clone --branch feat/m34-windows-source-ci https://github.com/kauankelvin7/crash-mario-fusion.git`. Then follow `docs/WINDOWS.md` and this document for private setup and your own legally obtained game files. Original `main`, `m0-recon` and `feat/m3-coordinate-contract` are intentionally older and unmerged. GitHub CI does not establish graphical or real-game runtime support. See `docs/M34_WINDOWS_CI.md`.
+
+
 ## Canonical remote checkpoint
 
 Repository: https://github.com/kauankelvin7/crash-mario-fusion
