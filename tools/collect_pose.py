@@ -61,6 +61,12 @@ class MarioCapture:
         return self.value
 
 
+def require_valid_capture(accepted):
+    """A successful process launch is not a verified native pose capture."""
+    if type(accepted) is not int or accepted <= 0:
+        raise RuntimeError('No valid Mario CMW1 pose; original gameplay observation NOT_VERIFIED. Consult private capture logs.')
+
+
 def collect(mario_exe, seconds=60, count=600):
     if os.name != 'nt':
         raise ValueError('This operator workflow requires native Windows')
@@ -132,6 +138,7 @@ def collect(mario_exe, seconds=60, count=600):
                    crash_continuous_emitter='pending',
                    freshness='receiver arrival only; source delay unknown')
     (folder/'summary.json').write_text(json.dumps(summary, indent=2)+'\n', encoding='utf-8')
+    require_valid_capture(accepted)
     print(f'Capture complete: {accepted} accepted, {rejected} rejected. Calibration remains gated.')
     return folder
 

@@ -34,5 +34,9 @@ if (-not (Test-Path -LiteralPath $dotnetPath)) {
     & $installer -Version '10.0.401' -Architecture x64 -InstallDir (Join-Path $TaskCache 'dotnet') -NoPath
 }
 Use-Dotnet
-Invoke-Msys 'pacman -S --needed --noconfirm git make python mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-glew' 'msys-packages.log'
+Invoke-Msys 'pacman -S --needed --noconfirm git make python mingw-w64-x86_64-python mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-glew' 'msys-packages.log'
+$nativePython = Join-Path $MsysRoot 'mingw64/bin/python.exe'
+if (-not (Test-Path -LiteralPath $nativePython)) { throw 'Required native MinGW64 Python not installed.' }
+& $nativePython -c 'import os; assert os.name == "nt", "Native MinGW64 Python required"'
+if ($LASTEXITCODE -ne 0) { throw 'Native MinGW64 Python validation failed.' }
 Write-Output "Setup completed locally; run Build.ps1. Logs: $TaskLogs"

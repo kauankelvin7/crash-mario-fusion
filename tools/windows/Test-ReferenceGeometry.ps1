@@ -24,5 +24,5 @@ foreach ($path in @($repo,$c1,$mario)) {
     if ($path.Contains("'")) { throw 'Paths containing a single quote are unsupported.' }
 }
 $check = if ($FullSuite) { 'discover -s tests -v' } else { 'tests/test_volume_boundary.py -v' }
-Invoke-Msys "cd '$repo' && export CM64_C1_ROOT='$c1' CM64_SM64EX_ROOT='$mario' && python -m unittest $check" 'reference-box-checks.log'
+Invoke-Msys "export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=input; cd '$repo' && export CM64_C1_ROOT='$c1' CM64_SM64EX_ROOT='$mario' && python -m unittest $check" 'reference-box-checks.log'
 Write-Output 'VERIFIED_SYNTHETIC: authored geometry, original reference queries, no game launched. New native Windows execution is not established by Cloud results.'

@@ -2,7 +2,7 @@ name: Windows asset-free native checks
 
 on:
   pull_request:
-    branches: [feat/m3-coordinate-contract, feat/m3-integration-observer]
+    branches: [feat/m3-coordinate-contract, feat/m3-integration-observer, feat/m34-windows-source-ci]
   workflow_dispatch:
 
 permissions:
