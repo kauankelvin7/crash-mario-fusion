@@ -78,3 +78,13 @@ The next precise test is a human-observed Mario yellow coin pickup, correlated t
 Session `20261009-142540-868`, real game runtimes, passive `Apply=False`: Mario recorded `coin seq=1` / `seq=2` at native ticks 6080/6081 and `coin seq=3` / `seq=4` at ticks 13483/13513. The live Crash runtime logged the corresponding `received seq=1..4` followed by `observe-only/drop` for every event. This is **VERIFIED_REAL for native coin observation and cross-runtime loopback receipt**, not for automated jump or shared-world rendering. Original game files and log transcripts remain local; no game data uploaded.
 
 Keyboard-only enhancement `5aac846`: `-Apply -KeyboardArm` arms one Cross pulse for up to 60 seconds after pressing and releasing Crash R1 (default keyboard W), with single-use, Start, level-change, and expiry guards. Windows native fixture tests **21/21 PASS**, Python tests **6/6 PASS**, script AST **0 errors**. A live Windows run logged `keyboard_arm=True` and multiple `keyboard armed crash_level=9` events. **No live `input_applied`, actual Crash jump or landing verified yet.**
+
+## Windows real native input application — 2026-10-09
+
+The operator collected two SM64 coins in the real Windows apply-mode paired session 20261009-144206-583, with keyboard arm enabled and original/recompiled Crash running concurrently. Local ignored logs only; no game data in Git.
+
+- Mario native stderr: coin seq=1 native_tick=17208 coins=1; coin seq=2 native_tick=17209 coins=2; both sent 52-byte native messages.
+- Crash stdout: receiver ready port=53768 apply=True keyboard_arm=True; keyboard armed crash_level=9.
+- Crash stdout: received seq=1 at crash_level=9, then input_applied seq=1; received seq=2 at crash_level=9, then observe-only/drop seq=2.
+
+VERIFIED_REAL: Mario native pickup -> UDP event -> Crash native runtime reception -> guarded active-low controller Cross pulse, with one-shot arm honored. NOT_VERIFIED: Crash visually jumping/landing, grounded/velocity changes, shared-world simulation or camera. Input_applied does not prove an actual physical jump. Synthetic regression 21/21 and Python 6/6 passed for keyboard arm code. Next gate: observe and instrument Crash jump/landing during actual gameplay.
