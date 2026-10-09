@@ -25,11 +25,16 @@ class GeometryPreflightTests(unittest.TestCase):
         self.assertEqual(result["interpretation"], "SYNTHETIC_GEOMETRY_PREFLIGHT_ONLY")
         self.assertFalse(result["engine_collision_inserted"])
         self.assertFalse(result["engine_rendering_inserted"])
+        self.assertFalse(result["native_surface_pool_capacity_verified"])
+        self.assertFalse(result["native_material_and_room_verified"])
         self.assertEqual(result["vertices_mario_candidate"],
                          ((10.0, 20.0, 30.0), (14.0, 20.0, 30.0), (10.0, 20.0, 26.0)))
         self.assertEqual(result["triangles"][0]["indices"], (0, 1, 2))
         self.assertAlmostEqual(result["triangles"][0]["source_double_area"], 4)
         self.assertAlmostEqual(result["triangles"][0]["mapped_double_area"], 16)
+        self.assertEqual(result["triangles"][0]["s16_trunc_vertices"],
+                         ((10, 20, 30), (14, 20, 30), (10, 20, 26)))
+        self.assertAlmostEqual(result["triangles"][0]["s16_trunc_double_area"], 16)
         self.assertGreater(result["triangles"][0]["orientation_cosine"], 0.999)
 
     def test_needs_explicit_frame_identity_and_same_crash_level(self):
@@ -54,6 +59,14 @@ class GeometryPreflightTests(unittest.TestCase):
                 frame_map=FrameMap((0, 0, 0), (1000, 0, 1000), 1, 0),
                 vertices=[(0, 0, 0), (0, 0, 1e-8), (1e-8, 0, 0)]))
 
+    def test_rejects_float32_triangle_collapsing_in_native_s16_surface(self):
+        # Float32 preserves this triangle, but the original sm64ex Surface
+        # Vec3s integer vertex representation cannot represent it as a floor.
+        with self.assertRaisesRegex(ValueError, "degenerate"):
+            preflight_mesh(**fixture(
+                frame_map=FrameMap((0, 0, 0), (100, 0, 100), 1, 0),
+                vertices=[(0, 0, 0), (0, 0, 0.4), (0.4, 0, 0)]))
+
     def test_rejects_nonfinite_points_and_out_of_native_query_bounds(self):
         with self.assertRaises(ValueError):
             preflight_mesh(**fixture(vertices=[(0, 0, 0), (math.nan, 0, 2), (2, 0, 0)]))
@@ -66,7 +79,9 @@ class GeometryPreflightTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             preflight_mesh(**fixture(vertices=[]))
         with self.assertRaises(ValueError):
-            preflight_mesh(**fixture(vertices=[(0, 0, 0)]*65536))
+            preflight_mesh(**fixture(vertices=[(0, 0, 0)]*4097))
+        with self.assertRaises(ValueError):
+            preflight_mesh(**fixture(triangles=[(0, 1, 2)]*513))
 
     def test_no_game_material_ids_or_collisions_are_inferred(self):
         result = preflight_mesh(**fixture())
