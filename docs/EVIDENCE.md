@@ -236,3 +236,11 @@ according to the jobs API. Individual hosted logs could not be downloaded:
 proxy denied `results-receiver.actions.githubusercontent.com`; exact test
 counts above come from the Cloud-local log, not that unavailable archive.
 No merge, remote Windows execution or release performed.
+
+## M3 native Windows geometry oracle and source-only regression — 2026-10-09
+
+On the user's connected Windows 11 machine, checked out exact feature commit `cbaa67a` in an isolated clean Git worktree (`crash-mario-fusion-m3`) without changing the original checkout or starting either game. First execution of `tools/windows/Test-Geometry.ps1` failed at MinGW/PE-COFF link time: unrelated full-game references from pinned `surface_load.c` and `surface_collision.c` were not eliminated by section GC as they were on Linux. The captured linker output included `main_pool_alloc`, object/terrain helpers, debug helpers, vector helpers and engine globals. This is a Windows test-harness portability issue, not evidence of an original-game collision failure.
+
+Added Windows-only **fail-fast, unreachable dependency stubs** in `tests/native_geometry_probe.c` for unrelated full-game entry points. Any accidental call aborts the fixture rather than supplying simulated collision behavior. The original `read_surface_data`, `add_surface`, `find_floor`, partition and dynamic cleanup implementations remain compiled from the exact pinned upstream source. No game executable or upstream source was patched.
+
+After the fix, `Test-Geometry.ps1`: **17/17 PASS, exit 0** (including 2 native original-code oracle tests); `Test-Integration.ps1`: **27/27 PASS, exit 0** (fixture RAM); complete MSYS2 Python source suite with `CM64_SM64EX_ROOT` pinned: **34/34 PASS, exit 0**, no skips. All **VERIFIED_SYNTHETIC on native Windows**, not real geometry/physics in the games. Original M2 real jump evidence is unchanged. Authentic M3 XYZ, operator-chosen calibration, source collider semantics, native pool occupancy, real collision injection and shared renderer remain NOT_TESTED or UNIMPLEMENTED. No commercial data was uploaded; no game was started. Keep PR #2 draft.

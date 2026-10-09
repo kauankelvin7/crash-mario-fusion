@@ -146,3 +146,9 @@ validate source units separately from player XYZ. Observe Mario pool occupancy
 and dynamic cleanup/update ordering in the selected area. Confirm calibration
 and native motion visually. Do not inject even one replica until those gate
 conditions pass; include a no-insertion control and reload cleanup when ready.
+
+## M3 geometry oracle: native Windows validation (2026-10-09)
+
+`Test-Geometry.ps1` now passes **17/17** on the configured Windows 11 / MSYS2 MINGW64 machine. The first local run exposed a PE/COFF linker portability difference: unused full-game dependencies retained by MinGW caused undefined references despite `--gc-sections`. The isolated test harness now supplies **Windows-only abort-on-call stubs** for those unrelated paths. It continues to compile and exercise the **original pinned** sm64ex surface loader and `find_floor`; if an unrelated stub is called, the test aborts instead of reporting a fabricated result. The complete Python suite passed **34/34**, and `Test-Integration.ps1` passed **27/27** using fixture RAM. These are synthetic results, not a real-world collision test. The original checkout and game processes were left untouched.
+
+The real XYZ/calibration procedure above is still pending and requires a paired game session and operator-confirmed landmarks. Never use the authored synthetic oracle coordinates as live calibration anchors.

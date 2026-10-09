@@ -19,6 +19,48 @@ struct NumTimesCalled gNumCalls;
 static struct Surface surfaces[2];
 static struct SurfaceNode nodes[256];
 
+/* MinGW PE/COFF retains references from otherwise-unused original engine
+ * sections that ELF --gc-sections discards. Supply fail-fast link stubs ONLY
+ * for unrelated full-game entry points. If the exercised floor/loader path
+ * ever reaches one, the oracle aborts instead of fabricating a result.
+ * This fixture never changes or links these definitions into a game. */
+#if defined(_WIN32)
+__attribute__((noreturn)) static void unsupported_game_path(void) {
+    fputs("ORACLE ERROR: unexpected full-game dependency reached\n", stderr);
+    abort();
+}
+#define FAIL_CLOSED(ret, name, args) ret name args { unsupported_game_path(); }
+FAIL_CLOSED(void *, main_pool_alloc, (u32 size, u32 side))
+FAIL_CLOSED(void, reset_red_coins_collected, (void))
+FAIL_CLOSED(u32, get_special_objects_size, (s16 *data))
+FAIL_CLOSED(void, spawn_special_objects, (s16 areaIndex, s16 **specialObjList))
+FAIL_CLOSED(void, spawn_macro_objects_hardcoded, (s16 areaIndex, s16 *macroObjList))
+FAIL_CLOSED(void, spawn_macro_objects, (s16 areaIndex, s16 *macroObjList))
+FAIL_CLOSED(void, obj_build_transform_from_pos_and_angle, (struct Object *obj, s16 posIndex, s16 angleIndex))
+FAIL_CLOSED(void, obj_apply_scale_to_matrix, (struct Object *obj, Mat4 dst, Mat4 src))
+FAIL_CLOSED(void *, segmented_to_virtual, (const void *addr))
+FAIL_CLOSED(f32, dist_between_objects, (struct Object *obj1, struct Object *obj2))
+FAIL_CLOSED(void, print_debug_top_down_mapinfo, (const char *str, s32 number))
+FAIL_CLOSED(void, set_text_array_x_y, (s32 xOffset, s32 yOffset))
+FAIL_CLOSED(void *, vec3s_to_vec3f, (Vec3f dest, Vec3s a))
+FAIL_CLOSED(void *, vec3f_dif, (Vec3f dest, Vec3f a, Vec3f b))
+FAIL_CLOSED(void *, vec3f_cross, (Vec3f dest, Vec3f a, Vec3f b))
+FAIL_CLOSED(f32, vec3f_dot, (Vec3f a, Vec3f b))
+FAIL_CLOSED(void *, vec3f_copy, (Vec3f dest, Vec3f src))
+FAIL_CLOSED(void *, vec3f_mul, (Vec3f dest, f32 a))
+FAIL_CLOSED(void *, vec3f_sum, (Vec3f dest, Vec3f a, Vec3f b))
+FAIL_CLOSED(f32, vec3f_length, (Vec3f a))
+FAIL_CLOSED(void *, vec3f_normalize, (Vec3f dest))
+#undef FAIL_CLOSED
+struct Object *gMarioObject;
+struct Object *gCurrentObject;
+struct MarioState *gMarioState;
+const BehaviorScript bhvDddWarp[1] = { 0 };
+s16 gCCMEnteredSlide;
+s16 *gEnvironmentRegions;
+s32 gEnvironmentLevels[20];
+#endif
+
 /* Fail before calling original unchecked allocators. Limits belong to this
  * isolated fixture, not to a running game's unknown pool capacity. */
 static int insert(s16 *vertices, int type, int room, int surface_limit, int node_limit) {
