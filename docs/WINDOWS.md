@@ -183,3 +183,16 @@ $disc = Join-Path $HOME 'Downloads\Crash Bandicoot (USA)\Crash Bandicoot (USA).c
 ```
 In actual Crash gameplay: stand still at first, walk different directions for >=15s, jump normally 3 times, pause ~5s then resume, walk+jump more, preferably change level only if convenient. The collector stops after at most 180s or 1200 accepted packets (Ctrl+C also stops it) and closes *only its child*. It requires the private sealed allowlisted build, sends/accepts localhost UDP only, and stores snapshots.jsonl, crash.log and summary.json in a random folder under LOCALAPPDATA/CrashMarioFusion/telemetry, never Git. If the runtime cannot reach valid gameplay or emits no packets, the collector exits with an honest failure and retains the private summary for diagnosis; don't retry blindly or delete game folders.
 Expected validation: native signed XYZ and rotation variation, actual Crash level, observer epoch changes on pause/level/replacement, sequence order, <=10Hz and unchanged native input. The CMW1 phase is UNKNOWN_DIAGNOSTIC, native_tick is a pad-callback ordinal, and this run **cannot validate postphysics coherence or world-fusion alignment**. Do not ask for coins/W arm, Mario is NOT involved in this session. M2 integration is unchanged. For another Build-CrashPose, an existing sealed private directory is intentionally protected, so do not rerun the build script over it; use the collector with the already verified build.
+# Reference-box checks without starting games
+
+On the new Windows PC, after the migration handoff's Setup.ps1 prerequisites:
+
+```powershell
+./tools/windows/Test-ReferenceGeometry.ps1
+```
+
+The script fetches only pinned public c1 source if absent, preserves existing
+cache changes, and executes five authored reference-boundary checks against
+existing public sm64ex source. No ROM/disc or game process is used. Linux
+ASan/UBSan and PowerShell parsing do not certify this new Windows script;
+actual native execution remains NOT_TESTED until run locally.

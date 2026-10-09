@@ -4,6 +4,13 @@
 > `docs/STATUS.md`, `docs/EVIDENCE.md`, `docs/CONTRACT.md`, `docs/DECISIONS.md`
 > and `docs/WINDOWS.md` before editing. Continue the existing project, not a new implementation.
 
+**Source-only follow-up branch `feat/m3-reference-box`:** authored top-boundary
+converter and exact c1-reference/Mario query comparison implemented, based on
+latest migration checkpoint a43ee9b. 54 Cloud Python checks (no skips), 58 Crash
+pose fixtures and 27 bridge fixtures pass. Overlap counterexample 40 vs 48
+prevents a general collision-equivalence claim. M3.2 diagnostic real Crash gate
+still requires the new Windows PC; no games launched by this increment.
+
 **Latest M3 continuation:** read M3_GEOMETRY_GATE and D006. Native loader/query
 oracle now uses unchanged pinned full-sm64ex collision code with authored
 triangles and isolated pools; 34 Cloud tests pass, with Linux ASan/UBSan for
