@@ -51,3 +51,37 @@ not runtime verified; changing either area requires a new calibration.
 pinned sm64ex `src/engine/surface_collision.h:8` and `surface_collision.c`
 `find_floor` (XYZ s16 casts and XZ bounds); `Surface.vertex1/2/3` are Vec3s.
 A safe coordinate does not imply any floor or shared collision exists.
+
+## CMW1 native snapshot prototype (separate from CMJ1)
+
+`integration/world_snapshot.py` serializes observations only; no runtime pose
+emitter, socket listener, collision command or memory writer is installed.
+Wire header is network-endian `4s BB H 16s 16s II`: magic `CMW1`, engine
+(1 Crash / 2 Mario), phase, flags (bit 0 paused; other bits rejected), session,
+frame generation, sequence and native tick. Both identities are explicit
+nonzero 16-byte values. Sequence must increase; renew session before u32 wrap.
+Native tick is u32 and may wrap independently; never compare engines' ticks.
+
+| Payload | Position | Rotation | State / flags | Total bytes |
+| --- | --- | --- | --- | --- |
+| Crash | 3 signed i32 raw translation | 3 signed i32 raw rotation | 2 u32, opaque | 80 |
+| Mario | 3 finite f32 native XYZ | 3 signed i16 `faceAngle` | 2 u32, opaque | 74 |
+
+Source types: Launcher `FramePacing.cs:347–348` translation/rotation offsets;
+sm64ex `include/types.h` `MarioState.pos`, `faceAngle`, `action`, `flags`.
+No common degrees/radians, action IDs, state masks or velocities are invented.
+Candidate phase tags: 1 post Mario update, 2 post Crash physics, 3 pre Crash
+GPU. Source emission timing and native tick acquisition still need actual
+instrumentation; tags do not prove a coherent gameplay snapshot.
+
+`SnapshotStore` binds both reviewed frame generations at construction and keeps
+at most two latest observations, rejecting duplicates/out-of-order sequences,
+foreign sessions/frames, malformed lengths, unknown flags and nonfinite values.
+Paused/expired observations are unavailable; there is no interpolation,
+extrapolation, replay queue or remote physics authority. A new zone/area/object
+generation requires explicit invalidation/rebinding, not pointer identity.
+Freshness bounds receiver-local elapsed time since arrival. **It cannot detect
+delay before receipt, synchronize clocks, or prove source capture freshness.**
+Session matching is not cryptographic authentication. Live use remains gated
+on source-frame identities, coherent sampling, loss/load/pause observations
+and local-only transport; CMJ1 gameplay behavior remains unchanged.

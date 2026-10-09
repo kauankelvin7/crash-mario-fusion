@@ -123,3 +123,26 @@ operator-confirmed, not instrumented. This test validates observations and
 placement only: neither character walks on the other's geometry yet.
 Next necessary work is verified native geometry/material extraction locally
 and a native collision insertion seam with explicit world ownership.
+
+## Asset-free native-code geometry oracle (no game launch)
+
+From the configured Windows checkout in PowerShell 7:
+
+```powershell
+./tools/windows/Test-Geometry.ps1
+```
+
+This uses existing pinned public sm64ex source/MSYS2 GCC, authored triangle
+data, bounded fixture pools and the original loader/floor queries, plus pure
+geometry/snapshot tests. It neither reads ROM/disc files nor starts the games.
+Linux Cloud ASan/UBSan results do not establish Windows sanitizer coverage.
+The new script has only been parsed on Linux; actual Windows execution pending.
+Log remains private in the standard TaskLogs directory.
+
+The next **real** experiment requires explicit local execution authorization:
+passively observe authentic Crash collision query bounds/type/subtype at the
+existing physics/final-update seams, record level/zone/object generation and
+validate source units separately from player XYZ. Observe Mario pool occupancy
+and dynamic cleanup/update ordering in the selected area. Confirm calibration
+and native motion visually. Do not inject even one replica until those gate
+conditions pass; include a no-insertion control and reload cleanup when ready.

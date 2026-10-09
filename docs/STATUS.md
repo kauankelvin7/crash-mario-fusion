@@ -71,3 +71,18 @@ Branch `feat/m3-coordinate-contract` is in [draft PR #2](https://github.com/kaua
 ## Offline M3 geometry readiness — 2026-10-09
 
 While the Windows games remain closed, advanced `feat/m3-coordinate-contract` with source-only `tools/geometry_preflight.py` and `tests/test_geometry_preflight.py` (8 new synthetic geometry checks). Hosted CI passed [run 37957543671](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37957543671), preserving the existing C/UDP/coordinate tests. Examined actual pinned Mario `Surface`/partition/allocator seams: s16 vertices, cell fan-out and ineffective native pool overrun guards mean **no collision insertion is authorized yet**. See `docs/M3_GEOMETRY_GATE.md` for source-backed ownership/capacity requirements and future local validation sequence. **VERIFIED_SYNTHETIC** for pure preflight only; native XYZ, calibration, Crash geometry source, native colliders, rendering and combined world remain **NOT_TESTED/UNIMPLEMENTED**. Keep draft PR #2, `m0-recon` and `main` unchanged.
+
+## Current M3: original collision-code oracle and pose protocol
+
+Cloud Linux: **34 tests PASS**, including actual full-sm64ex loader/floor
+queries with authored geometry and bounded fixture pools, six type/yaw cases,
+ASan/UBSan, capacity rejection and native dynamic cleanup. Geometry preflight
+now includes s32 normal/s16 padding safety, cell fan-out, explicit synthetic
+materials and pool planning. CMW1 adds tested native position/rotation/state
+encoding and bounded deterministic snapshot storage; no live emitters or pose
+writes. **10 PowerShell ASTs parsed**; new Test-Geometry launches no games.
+All new validation is VERIFIED_SYNTHETIC; native Windows increment NOT_TESTED.
+D006 records fresh Crash octree-vs-Mario triangle evidence and conditional
+Astra recommendation. Live geometry/collisions/rendering remain unimplemented.
+Next: source-only authored box oracle, then authorized private Windows layout,
+XYZ/calibration and pool/lifecycle observations before a real collision slice.

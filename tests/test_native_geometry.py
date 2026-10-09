@@ -19,6 +19,8 @@ class NativeGeometryTests(unittest.TestCase):
     def setUpClass(cls):
         source = Path(os.environ.get("CM64_SM64EX_ROOT", "/workspace/.cache/crash-mario-m0/sm64ex"))
         if not source.is_dir() or not shutil.which("gcc"):
+            if "CM64_SM64EX_ROOT" in os.environ:
+                raise AssertionError("Configured native oracle requires pinned source and GCC; do not silently skip")
             raise unittest.SkipTest("Pinned sm64ex/GCC absent; set CM64_SM64EX_ROOT for native oracle")
         revision = subprocess.check_output(["git", "-C", str(source), "rev-parse", "HEAD"], text=True).strip()
         if revision != PIN or subprocess.check_output(["git", "-C", str(source), "status", "--porcelain", "--untracked-files=no"], text=True).strip():

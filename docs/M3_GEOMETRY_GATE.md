@@ -1,6 +1,6 @@
 # M3 -> M4 collision and geometry gate (source-only groundwork)
 
-**Status (2026-10-09):** preview-only code and tests; no native cross-game collision,
+**Status (2026-10-09):** offline preflight plus isolated native-code oracle; no live cross-game collision,
 shared renderer, level-geometry extraction or unified world has been implemented.
 This document records evidence-backed seams, stopping conditions, and the next
 smallest experiment. **Do not request or commit commercial game files.**
@@ -52,6 +52,49 @@ python -m unittest discover -s tests -v
 
 All new code in this phase is **VERIFIED_SYNTHETIC only**. It uses no original
 geometry; a successful synthetic triangle does not satisfy the M4 gate.
+
+## Isolated native-code proof and remaining seams
+
+`tests/native_geometry_probe.c` includes the unchanged pinned full-sm64ex
+`surface_load.c` and links its `surface_collision.c`. `test_native_geometry.py`
+maps an authored triangle, reserves its exact cell fan-out before allocation,
+and verifies original `read_surface_data`/`add_surface`/`find_floor`: expected
+height/normal, explicit synthetic type/room, no-insertion control, rejection
+without disturbing existing contact, time-stop retention and dynamic cleanup.
+Fixture pools are 2 surfaces/256 nodes, not a discovered live-game capacity.
+Six type/yaw cases and malformed input cases run with ASan/UBSan on Linux.
+No upstream collision functions are stubbed or reimplemented; unrelated game
+functions are removed by linker section GC. No original character update,
+gameplay, renderer or commercial geometry runs in this oracle.
+
+Preflight now rejects native normal s32 arithmetic overflow and signed-s16
+height padding overflow; `plan_native_surfaces` validates explicit authored
+DEFAULT/BURNING metadata, normals/partition and node/surface occupancy. No
+Crash material mapping is inferred. Actual burning gameplay is not tested.
+
+**Crash is volumetric:** c1 reference `src/solid.c` `ZoneQueryOctreeR` (959),
+`FindFloorY` (1164), `ProcessNode` (210) uses octree AABBs, aggregated support
+heights and type/subtype events. Zone coordinates shift by 8; compact query
+coordinates shift by 4. These are not established live Launcher collider
+units. Reference renderer meshes cannot substitute for them. Launcher
+`FramePacing.Hooks.cs` `PostObjectPhysics`/`PreGpuUpdate`, `GatedObjects.cs`
+`CaptureBound` and `PreNsInit` identify candidate observation/cleanup seams;
+do not replace existing dispatcher callbacks or re-run side-effecting queries.
+Guest query layout and level/zone/object generation are still unverified.
+
+**Mario update ordering:** `object_list_processor.c:update_objects` clears
+dynamic surfaces, updates terrain, applies platform displacement, then updates
+non-terrain objects including Mario. A future replica must be installed within
+that verified native lifecycle before character queries and excluded during
+time stop/reload. `pc_main.c:produce_one_frame` calls original game iteration;
+`send_display_list` submits native graphics. Neither is a demonstrated safe
+collision-insertion API. Source comparison/Astra review is recorded as D006.
+
+CMW1 prototype and tests cover native pose/state encoding, phase/frame identity
+and deterministic bounded observation storage only; no live pose synchronization.
+Run `tools/windows/Test-Geometry.ps1` to repeat these isolated tests locally,
+without starting either game. Then obtain authorized private XYZ/geometry and
+capacity evidence before any original-level insertion. Keep PR #2 draft.
 
 ## Next native engineering gate (requires local original game runtime)
 

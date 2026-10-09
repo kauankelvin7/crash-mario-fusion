@@ -189,3 +189,40 @@ Read-only source inspection of pinned upstream sm64ex `d7ca2c0` found `struct Su
 Added `tools/geometry_preflight.py`, `tests/test_geometry_preflight.py`, and `docs/M3_GEOMETRY_GATE.md`. These accept **synthetic, caller-authored** triangle vertices already in Crash view units, require explicit frame/level mapping, check face indices, duplicate/degenerate geometry, winding, numeric bounds, float32 retention and **collapse or flipped orientation after native signed-s16 truncation**. Preview caps (4096 vertices, 512 triangles) are independent tool caps, explicitly **NOT proof of available native surface pool**. Output says no native collision, rendering, material or capacity verification has occurred.
 
 Hosted GitHub Actions [run 37957543671](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37957543671) completed successfully against this source-only change; a prior run [37957367390](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37957367390) logs **25 Python tests PASS** including 8 geometry tests and the original C/UDP sender. This is **VERIFIED_SYNTHETIC only**, **NOT_TESTED** for collision/geometry in the actual Crash/SM64 runtime. No Windows games were launched during this source-only increment; native XYZ/operator calibration remain pending. 
+## M3 original collision-code oracle and snapshots — Cloud, 2026-10-09
+
+Continued remote feature at `a0abc0b36abac45d8d306b2a5a3ea81a4fa9fa47`;
+native geometry implementation commit `469b421`. Did not repeat M0/M1/M2.
+Read latest gate/handoff and attached existing draft PR #2 targeting m0-recon.
+
+- `python -m unittest discover -s tests -v`: **34 PASS, exit 0**, no skips
+  in this Cloud run. Python 3.12.14 / GCC 14.2.0; log ignored at
+  `.cache/integration/m3-geometry-tests.log`.
+- Native oracle compiles unchanged pinned full-sm64ex `surface_load.c` and
+  `surface_collision.c`, using linker GC for unrelated code, Linux
+  `-fsanitize=address,undefined -fno-sanitize-recover=all`. Six authored type/yaw
+  cases verify mapped integer vertices, floor height 20, upward native normal,
+  DEFAULT/BURNING type retention and signed room metadata, exact node fan-out,
+  no-insertion control, capacity refusal with existing contact retained,
+  time-stop retention and dynamic cleanup. No character simulation or burning
+  gameplay tested. Malformed/truncated/oversized inputs rejected; no sanitizer
+  findings. Pool sizes belong only to the fixture (2 surfaces/256 nodes).
+- `bash tools/check_integration.sh`: **27 checks PASS, exit 0**, .NET 10.0.401;
+  log `.cache/integration/m3-event-regression.log`. Original M2 C sender / native
+  compiler / pad-event fixture regression remains passing.
+- PowerShell 7.5.4 parser: **10 ASTs PASS**, including Test-Geometry.ps1,
+  on Linux. New Windows script execution **NOT_TESTED**; no game launched.
+- CMW1 deterministic tests: raw native pose/state types and packet lengths,
+  malformed/nonfinite rejection, session/frame identity, ordering, pause and
+  receiver-age expiry, independent native tick wrap, two-slot storage over
+  2000 accepted observations. No live emitters or cross-clock freshness claim.
+- Read-only gate QA: PASS. Fresh explicit gpt-6-astra architectural review
+  returned conditional boundary-replica recommendation; evidence/limits in D006.
+  Authoritative Crash collision volume units, guest query layout/material
+  semantics and actual Mario pool availability are not inferred by this proof.
+
+All new results **VERIFIED_SYNTHETIC**. Live native geometry/collision/rendering,
+pose synchronization and gameplay **NOT_TESTED/UNIMPLEMENTED**. Original
+commercial files and private Windows traces remain off Git; no remote PC used.
+Hosted workflow now checks pinned public sm64ex and runs the native oracle;
+explicitly configured missing sources/compiler fail rather than skip.

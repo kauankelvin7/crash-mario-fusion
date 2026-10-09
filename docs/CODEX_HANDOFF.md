@@ -4,6 +4,15 @@
 > `docs/STATUS.md`, `docs/EVIDENCE.md`, `docs/CONTRACT.md`, `docs/DECISIONS.md`
 > and `docs/WINDOWS.md` before editing. Continue the existing project, not a new implementation.
 
+**Latest M3 continuation:** read M3_GEOMETRY_GATE and D006. Native loader/query
+oracle now uses unchanged pinned full-sm64ex collision code with authored
+triangles and isolated pools; 34 Cloud tests pass, with Linux ASan/UBSan for
+the oracle. CMW1 is a tested observation protocol prototype, not live pose
+sync. Test-Geometry.ps1 starts no games. Crash collision is volumetric and
+cannot be inferred from rendered triangles/player units. Next source-only
+extension is an authored ordinary box/reference query comparison; live
+extraction/insertion still requires private authorized Windows evidence.
+
 **M3 increment (2026-10-09):** `feat/m3-coordinate-contract` adds read-only XYZ
 observation and `tools/world_coordinates.py`, with explicit calibration,
 float32 inverse-error guard and native floor bounds. Cloud checks: 17 Python,
