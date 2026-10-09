@@ -173,3 +173,8 @@ Required acceptance/report:
   when the testable M3 increment is ready, without automatic merge.
 - **No playable-fusion claim or Release/ZIP until real shared-world gameplay
   is implemented and verified on native Windows.**
+
+## Native Windows M3 session evidence and next gate — 2026-10-09
+An authorized paired session collected native M3 signed XYZ and Crash level from original gameplay, superseding earlier NOT_TESTED notes. Two native Mario coins received; one authorized native Cross; 22 native guest-memory rise/fall/AIR/ground samples. However X/Z were IDENTICAL across all samples. Horizontal variation, true Crash-to-Mario scale/yaw and Mario area identity remain unverified. The data is kept only in the Windows private cache; there is no new visual evidence, real native source collider, collision insertion or fused game.
+
+NEXT: operator-driven test with at least two distinct moving Crash X/Z positions in one level, independently observed Mario area and selected real spatial landmarks. Then observe Crash original octree collision volume/zone/object-generation and Mario native surface/node occupancy without mutation. Only after genuine geometry provenance, capacity and lifecycle gates can one bounded, reversible collider be considered. Do not invent calibration, preserve both solvers, keep draft PR #2 without merge or release.

@@ -91,3 +91,6 @@ Published implementation `857a6a1`, draft PR #2 updated (base m0-recon).
 Hosted source-only CI [37959761599](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37959761599)
 passed; job/test-step success verified via API. Detailed hosted log download
 is proxy-blocked; local test evidence above is retained. No main merge.
+
+## Live M3 Windows observation — 2026-10-09 (supersedes older XYZ NOT_TESTED status)
+New authorized native Windows run: Crash received two real Mario coin events, applied one armed native Cross pulse, captured 22 real guest-player XYZ samples and level 9, with rise/fall, AIR and GROUNDLAND transitions. Live XYZ field observation is VERIFIED_REAL, but X and Z remained constant in every sample: real horizontal movement, units and axis mapping are NOT_VERIFIED. Mario area identity and calibration anchors still unknown. No native collider, geometry provenance, dynamic pool occupancy, shared camera/rendering or playable fused world. No new visual-confirmation claim or copyrighted/private files shared. PR remains draft; no merge.
