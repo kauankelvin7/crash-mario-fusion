@@ -28,9 +28,9 @@ class TestOrchestrationBootstrap(unittest.TestCase):
             self.assertEqual(agent['model'],expected)
         self.assertEqual(names,{'crash_recon','mario_recon','astra_architect','astra_debugger','qa_reviewer'})
 
-    def test_material_is_only_bootstrap(self):
+    def test_status_separates_bootstrap_from_real_gameplay(self):
         status=(ROOT/'docs/STATUS.md').read_text()
-        self.assertIn('Astra subagent invocation: NOT_TESTED',status)
         self.assertIn('Real shared-world event: NOT_TESTED',status)
+        self.assertIn('Original game data: BLOCKED',status)
 
 if __name__=='__main__': unittest.main()

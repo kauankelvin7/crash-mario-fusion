@@ -2,6 +2,10 @@
 
 Mission: establish a **real cross-engine gameplay** fusion between Crash Bandicoot 1 (PS1, 1996) and Super Mario 64 (N64, 1996), prioritizing preservation of original movement, physics, events and object behavior.
 
+## Primary platform
+
+Windows 10/11 x64 is the user's execution, graphics-test and distribution platform. Codex Cloud may run Linux; record cloud and native Windows results separately. Preserve the current architecture and milestones when adapting platforms. Prefer compatible native Windows toolchains (.NET, MSYS2/MinGW, MSVC/CMake where actually supported), keep upstream renderers, and provide PowerShell setup/build/test/start instructions. Do not claim Windows support without actual native compilation and execution. Owned-data/graphics validation runs locally on Windows; never fetch or upload retail files. Keep simple cross-platform probes; no RAM benchmarks or platform-triggered Astra calls.
+
 ## Operating rules
 
 1. Start by checking `docs/STATUS.md`, `docs/ORCHESTRATION.md`, `docs/DECISIONS.md` and the current Git tree. Continue the next incomplete milestone, never restart it.

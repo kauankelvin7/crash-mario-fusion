@@ -1,0 +1,77 @@
+M0 actual Linux results, 2026-10-09. Native Windows: NOT_TESTED.
+
+bootstrap-tests.log
+test_root_config (test_orchestration.TestOrchestrationBootstrap.test_root_config) ... ok
+test_status_separates_bootstrap_from_real_gameplay (test_orchestration.TestOrchestrationBootstrap.test_status_separates_bootstrap_from_real_gameplay) ... ok
+test_subagent_config (test_orchestration.TestOrchestrationBootstrap.test_subagent_config) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK
+
+libsm64-probe.log
+VERIFIED_SYNTHETIC: 7 floor/platform/lifecycle checks passed; no game tick.
+
+disc-check.log
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/Window/Panels/Debug/CdDebugPanel.cs(23,9): warning CS8602: Dereference of a possibly null reference. [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/Window/Panels/Debug/SpuViewerPanel.cs(23,9): warning CS8602: Dereference of a possibly null reference. [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/Window/Panels/Help/AboutPopup.cs(34,13): warning CS0219: The variable 'contributors' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/FramePacing.cs(739,17): warning CS0414: The field 'FramePacing._crashDidScale' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/sdk/LibCd.cs(43,17): warning CS0414: The field 'LibCd._xaActive' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/FramePacing.cs(719,16): warning CS0414: The field 'FramePacing._gateStuckLog' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj]
+Synthetic test files: /workspace/.cache/crash-mario-m0/disc-check/23979620bb954b4a8e2fbc2f0680710b
+PASS: none.CHD — 37 sectors, read modes, bounds and concurrent seeks
+PASS: cdzl.CHD — 37 sectors, read modes, bounds and concurrent seeks
+PASS: cdlz.CHD — 37 sectors, read modes, bounds and concurrent seeks
+PASS: cdfl.CHD — 37 sectors, read modes, bounds and concurrent seeks
+PASS: cdzs.CHD — 37 sectors, read modes, bounds and concurrent seeks
+PASS: stored-pregap.chd — 34 sectors, read modes, bounds and concurrent seeks
+PASS: virtual-pregap.chd — 37 sectors, read modes, bounds and concurrent seeks
+PASS: all disc checks passed.
+
+launcher-cli.log
+Crash Bandicoot: Recompiled
+  (no args)              open the launcher (no X11 display: play the saved disc directly)
+  --prepare <file.cue|file.chd>   prepare game folder without UI
+  --run <file.cue|file.chd>       prepare (if needed) and play (no UI)
+  --smoke <file.cue|file.chd>     load prepared game briefly (debug)
+  --help                 show this help
+
+If <file.cue|file.chd> is omitted for --run/--smoke, uses CdPath from settings.json when set.
+
+windows-powershell-parse.log
+PARSED: Build.ps1
+PARSED: Common.ps1
+PARSED: Setup.ps1
+PARSED: Start.ps1
+PARSED: Test.ps1
+VERIFIED_SYNTHETIC: 5 PowerShell ASTs parsed on Linux; native Windows NOT_TESTED.
+
+windows-platform-guard.log
+Exception: /workspace/crash-mario-fusion/tools/windows/Common.ps1:6
+Line |
+   6 |      throw 'Native Windows 10/11 x64 is required. Cloud/Linux results  …
+     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Native Windows 10/11 x64 is required. Cloud/Linux results are separate.
+
+c1-multilib-probe.log
+In file included from src/util/list.c:2:
+/usr/include/stdlib.h:26:10: fatal error: bits/libc-header-start.h: No such file or directory
+   26 | #include <bits/libc-header-start.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+launcher-build-linux.log (repeat setup, tail)
+Build succeeded.
+
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/Window/Panels/Debug/CdDebugPanel.cs(23,9): warning CS8602: Dereference of a possibly null reference. [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj::TargetFramework=net10.0]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/Window/Panels/Debug/SpuViewerPanel.cs(23,9): warning CS8602: Dereference of a possibly null reference. [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj::TargetFramework=net10.0]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/Window/Panels/Help/AboutPopup.cs(34,13): warning CS0219: The variable 'contributors' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj::TargetFramework=net10.0]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/FramePacing.cs(739,17): warning CS0414: The field 'FramePacing._crashDidScale' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj::TargetFramework=net10.0]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/Host/FramePacing.cs(719,16): warning CS0414: The field 'FramePacing._gateStuckLog' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj::TargetFramework=net10.0]
+/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/sdk/LibCd.cs(43,17): warning CS0414: The field 'LibCd._xaActive' is assigned but its value is never used [/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher/RecompOne.Runtime/RecompOne.Runtime.csproj::TargetFramework=net10.0]
+    6 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.27
