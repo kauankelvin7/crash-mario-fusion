@@ -46,3 +46,9 @@ Continuation after M0: branch published to `origin/m0-recon`, preserving `6e21f4
 ## Native Windows movement confirmed (2026-10-09)
 
 Real Windows session `20261009-151351-877`: Mario two native coin events reached Crash; first applied native controller Cross, second was observe-only. Live Crash guest player object provided 22 movement samples with raw vertical position climbing from 1387515 to 1546674 and returning to 1387507, AIR flag transitioning true then false and GROUNDLAND returning. Classification: VERIFIED_REAL for recorded guest jump and landing sequence following cross-game input. A control run and independent visual confirmation would strengthen causal attribution. Unified world, collisions, camera and final playable fusion are NOT IMPLEMENTED; no release. Full values in EVIDENCE.md.
+
+## Confirmed visual result: Mario coin → Crash jump (2026-10-09)
+
+**M2 interaction demonstration PASS (VERIFIED_REAL + operator-reported visual corroboration):** Mario coin `seq=1` was sent and received by the actual Crash runtime, applied as guarded native Cross; Crash guest memory recorded a full rise, airborne movement, fall and grounded return (22 samples). The user confirmed they saw Crash jump concurrently with the Mario coin pickup. The visual part is a firsthand user report, not video evidence; latency was not independently measured. The second coin did not trigger an additional jump.
+
+**Not yet the requested fusion:** worlds, geometry, collisions, camera and renderer remain separate. Recommended next engineering gate is a brief no-Apply control scenario, then design a minimal shared-coordinate, visibility and collision prototype with native-world authority and explicit ownership; do not claim a unified game until validated. Keep `main` unchanged until authorized.
