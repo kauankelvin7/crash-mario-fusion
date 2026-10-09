@@ -34,5 +34,5 @@ if (-not (Test-Path -LiteralPath $dotnetPath)) {
     & $installer -Version '10.0.401' -Architecture x64 -InstallDir (Join-Path $TaskCache 'dotnet') -NoPath
 }
 Use-Dotnet
-Invoke-Msys 'pacman -S --needed --noconfirm make python mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-glew' 'msys-packages.log'
+Invoke-Msys 'pacman -S --needed --noconfirm git make python mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-glew' 'msys-packages.log'
 Write-Output "Setup completed locally; run Build.ps1. Logs: $TaskLogs"
