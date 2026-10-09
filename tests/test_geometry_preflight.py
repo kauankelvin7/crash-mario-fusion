@@ -2,7 +2,7 @@
 import math
 import unittest
 
-from tools.geometry_preflight import preflight_mesh
+from tools.geometry_preflight import preflight_mesh, plan_native_surfaces, native_cell_span, native_integer_normal
 from tools.world_coordinates import FrameMap
 
 
@@ -89,6 +89,39 @@ class GeometryPreflightTests(unittest.TestCase):
         self.assertNotIn("material_id", result)
         self.assertNotIn("native_surface_type", result)
         self.assertEqual(result["frame_identity"], "OPERATOR_SUPPLIED_NOT_RUNTIME_VERIFIED")
+
+    def test_native_materials_and_pool_reservation_are_explicit(self):
+        preview = preflight_mesh(**fixture())
+        material=dict(provenance="AUTHORED_SYNTHETIC",native_type=0,room=0)
+        counts=dict(surface_capacity=2,node_capacity=256,surfaces_used=1,nodes_used=0)
+        result=plan_native_surfaces(preview,materials=[material],**counts)
+        self.assertEqual(result["surfaces"][0]["partition"],"floor")
+        self.assertEqual(result["surfaces"][0]["unit_normal"],(0,1,0))
+        self.assertEqual(result["nodes_required"],4)  # 50-unit border includes neighboring cells
+        for overrides in (dict(surfaces_used=2),dict(node_capacity=3),dict(node_capacity=True),
+                          dict(surfaces_used=-1),dict(nodes_used=257)):
+            with self.assertRaises(ValueError):
+                plan_native_surfaces(preview,materials=[material],**{**counts,**overrides})
+        for bad in ({**material,"native_type":True}, {**material,"native_type":999},
+                    {**material,"provenance":"UNKNOWN_CRASH_LEAF"},{**material,"room":128}):
+            with self.assertRaises(ValueError):
+                plan_native_surfaces(preview,materials=[bad],**counts)
+        with self.assertRaises(ValueError):
+            plan_native_surfaces(preview,materials=[],**counts)
+
+    def test_native_integer_arithmetic_and_height_padding_guards(self):
+        for vertices in ([(0,-32768,0),(0,-32768,100),(100,-32768,0)],):
+            with self.assertRaisesRegex(ValueError,"overflow"):
+                preflight_mesh(**fixture(vertices=vertices,
+                    frame_map=FrameMap((0,0,0),(0,0,0),1,0)))
+        # A general s16 stream can overflow s32 cross-products even though the
+        # earlier conservative query guard rejects this large XZ footprint.
+        with self.assertRaisesRegex(ValueError,"overflow"):
+            native_integer_normal([(-32760,-32760,-32760),(32760,32760,-32760),(-32760,32760,32760)])
+
+    def test_cell_border_buffer_is_not_one_node_per_triangle(self):
+        self.assertEqual(native_cell_span([(0,0,0),(0,0,100),(100,0,0)]),(7,8,7,8))
+        self.assertEqual(native_cell_span([(100,0,100),(100,0,200),(200,0,100)]),(8,8,8,8))
 
 
 if __name__ == "__main__":

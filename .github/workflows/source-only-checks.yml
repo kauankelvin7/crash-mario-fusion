@@ -24,7 +24,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Checkout pinned public sm64ex source for isolated collision oracle
+        uses: actions/checkout@v4
+        with:
+          repository: sm64pc/sm64ex
+          ref: d7ca2c04364a6dd0dac58b47151e04e26887e6f0
+          path: .cache/native-sm64ex
+          persist-credentials: false
       - name: Test source-only code, recorded trace, and live loopback C sender
+        env:
+          CM64_SM64EX_ROOT: ${{ github.workspace }}/.cache/native-sm64ex
         run: python -m unittest discover -s tests -v
       - name: Explicitly report verification level
         run: |

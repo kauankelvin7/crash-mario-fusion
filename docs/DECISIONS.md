@@ -46,3 +46,34 @@ it neither chooses the final world owner nor replaces either physics engine.
 No new Astra review: no irreversible integration architecture is selected.
 Next material decision remains which native world owns a shared collision
 slice, after private Windows XYZ/calibration and native geometry evidence.
+
+## D006 — Native collision oracle and conditional boundary replicas
+
+New evidence: c1 `256fdcef` `ZoneQueryOctreeR`/`FindFloorY` (`src/solid.c`)
+uses volumetric leaf AABBs and can average support heights; `ProcessNode`
+type/subtype drives Crash events. Screen triangles/player coordinates do not
+establish collision units or Mario material equivalence. Launcher `224da775`
+already has physics/bound hooks, but guest query layout/lifetime is unverified.
+
+Explicit specialist call: `/root/astra_m3_geometry`, selected through
+`spawn_agent(model="gpt-6-astra", reasoning_effort="high", fork_turns="none")`;
+tool accepted selection and returned review (no separate model telemetry).
+Compared (A) validated static volume boundaries replicated into native Mario
+surfaces, each solver retaining character authority, with (B) foreign Crash
+floor queries inside Mario. Conditional recommendation A: B mixes support,
+wall/ceiling/action semantics without a demonstrated compatible solver seam.
+A also cannot generally reproduce Crash's averaged floors or event semantics.
+Neither live world ownership nor fidelity equivalence is established.
+
+Implemented next proof: authored triangles transformed by existing FrameMap,
+explicit synthetic DEFAULT/BURNING type and room, exact cell fan-out and pool
+reservation, then original full-sm64ex loader/`find_floor` in isolated pools.
+No libsm64 substitution, game hook or live insertion. Original dynamic cleanup
+and time-stop behavior are exercised; insufficient capacity fails before
+allocation. Linux ASan/UBSan checks memory and arithmetic in this fixture only.
+Real insertion still requires the gate's measured pool occupancy, atomic
+reservation/lifecycle and authentic geometry/frame/material evidence.
+Next source-only extension: one authored ordinary octree box against c1 and
+Mario reference queries, including boundary/diagonal/outside cases and overlap
+counterexamples. Live Crash extraction remains blocked by guest layout and
+private Windows observations; do not infer volume units from player XYZ.
