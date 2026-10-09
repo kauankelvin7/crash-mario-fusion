@@ -94,3 +94,68 @@ CMW1 frame bytes [24..39] are M31A (4 bytes), native Mario signed s16 level and 
 ## M3.2 Crash-only opt-in diagnostic CMW1 — source contract and restrictions
 CMW1 Crash observations from RecompOne PadReadEvent use engine=1, **phase=0 UNKNOWN_DIAGNOSTIC** (neither verified POST_CRASH_PHYSICS nor PRE_CRASH_GPU). The phase zero addition to integration/world_snapshot.py is exclusive to Crash, while Mario remains phase=1 POST_MARIO_UPDATE; existing synthetic phases 2/3 retain prior meaning. Do not interpret the Crash native_tick header as real Crash game frame: it is an observer-only callback ordinal. The frame 16-byte descriptor is struct big-endian M32D (4 ASCII bytes), original Crash native level uint32, observer-local epoch uint32, reserved zero uint32; no native zone ID or genuine engine lifecycle generation proved. Each live run uses a fresh nonzero 16-byte session, never shared across runs. Payload includes native signed int32 XYZ (object offsets +0x80/+0x84/+0x88), signed int32 native raw rotation (+0x8c/+0x90/+0x94), uint32 opaque state (+0x2c) and flags (+0x120). This is signed raw data, NOT translated world units.
 Independent local UDP emitter is disabled unless CM64_CRASH_POSE_ENABLE=1 and fresh CM64_CRASH_POSE_SESSION+CM64_CRASH_POSE_PORT are provided. Loopback-only, nonblocking, <=10Hz, <=300s, <=3000 attempts, no replay/catchup, no gameplay memory/input mutation. Pointer bounds, native gameplay level, native pause flags, Start request and valid object lifecycle signature are checked before observation; invalid contexts suppress packets and invalidate observer epoch. Private collector validates signed CMW1 packet, phase/session/replay/frame/freshness, enforces finite local child/process and writes only outside repo; it is NOT a world calibration or live gameplay validation tool. CMJ1 Mario coin->Crash event transport remains unchanged and separate. No shared collider or renderer exists.
+
+## Issue #5 — observational CMW1 correlation and offline landmark fit
+
+`integration/observation_alignment.py` wraps `SnapshotStore` with exactly two
+pose slots and fixed per-engine rejection/sequence metadata. Bind **each**
+capture session and frame explicitly using `Binding(session, frame)`; they may
+be entirely different across engines. An explicit `receiver_clock_id` identifies
+one monotonic receiver clock for `accept(packet, receive_ns, ...)` and
+`evaluate(now_ns, ...)`. It is a caller assertion, not clock discovery: **do not
+feed timestamps from the two existing independent collectors as one clock**.
+No wall-clock or native-tick arithmetic is performed. Tick wraps are harmless;
+CMW1 sequence wrap requires a fresh capture session. `receiver_arrival_separation_ns`
+is only the distance between local receipt stamps, never latency/physics skew.
+
+Only current Crash phase 0 / Mario phase 1 observations can be telemetry-comparable.
+`Comparison` always has `physical_status="BLOCKED"`, `calibration_ready=False`.
+Malformed, session, phase, replay, frame, missing, paused, gap, timeout, clock
+regression and clock-domain rejection reasons are structured. Pause, a newer or
+contradictory frame, and a gap invalidate that source until explicit `rebind`.
+Same-session rebinding requires a newer observer epoch and retains the sequence
+high-water mark; a fresh session resets it. Old epochs do not displace a valid
+newer binding. Epochs are observer-local, **not** certified native generations.
+Age is explicitly bounded to 1..1,000,000,000 ns; gap to age..300,000,000,000 ns.
+No queue, extrapolation, socket, game writes or automatic frame matching.
+`SnapshotStore` still accepts its old shared-session constructor and unchanged
+80/74-byte CMW1 wire format; it additionally accepts per-engine session bindings.
+
+`tools/estimate_calibration.py` consumes <=128 **explicitly declared** landmark
+pairs, <=128 KiB JSON. Each pair requires a unique label, signed-int32 Crash
+XYZ, Mario XYZ, Crash level/observer epoch, Mario level/area/observer epoch,
+provenance and `correspondence_declared=true`. All fit and holdout pairs must
+share the same per-engine scope and provenance. Names never establish matching.
+Use `SYNTHETIC` or `OPERATOR_SUPPLIED_NOT_RUNTIME_VERIFIED`; neither is runtime
+calibration evidence. FitPolicy requires every tolerance explicitly: maximum/RMS
+Euclidean Mario-unit residual, source/target minimum XZ baseline, XZ covariance
+minimum eigenvalue ratio, target float32 absolute-error limit, and holdout policy.
+No real-world scale, yaw or tolerance is supplied by default.
+
+For centered Crash points c and Mario points m, define
+A=sum(cx*mx+cz*mz), B=sum(cz*mx-cx*mz), C=sum(cy*my), D=sum(|c|²).
+The least-squares Y-yaw is atan2(B,A), and uniform scale is
+(hypot(A,B)+C)/D. FrameMap origins are the two centroids. This uses the existing
+convention X'=cos(yaw)X+sin(yaw)Z, Z'=-sin(yaw)X+cos(yaw)Z;
+Y contributes to scale, but cannot replace three well-conditioned, noncollinear
+XZ fit pairs. Nonpositive scale, undefined yaw, duplicates, weak baseline or
+conditioning fail closed. Every supplied pair is checked; outliers are never
+silently trimmed. Holdout points never participate in fitting and are checked
+separately against the same maximum/RMS limits. Omitting holdout requires an
+explicit policy opt-out and adds an unresolved gate.
+
+Checks model actual Mario float32 inputs/outputs, half-Crash-raw-unit inverse
+loss, signed Crash fixed-point inverse range, and conservative open Mario
+XZ (-8192,8192) / Y s16 bounds. These are coordinate query bounds, **not** a
+native geometry converter or a floor/collision result. Residuals compare against
+float32 targets; input and output quantization errors are separately bounded.
+No geometry is inserted and no solver is called by the estimator.
+
+Reproducible mathematical example:
+`python -m tools.estimate_calibration --input tests/fixtures/calibration_landmarks_synthetic.json`.
+Authored scale=2, yaw=90°, translation=(10,20,-30), three fit pairs and two distinct
+holdouts recover zero float32 residuals. Output is
+`SYNTHETIC_MATH_ESTIMATE_ONLY`, `calibration_ready=false`, `physical_status=BLOCKED`.
+Operator data instead returns `OPERATOR_SUPPLIED_NOT_RUNTIME_VERIFIED` with the
+same gates: Crash postphysics, native frame identity, runtime correspondence,
+and shared collisions/gameplay remain unverified. Keep operator inputs private.

@@ -4,7 +4,7 @@ on:
   push:
     branches: [m0-recon]
   pull_request:
-    branches: [m0-recon]
+    branches: [m0-recon, feat/m3-coordinate-contract]
   workflow_dispatch:
 
 permissions:

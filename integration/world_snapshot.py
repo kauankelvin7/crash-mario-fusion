@@ -92,14 +92,17 @@ class SnapshotStore:
     Freshness uses receiver-local time, never a cross-machine clock subtraction.
     """
     def __init__(self, session, frames, max_age_ns):
-        if type(session) is not bytes or len(session)!=16 or not any(session):
-            raise ValueError("Explicit session required")
+        sessions = dict(session) if type(session) is dict else {CRASH:session,MARIO:session}
+        if set(sessions)!={CRASH,MARIO} or any(type(s) is not bytes or len(s)!=16 or not any(s)
+                                              for s in sessions.values()):
+            raise ValueError("Explicit session required for each engine")
         if set(frames) != {CRASH,MARIO} or any(type(f) is not bytes or len(f)!=16 or not any(f)
                                               for f in frames.values()):
             raise ValueError("Bind both native frame generations explicitly")
         if type(max_age_ns) is not int or not 0 < max_age_ns <= 10**9:
             raise ValueError("Receiver age bound must be 1..1000000000 ns")
         self.session,self.frames,self.max_age_ns = session,dict(frames),max_age_ns
+        self.sessions = sessions
         self.slots = {}
         self.last_receive_ns = -1
 
@@ -108,7 +111,7 @@ class SnapshotStore:
         if receive_ns < self.last_receive_ns:
             raise ValueError("Receiver monotonic clock moved backwards")
         snapshot=decode(packet)
-        if snapshot.session != self.session or snapshot.frame != self.frames[snapshot.engine]:
+        if snapshot.session != self.sessions[snapshot.engine] or snapshot.frame != self.frames[snapshot.engine]:
             return False
         previous=self.slots.get(snapshot.engine)
         if previous and snapshot.sequence <= previous[0].sequence:
