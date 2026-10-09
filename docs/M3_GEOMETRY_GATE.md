@@ -135,6 +135,31 @@ Stop and record `BLOCKED` if a real source seam/asset provenance/capacity
 cannot be verified without local native execution. Continue inexpensive
 source-only tests and decisions in the meantime.
 
+## Authored reference-box proof (source-only continuation)
+
+`tools/volume_boundary.py` converts an explicitly authored c1 single leaf
+(`node=0x0003`, reference type 1, no event subtype) into two upward candidate
+faces, using the existing transform/material/pool preflight. Query origin is
+explicitly zero; source origins must be 0..2047 so `(origin*256)>>4` fits the
+original signed-s16 query record. Negative signed-left-shift domains and
+unsupported provenance/node semantics are rejected before conversion.
+
+`tests/test_volume_boundary.py` compiles exact unchanged pinned c1
+`ZoneQueryOctreeR`, `ZoneQueryOctree`, `FindFloorY` slices in an ignored temporary
+header; it does not build c1's full 32-bit engine. Layout assertions cover
+the compact query/descriptor/zone prefix. Mario uses the existing original
+surface loader and `find_floor`, with isolated fixture pools. Both run with
+ASan/UBSan on Linux. Authored geometry only, not Launcher guest data.
+
+Single-box tests compare interior, shared diagonal, perimeter and outside
+responses. Reference Crash uses an XZ point and Y interval `[0, queryY]`;
+Mario uses its native point query/78-unit eligibility buffer. Tests restrict
+queryY to 64, above authored tops, without asserting equal query semantics.
+Measured overlapping-box counterexample: original c1 reference averages
+32 and 48 to **40**; original Mario returns **48**. Two top faces are therefore
+not general volumetric equivalence, full-box collision, walls or gameplay.
+No native events, materials, character physics or live collider writes added.
+
 ## Completion criteria
 
 - Source-only Python/C protocol regression green and separately labeled.

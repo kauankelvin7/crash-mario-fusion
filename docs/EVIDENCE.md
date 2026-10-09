@@ -285,3 +285,41 @@ Actual native seam: pinned RecompOne.Runtime.Events.PadReadEvent occurs during c
 Windows verification with MSYS2 MINGW64 Python, PowerShell 7, cached pinned public-source RecompOne launcher: python -m unittest tests.test_crash_pose -v passed 7/7; python -m unittest discover -s tests -v passed **49/49**; tools/windows/Test-CrashPose.ps1 passed **58/58 fixture assertions** with the actual pinned mod compiler, RAM implementation, native event bus, no memory writes, unchanged physical buttons and verified no access-counter/VBlank side effects; tools/windows/Test-Integration.ps1 passed **27/27**; tools/windows/Test-Geometry.ps1 passed **17/17**; tools/windows/Build-CrashPose.ps1 built separate private Win64 .NET launcher at LOCALAPPDATA/CrashMarioFusion/M3-crash-pose with **zero errors and warnings**, sealed allowlisted SHA-256 manifest; checked_launcher() verifies correct hash and only active diagnostic mod. No Crash game launched. All results VERIFIED_SYNTHETIC or Windows native build; runtime Crash M3.2 new packet collection is NOT_TESTED. Historical Mario 1,137 live pose and M2 42 Crash samples are separate evidence and cannot be substituted.
 
 Next real gate: operator run the documented private 90–180s Crash collector, enter actual Crash level, walk and jump, pause/restart, then verify native X/Y/Z and signed rotations change coherently, scene level and observer epoch, rate<=10Hz, sequence and lifecycle, no input or physics change, and private-only logs. Do not proclaim coherent postphysics sampling from this experiment: require a real engine hook and independent correspondence landmarks before mapping two worlds. Never merge PR until authentic shared-world collision gate.
+# Authored reference-box continuation — Cloud Linux
+
+Base `a43ee9b` from latest `feat/m3-coordinate-contract`, new working branch
+`feat/m3-reference-box`. First implementation commit `2dad120`.
+No M0/M1/M2 restart, no games launched or commercial files downloaded.
+
+- With `CM64_SM64EX_ROOT=/workspace/.cache/crash-mario-m0/sm64ex` and
+  `CM64_C1_ROOT=/workspace/.cache/crash-mario-m0/c1`,
+  `python -m unittest discover -s tests -v`: **54 PASS, no skips, exit 0**.
+  Earlier baseline without explicit sm64ex root skipped one existing hook test;
+  the configured final run executes it. Log `.cache/integration/m3-reference-tests.log`.
+- Five new converter/native comparison tests execute exact pinned c1 query
+  source slices and unchanged Mario loader/floor code, authored fixtures only.
+  Source pins unchanged. Linux ASan/UBSan PASS, no findings. Single top:
+  interior, diagonal, perimeter and outside responses match. Overlap: reference
+  Crash **40**, Mario **48**, explicitly tested disagreement. Native query
+  conventions differ; no gameplay or Launcher collision claimed.
+- Fixed compact-coordinate domain: origin<=2047 for query-bound-zero;
+  regressions reject origin2048 and origin3000 even with translated FrameMap.
+  Query ABI assertions: record8 / descriptor16 / zone octree offset28 bytes.
+- `dotnet run --project tests/crash_pose -p:CrashRoot=<pinned-public-cache>
+  -- <repo>` with cached .NET10.0.401: **58 assertions PASS, exit0**.
+  Log `.cache/integration/m3-crash-pose-regression.log`.
+- `bash tools/check_integration.sh`: **27 checks PASS, exit0**, log
+  `.cache/integration/m3-reference-event-regression.log`.
+- PowerShell7.5.4/Linux parser: **13 ASTs PASS**, including new source-only
+  Test-ReferenceGeometry.ps1. Workflow YAML parsed and steps validated.
+- QA approved bounded authored proof after compact-domain correction.
+
+All new results **VERIFIED_SYNTHETIC**. New Windows script **NOT_TESTED**;
+real Crash pose/graphics/post-physics/geometry/capacity gates remain dependent
+on the new computer. No state/input writes or physics replacements implemented.
+
+Published commits `2dad120` and `1571f25`; [draft PR #4](https://github.com/kauankelvin7/crash-mario-fusion/pull/4)
+targets **feat/m3-coordinate-contract**, verified through GitHub API.
+[Hosted CI 37987762871](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37987762871)
+completed **success** for `1571f254c6803bb45e6962eace5dc5677cdc79d5`.
+No merge or original-game execution performed.
