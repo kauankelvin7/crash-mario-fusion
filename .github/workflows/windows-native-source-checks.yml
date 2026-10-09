@@ -105,6 +105,26 @@ jobs:
           & dotnet run --project tests/crash_pose/CrashPoseChecks.csproj "-p:CrashRoot=$env:CM64_CRASH_PUBLIC_ROOT" -- "$PWD"
           if ($LASTEXITCODE -ne 0) { throw "Pinned native Crash fixture failed: $LASTEXITCODE" }
 
+      - name: Compile original CMJ1 C sender on native Windows
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          mkdir -p .cache/integration
+          gcc -std=c11 -Wall -Wextra -Werror -Iintegration/sm64 \
+            integration/sm64/cm64_coin.c tests/integration/native_sender.c \
+            -lws2_32 -o .cache/integration/native-coin-sender.exe
+
+      - name: Execute original M2 C sender to Crash mod event-bus fixtures on Windows
+        shell: pwsh
+        env:
+          CM64_CRASH_PUBLIC_ROOT: ${{ github.workspace }}/.cache/native-crash-launcher
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $nativeSender = Join-Path $PWD '.cache/integration/native-coin-sender.exe'
+          if (-not (Test-Path -LiteralPath $nativeSender)) { throw 'Native Windows CMJ1 sender executable missing' }
+          & dotnet run --project tests/integration/IntegrationChecks.csproj "-p:CrashRoot=$env:CM64_CRASH_PUBLIC_ROOT" -- "$PWD" $nativeSender
+          if ($LASTEXITCODE -ne 0) { throw "M2 native sender/Crash adapter checks failed: $LASTEXITCODE" }
+
       - name: Mark exactly what Windows CI verified
         shell: pwsh
         run: |
