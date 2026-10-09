@@ -4,6 +4,33 @@
 > `docs/STATUS.md`, `docs/EVIDENCE.md`, `docs/CONTRACT.md`, `docs/DECISIONS.md`
 > and `docs/WINDOWS.md` before editing. Continue the existing project, not a new implementation.
 
+**Latest M3 continuation:** read M3_GEOMETRY_GATE and D006. Native loader/query
+oracle now uses unchanged pinned full-sm64ex collision code with authored
+triangles and isolated pools; 34 Cloud tests pass, with Linux ASan/UBSan for
+the oracle. CMW1 is a tested observation protocol prototype, not live pose
+sync. Test-Geometry.ps1 starts no games. Crash collision is volumetric and
+cannot be inferred from rendered triangles/player units. Next source-only
+extension is an authored ordinary box/reference query comparison; live
+extraction/insertion still requires private authorized Windows evidence.
+
+**M3 increment (2026-10-09):** `feat/m3-coordinate-contract` adds read-only XYZ
+observation and `tools/world_coordinates.py`, with explicit calibration,
+float32 inverse-error guard and native floor bounds. Cloud checks: 17 Python,
+27 compiled native-adapter fixtures, 9 PowerShell ASTs pass. These are synthetic;
+new live Windows XYZ/calibration is pending. Do not repeat M0/M2 or treat this
+as shared collision. Next: Windows procedure in WINDOWS.md, then inspect
+native geometry/material/frame ownership for a collision slice. D005 records
+the two candidate routes and why observations precede geometry injection.
+
+
+**Next source-only M3 geometry gate:** read [M3_GEOMETRY_GATE.md](M3_GEOMETRY_GATE.md).
+It records pinned upstream collision memory/partition/lifetime constraints and
+explains the new `tools/geometry_preflight.py` / `tests/test_geometry_preflight.py`
+synthetic triangle checks. These do not access commercial assets or alter native
+collision; a future original-runtime insertion is BLOCKED on real XYZ,
+calibration, genuine source geometry, explicit pool-capacity guards and
+native ownership evidence.
+
 ## 1. Objective and actual state
 
 User goal: a playable **Crash Bandicoot 1 × Super Mario 64** fusion retaining the
@@ -146,3 +173,24 @@ Required acceptance/report:
   when the testable M3 increment is ready, without automatic merge.
 - **No playable-fusion claim or Release/ZIP until real shared-world gameplay
   is implemented and verified on native Windows.**
+
+## Native Windows M3 session evidence and next gate — 2026-10-09
+An authorized paired session collected native M3 signed XYZ and Crash level from original gameplay, superseding earlier NOT_TESTED notes. Two native Mario coins received; one authorized native Cross; 22 native guest-memory rise/fall/AIR/ground samples. However X/Z were IDENTICAL across all samples. Horizontal variation, true Crash-to-Mario scale/yaw and Mario area identity remain unverified. The data is kept only in the Windows private cache; there is no new visual evidence, real native source collider, collision insertion or fused game.
+
+NEXT: operator-driven test with at least two distinct moving Crash X/Z positions in one level, independently observed Mario area and selected real spatial landmarks. Then observe Crash original octree collision volume/zone/object-generation and Mario native surface/node occupancy without mutation. Only after genuine geometry provenance, capacity and lifecycle gates can one bounded, reversible collider be considered. Do not invent calibration, preserve both solvers, keep draft PR #2 without merge or release.
+
+## Second authorized gameplay confirmation — 2026-10-09
+The same M3 Windows session now has four matched Mario coin emissions and native Crash receipts, two authorized guarded Cross applications (seq 1 and 3), and 42 real Crash XYZ/level samples. Real XZ fields differ across two captures: first (2091776,33844480), second (1985280,31528192), plus the second capture ends with X=1987328. Thus genuine variable native XZ observations, including a small X movement within the second observation, now VERIFIED_REAL. Earlier note of identical XZ within the *first* capture is still true but no longer characterizes the full session. No validated world-unit scale, Mario area identity, shared anchors, collision volumes, occupied native Mario pool budget or merged world. Next gate is instrumented read-only movement landmarks and area identity, then evidence-based relative frame calibration; no arbitrary geometry injection.
+
+## M3.1 Codex/independent reviewer handoff — 2026-10-09
+Codex delivered a first vertical slice, the opt-in native **Mario-only** continuous post-update read observer and finite private localhost CMW1 collector. The reviewer fixed Windows UTF-8 parsing, re-ran eight targeted tests, all 42 source tests, 27 M2 fixture integration checks, 17 native geometry fixture tests, and successfully rebuilt the private Windows sm64ex with cm64_pose.o included. Original native games were **not launched to test new observer**; no cross-engine alignment or shared collisions were measured. Crash's continuous source read is still pending a proven safe post-update hook. Do not misrepresent historical M2 live XYZ as M3.1 validation.
+
+NEXT: (1) authorized, bounded 60-120 second **Mario-only** operator session via the documented python -m tools.collect_pose workflow; measure actual native level/area, varying XYZ, epoch after area change, and no sending while paused, using private local JSONL, and visually confirm original physics remains intact. (2) Investigate a true safe post-physics Crash observer (not merely pad polling), opt-in with similar finite CMW1 semantics. (3) Choose real correspondence landmarks in both games and calculate scale/yaw/origin only after frame/area identity and native units are evidenced. (4) Original engine collision provenance/occupancy/lifetime gates remain mandatory before any native collider insertion. Preserve draft PR, source pins and main/m0-recon.
+
+## Next gate after M3.1 Mario live pose — 2026-10-09
+A user-run 180-s capped private Windows collection produced 1,137 genuine Mario CMW1 post-update pose frames (0 invalid, contiguous seq and native ticks). Level=16, area=1, 5 observer-local epochs, 441 distinct XYZ tuples, 21 native actions including WALKING/JUMP/DOUBLE_JUMP/TRIPLE_JUMP. Observed maximum 9 frames per sliding second; a 4.7-second sampling gap was compatible with a manual pause but NOT sufficient evidence to certify pause gating. No area transition was recorded; audio-only WASAPI endpoint warning was nonfatal. Privacy boundary: logs only in user's LOCALAPPDATA, neither their path identifiers, raw logs nor copyrighted game assets belong in Git.
+
+NEXT IMPLEMENTATION BY CODEX: add Crash-only opt-in bounded continuous read-only pose emitter with genuine native post-update sampling ownership (do not assume the existing pad polling is coherent); use existing CMW1 contract plus explicit Crash level/zone/frame identity when grounded, or mark missing as unknown and gate calibration. Preserve CMJ1 guarded coin-to-jump and original physics. Add deterministic lifecycle/rate/replay regression tests and operator-controlled separate private live collection; peer review and original-game build before runtime testing. Independently test manual pause with external time marker and optional area transition before claiming those validated. DO NOT calibrate across engines from two sets of native XYZ with no shared landmarks. Maintain draft PR until true original native collision gate.
+
+## M3.2 private Crash diagnostic observer handoff — 2026-10-09
+Codex produced an isolated read-only CMW1 Crash mod using a byte-span native RAM observer from RecompOne's controller polling seam, not proven postphysics. Reviewer verified 7/7 new Python, 49/49 full suite, 58/58 pinned native mod compiler/RAM/event-bus fixtures, 27/27 M2 fixtures and 17/17 native geometry fixtures, repaired the safe incomplete-private-build resumption logic and built a separate sealed Crash launcher (0 errors/warnings); only asset-free source code/tests/docs in worktree. Original pinned launcher and original M2 mod left untouched. Actual new Crash diagnostic gameplay/packets STILL NOT_TESTED. Run local operator test from WINDOWS.md to validate it, then re-audit unchanged original gameplay. Do not reclassify diagnostic pad polling as a coherent physics frame, nor infer Crash-to-Mario coordinate transform from unrelated live XYZ clouds. Future postphysics read seam, genuine frame identity, source collision geometry and engine-local pool ownership/capacity remain gates. PR draft, unmerged until proven.

@@ -93,12 +93,22 @@ try {
     // The native monitor only reads the pinned NTSC-U player pointer and fields.
     const uint playerObject=0x80070000u;
     memory.WriteU32(0x800566B4u,playerObject);
+    memory.WriteU32(playerObject+0x80u,unchecked((uint)-257));
+    memory.WriteU32(playerObject+0x88u,513u);
     memory.WriteU32(playerObject+0x84u,100000u); // position Y, signed raw
     memory.WriteU32(playerObject+0xA8u,0); // velocity Y
     memory.WriteU32(playerObject+0x2Cu,2); // walk
     memory.WriteU32(playerObject+0x120u,0); // not air
     memory.WriteU32(playerObject+0xC8u,1); // GROUNDLAND
-    Send(11); Thread.Sleep(5); var keyboardPad=Pad(0xffff);
+    var motionOutput = new StringWriter();
+    var originalOutput = Console.Out;
+    ushort keyboardPad;
+    try {
+        Console.SetOut(motionOutput);
+        Send(11); Thread.Sleep(5); keyboardPad=Pad(0xffff);
+    } finally { Console.SetOut(originalOutput); }
+    Check(motionOutput.ToString().Contains("x_raw=-257 z_raw=513 crash_level=9"),
+        "compiled native observer exports signed XYZ and source level");
     Check(KeyboardApplied()==1 && (keyboardPad & Controller.Cross)==0,
         "one W tap permits the first later coin with no R1 held");
     var sampleAt=type.GetField("nextMotionSample",BindingFlags.NonPublic|BindingFlags.Instance)!;
@@ -120,6 +130,8 @@ try {
         "motion samples capture simulated rise, AIR flag and ground-after-air");
     Check(memory.ReadU32(playerObject+0x84u)==100000u && memory.ReadU32(playerObject+0xC8u)==1u,
         "diagnostic observer never writes to native player motion fields");
+    Check(memory.ReadU32(playerObject+0x80u)==unchecked((uint)-257) && memory.ReadU32(playerObject+0x88u)==513u,
+        "XYZ observation preserves native horizontal coordinates");
     motionEnd.SetValue(keyboard,Environment.TickCount64-1); Pad(0xffff);
     Check(((long)motionEnd.GetValue(keyboard)!) == 0,
         "motion sampling stops after its bounded observation window");
@@ -148,4 +160,4 @@ try {
     Environment.SetEnvironmentVariable("CM64_PORT",null);
     Environment.SetEnvironmentVariable("CM64_KEYBOARD_ARM",null);
 }
-Console.WriteLine("VERIFIED_SYNTHETIC: 25 checks; fixture RAM, no original gameplay or shared-world validation.");
+Console.WriteLine("VERIFIED_SYNTHETIC: 27 checks; fixture RAM, no original gameplay or shared-world validation.");

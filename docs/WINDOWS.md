@@ -74,3 +74,112 @@ In Crash **gameplay** (not the title/menu), tap **W** once and release it. This 
 After a valid real `input_applied seq=N`, the authored Crash source mod now **reads** (never writes) the original NTSC-U player object for 3.5 seconds. It records `motion_sample seq=N` every ~120 ms: raw Y position, vertical velocity, state index, AIR flag and GROUNDLAND flag. The closing `motion_summary seq=N` records min/max/last Y and `rise_and_landing_candidate`. Candidate means **observational evidence to review**, not an automatically validated physical jump: inspect the timeline and game window before calling it real. Invalid/unavailable player pointers, level changes and pauses stop sampling without changing input/physics. Original upstream fields are grounded in the pinned `RecompOne.Runtime/Host/FramePacing.cs` (Crash pointer `0x800566B4`, translation Y `+0x84`, velocity Y `+0xA8`, state `+0x2C`, state flags `+0x120`, status A `+0xC8`). This is a diagnostic specific to the supported US Crash build, not a universal memory map.
 
 Use the keyboard-only `-Apply -KeyboardArm` command above. Tap W in real Crash gameplay, switch to Mario and collect a yellow coin within 60 seconds. Keep Crash unpaused and visible while it moves. Correlate `coin`, `received`, `input_applied`, `motion_sample`, `motion_summary` by sequence, and separately verify the visual jump/landing. As of this change, local Windows fixture checks **25/25 PASS**, Python **6/6 PASS**; the new native-state sampling has **not yet been observed in a live cross-game jump**, and shared-world fusion remains unimplemented.
+# Next local test: M3 XYZ and calibrated frame preflight
+
+M2 already passed on the user's Windows PC (CODEX_HANDOFF/EVIDENCE); older
+NOT_TESTED notes below are historical. This increment has only Cloud synthetic
+verification. In PowerShell 7, rebuild/install the updated source mod using
+the existing configured private game files, then run:
+
+```powershell
+./tools/windows/Build-Integration.ps1
+./tools/windows/Test-Integration.ps1  # expect 27 fixture checks
+./tools/windows/Start-Integration.ps1 -CrashDisc 'D:/MyGames/Crash/game.cue' -Apply -KeyboardArm -Seconds 300
+```
+
+Use the previously validated keyboard procedure: W in unpaused Crash gameplay,
+release, collect a Mario coin within 60 seconds. Inspect the private Crash log
+under `%LOCALAPPDATA%/CrashMarioFusion/M0/logs`: `motion_sample` must now retain
+Y/flags and add signed `x_raw`, `z_raw`, `crash_level`. Move Crash horizontally
+while sampling to verify X/Z change; verify native controls/jump/landing remain
+normal. The M3 reader itself injects nothing; this paired acquisition uses the
+existing guarded M2 input. Do not upload local logs or game files.
+
+Create an explicit calibration using local measured/chosen placement anchors,
+not arbitrary defaults. Origin XYZ inputs are JSON arrays; Crash origin is
+raw XYZ divided by 256, Mario origin is the native `received ... pos=` value.
+Scale and yaw describe the chosen world placement, not measured physics units.
+This prompt writes only operator-supplied values to the private cache:
+
+```powershell
+$calibration = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M0/world-calibration.json'
+@{
+    schema_version = 1
+    crash_level = [int](Read-Host 'Crash level from motion_sample')
+    mario_frame = Read-Host 'Confirmed Mario level and area (remain in this area)'
+    crash_origin = @(ConvertFrom-Json (Read-Host 'Crash native origin [x,y,z], raw divided by 256'))
+    mario_origin = @(ConvertFrom-Json (Read-Host 'Mario native origin [x,y,z]'))
+    scale = [double](Read-Host 'Explicit positive landmark distance ratio Mario/Crash')
+    yaw_degrees = [double](Read-Host 'Explicit XZ landmark alignment yaw in degrees')
+} | ConvertTo-Json | Set-Content -LiteralPath $calibration -Encoding utf8
+./tools/windows/Test-WorldCoordinates.ps1 -CrashLog 'C:/path/to/private/crash.log' -Calibration $calibration
+```
+
+Review `crash_native`, `mario_candidate`, `roundtrip_error` and
+`floor_query_safe` in the private report. Test a new level against the old
+calibration: it must fail. Old Y-only M2 logs must fail; do not invent XZ.
+A true bounds flag does not assert a floor exists. Mario level/area is still
+operator-confirmed, not instrumented. This test validates observations and
+placement only: neither character walks on the other's geometry yet.
+Next necessary work is verified native geometry/material extraction locally
+and a native collision insertion seam with explicit world ownership.
+
+## Asset-free native-code geometry oracle (no game launch)
+
+From the configured Windows checkout in PowerShell 7:
+
+```powershell
+./tools/windows/Test-Geometry.ps1
+```
+
+This uses existing pinned public sm64ex source/MSYS2 GCC, authored triangle
+data, bounded fixture pools and the original loader/floor queries, plus pure
+geometry/snapshot tests. It neither reads ROM/disc files nor starts the games.
+Linux Cloud ASan/UBSan results do not establish Windows sanitizer coverage.
+The new script has only been parsed on Linux; actual Windows execution pending.
+Log remains private in the standard TaskLogs directory.
+
+The next **real** experiment requires explicit local execution authorization:
+passively observe authentic Crash collision query bounds/type/subtype at the
+existing physics/final-update seams, record level/zone/object generation and
+validate source units separately from player XYZ. Observe Mario pool occupancy
+and dynamic cleanup/update ordering in the selected area. Confirm calibration
+and native motion visually. Do not inject even one replica until those gate
+conditions pass; include a no-insertion control and reload cleanup when ready.
+
+## M3 geometry oracle: native Windows validation (2026-10-09)
+
+`Test-Geometry.ps1` now passes **17/17** on the configured Windows 11 / MSYS2 MINGW64 machine. The first local run exposed a PE/COFF linker portability difference: unused full-game dependencies retained by MinGW caused undefined references despite `--gc-sections`. The isolated test harness now supplies **Windows-only abort-on-call stubs** for those unrelated paths. It continues to compile and exercise the **original pinned** sm64ex surface loader and `find_floor`; if an unrelated stub is called, the test aborts instead of reporting a fabricated result. The complete Python suite passed **34/34**, and `Test-Integration.ps1` passed **27/27** using fixture RAM. These are synthetic results, not a real-world collision test. The original checkout and game processes were left untouched.
+
+The real XYZ/calibration procedure above is still pending and requires a paired game session and operator-confirmed landmarks. Never use the authored synthetic oracle coordinates as live calibration anchors.
+
+## M3.1 private native Mario pose capture (first half of two-engine telemetry)
+Windows 11 x64: opt-in, rate-limited (at most 10 Hz), read-only **Mario** pose frames emitted from the post-update native gameplay seam. No Crash continuous pose emitter yet; M2 CMJ1 and existing Crash jump tests are independent. Native Mario level+area IDs and an observer-local epoch travel in the 16-byte CMW1 frame field; the epoch is NOT authoritative engine frame generation. The emitter invalidates its frame across pause/area changes and refuses unavailable states. Limit 300 seconds and 3000 samples per run, to UDP 127.0.0.1 only, with no network replay or gameplay modification. Logs and the authorized retail ROM stay in LOCALAPPDATA outside Git.
+
+From the isolated project worktree in **PowerShell 7**, after a successful Build-Integration.ps1 (on your own cached validated Mario ROM):
+
+```powershell
+cd 'C:/Users/Kauan/Projects/crash-mario-fusion-m3'
+$env:PATH = 'C:/msys64/mingw64/bin;' + $env:PATH
+$env:GALLIUM_DRIVER = 'llvmpipe' # only on the verified Intel-HD local Mesa software-GL setup
+$marioExe = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M0/sm64ex-cm64/build/us_pc/sm64.us.f3dex2e.exe'
+& 'C:/msys64/mingw64/bin/python.exe' -m tools.collect_pose --mario-exe $marioExe --seconds 90 --count 800
+```
+
+The collector launches exactly one Mario child with CM64_POSE_ENABLE=1 and a fresh random session, writes snapshots.jsonl/mario.log/summary.json into LOCALAPPDATA/CrashMarioFusion/telemetry/<random-folder>, and closes the child at timeout, count or Ctrl+C. This session has **not yet been run with the new emitter**; successful source/native compilation is NOT live-game proof. For a real gate the operator must move Mario while playing, confirm actual native level and area, pause/area transition behavior, and visually verify normal original gameplay. Never commit the retail files or telemetry. No calibration is automatic and no shared physics is implied. Original M2 session and runner remain separate.
+
+## M3.1 Mario live-pose collector observed result — 2026-10-09
+The user executed the prior documented 180-second private native Mario collector: 1,137 accepted CMW1 pose packets; zero rejected; original native player XYZ, Mario level=16 area=1, walking and jump action identifiers, original-game native ticks; no packet sequence losses and observed max 9 messages in a sliding 1-second interval. A 4.7-s silent gap coincided with an observer epoch change, compatible with the requested pause but not conclusive proof of pause suppression. All five observer epochs were in the same area, therefore an actual area switch was not tested. WASAPI audio endpoint warning did not prevent pose collection. Generated summary.json intentionally keeps calibration_ready=false and live_gameplay_verified=false as a collector-internal no-visual-certification default. Human review classified actual native CMW1 telemetry VERIFIED_REAL; cross-engine calibration remains BLOCKED. No telemetry bytes were put in source control.
+
+## M3.2 — private real Crash diagnostic pose test (not Mario and not shared-world calibration)
+Preflight already performed on user's Windows 11: Build-CrashPose.ps1 compiled a **separate** .NET 10 Crash launcher at LOCALAPPDATA/CrashMarioFusion/M3-crash-pose/app with 0 errors/warnings and SHA-256 manifest. It reuses the user's original retail Crash CUE *only at runtime*, locally; it does not upload, duplicate or mutate that disc. Original Crash M0 launcher and both main/m0-recon worktrees untouched. This diagnostic mod is disabled outside an operator-controlled session, and no new actual Crash gameplay session has yet been run.
+
+From PowerShell in the isolated source checkout, run the one-shot collector below (it launches its private Crash, not Mario):
+```powershell
+cd 'C:\Users\Kauan\Projects\crash-mario-fusion-m3'
+$env:PATH = 'C:\msys64\mingw64\bin;' + $env:PATH
+$disc = Join-Path $HOME 'Downloads\Crash Bandicoot (USA)\Crash Bandicoot (USA).cue'
+& 'C:\msys64\mingw64\bin\python.exe' -m tools.collect_crash_pose --crash-disc $disc --seconds 180 --count 1200
+```
+In actual Crash gameplay: stand still at first, walk different directions for >=15s, jump normally 3 times, pause ~5s then resume, walk+jump more, preferably change level only if convenient. The collector stops after at most 180s or 1200 accepted packets (Ctrl+C also stops it) and closes *only its child*. It requires the private sealed allowlisted build, sends/accepts localhost UDP only, and stores snapshots.jsonl, crash.log and summary.json in a random folder under LOCALAPPDATA/CrashMarioFusion/telemetry, never Git. If the runtime cannot reach valid gameplay or emits no packets, the collector exits with an honest failure and retains the private summary for diagnosis; don't retry blindly or delete game folders.
+Expected validation: native signed XYZ and rotation variation, actual Crash level, observer epoch changes on pause/level/replacement, sequence order, <=10Hz and unchanged native input. The CMW1 phase is UNKNOWN_DIAGNOSTIC, native_tick is a pad-callback ordinal, and this run **cannot validate postphysics coherence or world-fusion alignment**. Do not ask for coins/W arm, Mario is NOT involved in this session. M2 integration is unchanged. For another Build-CrashPose, an existing sealed private directory is intentionally protected, so do not rerun the build script over it; use the collector with the already verified build.

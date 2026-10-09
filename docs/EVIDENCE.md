@@ -131,3 +131,157 @@ GitHub Actions **Asset-free integration checks** completed successfully on hoste
 - A separate local Windows invocation of the same source-only unit suite ran **12/12**, exit 0, with MSYS2 MINGW64 GCC available.
 
 Classification: **VERIFIED_SYNTHETIC** on the hosted Linux runner, which executes the C sender and test fixture but does NOT launch original Crash/SM64 ROMs. No commercial assets or game files entered GitHub. The earlier Windows game-runtime jump telemetry remains a separate, operator-confirmed **VERIFIED_REAL** result. A future Codex Cloud session should run its own tests and report its own exit status.
+## M3 coordinate increment — Cloud Linux, 2026-10-09
+
+Base: `m0-recon` **38bb59413071995c921efd87bf95c8fd51d3e83b**;
+working branch `feat/m3-coordinate-contract`. Read Issue #1 through GitHub HTML
+(API blocked by proxy), canonical CODEX_HANDOFF and the relevant pinned source
+seams. Existing Windows M2 observations are retained; no games ran in Cloud.
+
+- `python -m unittest discover -s tests -v`: **17/17 PASS**, Python 3.12.14,
+  GCC 14.2.0. Includes actual C UDP wire sender plus synthetic coordinate
+  invariants, signed fixed-point extrema, f32 precision-collapse rejection,
+  floor-boundary checks, source-level guards and recorded Windows trace replay.
+- `bash tools/check_integration.sh`: **27 checks PASS**, .NET SDK 10.0.401.
+  Compiled patched pinned sm64ex `interaction.c`, production C sender and
+  Crash mod via actual upstream ModCompiler/event bus; player RAM is a fixture.
+  Signed XYZ output and preservation of horizontal player fields asserted.
+- PowerShell 7.5.4 AST parse of `tools/windows/*.ps1`: **9 PASS** on Linux,
+  including Test-WorldCoordinates. This is not native Windows execution.
+- `python tools/world_coordinates.py --log
+  /workspace/.cache/crash-mario-m0/logs/integration-checks.log --calibration
+  .cache/integration/synthetic-world-calibration.json`: **PASS**, two actual
+  compiled-adapter fixture log samples consumed, inverse error 0. Test placement
+  is explicitly SYNTHETIC_FIXTURE_ONLY, not a proposed native-game calibration.
+  Reports/logs remain in ignored local caches. `git diff --check`: PASS.
+
+All new results are **VERIFIED_SYNTHETIC**. Real Windows XYZ acquisition,
+calibration, shared geometry/collision/rendering: **NOT_TESTED / NOT IMPLEMENTED**.
+No commercial files, extracted resources or generated game binaries added.
+QA review found possible float32 collapse with extreme calibrations; corrected
+with per-sample half-raw-unit inverse-error rejection and regression cases.
+No new Astra decision was necessary; D005 preserves the existing architecture.
+
+Publication: implementation **210911e** pushed successfully to
+`origin/feat/m3-coordinate-contract`. `gh pr create --base m0-recon --head
+feat/m3-coordinate-contract` failed: `Post https://api.github.com/graphql:
+Forbidden`; unauthenticated API CONNECT also returned HTTP 403 from Envoy.
+The configuration lacked `api.github.com`; an additive allowed-domain draft
+was saved (requires review/save and environment publication, not applied here).
+PR creation and this branch's PR-triggered hosted CI remain BLOCKED.
+Open manually at
+https://github.com/kauankelvin7/crash-mario-fusion/compare/m0-recon...feat/m3-coordinate-contract?expand=1
+or retry `gh pr create --repo kauankelvin7/crash-mario-fusion --base m0-recon
+--head feat/m3-coordinate-contract` after supported API access works. No merge.
+
+## M3 native Windows preflight — independent verification
+
+The M3 branch `748443e` was checked out separately on the authorized Windows 11 host in a clean detached worktree; the existing local `m0-recon` checkout remained unchanged. Native tests on Windows: `python -m unittest discover -s tests -v` **17/17 PASS**, `tools/windows/Test-Integration.ps1` **27/27 PASS** using upstream compiled Crash adapter and fixture RAM, PowerShell AST syntax **9/9 PASS**. `tools/windows/Build-Integration.ps1` **exit 0** after private original-runtime build and installation; the M3 Crash mod source SHA-256 matched the installed source. The source/archive `git HEAD` warning is non-fatal; no runtime success is inferred from that warning.
+
+`tools/windows/Test-WorldCoordinates.ps1` **exit 0** on two adapter-fixture samples with deliberate calibration `mario_frame=SYNTHETIC_FIXTURE_ONLY_NOT_PHYSICAL_ALIGNMENT` (scale 1, yaw 0), both roundtrip errors 0 and conservative floor range true. These anchors deliberately do **not** claim real-game spatial alignment. The calibration and all output remain in the private Windows cache. GitHub Actions pull-request [run 37955403614](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37955403614) succeeded on hosted Linux (source-only).
+
+A fresh private paired real-game session was started with `-Apply -KeyboardArm`, native Crash receiver ready and both windows responsive. At the time of this record no native M3 XYZ sample had yet been collected; **Windows native XYZ movement/calibrated cross-game placement remain NOT_TESTED**. All listed test results are **VERIFIED_SYNTHETIC**, except original-run *startup* being VERIFIED_REAL for process/window readiness. The prior M2 live jump is separate and remains confirmed. PR [#2](https://github.com/kauankelvin7/crash-mario-fusion/pull/2) is open as a **draft** against `m0-recon`; this supersedes the earlier Codex proxy/PR-blocked note. No merge or retail data upload.
+
+## Asset-free M3 geometry preflight — source review and CI
+
+Read-only source inspection of pinned upstream sm64ex `d7ca2c0` found `struct Surface` holding signed `Vec3s` vertices in `include/types.h:228-243`, static/dynamic 16×16 partitions and per-cell surface-node fan-out in `src/engine/surface_load.c:24-25,266-294`, `find_floor` float-to-s16 casts in `src/engine/surface_collision.c:512-544`, and `alloc_surface_node`/`alloc_surface` increments with ineffective empty overrun guard bodies in `src/engine/surface_load.c:43-75`. Upstream active pool occupancy has **not** been measured; an arbitrary native insertion could overrun those pools.
+
+Added `tools/geometry_preflight.py`, `tests/test_geometry_preflight.py`, and `docs/M3_GEOMETRY_GATE.md`. These accept **synthetic, caller-authored** triangle vertices already in Crash view units, require explicit frame/level mapping, check face indices, duplicate/degenerate geometry, winding, numeric bounds, float32 retention and **collapse or flipped orientation after native signed-s16 truncation**. Preview caps (4096 vertices, 512 triangles) are independent tool caps, explicitly **NOT proof of available native surface pool**. Output says no native collision, rendering, material or capacity verification has occurred.
+
+Hosted GitHub Actions [run 37957543671](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37957543671) completed successfully against this source-only change; a prior run [37957367390](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37957367390) logs **25 Python tests PASS** including 8 geometry tests and the original C/UDP sender. This is **VERIFIED_SYNTHETIC only**, **NOT_TESTED** for collision/geometry in the actual Crash/SM64 runtime. No Windows games were launched during this source-only increment; native XYZ/operator calibration remain pending. 
+## M3 original collision-code oracle and snapshots — Cloud, 2026-10-09
+
+Continued remote feature at `a0abc0b36abac45d8d306b2a5a3ea81a4fa9fa47`;
+native geometry implementation commit `469b421`. Did not repeat M0/M1/M2.
+Read latest gate/handoff and attached existing draft PR #2 targeting m0-recon.
+
+- `python -m unittest discover -s tests -v`: **34 PASS, exit 0**, no skips
+  in this Cloud run. Python 3.12.14 / GCC 14.2.0; log ignored at
+  `.cache/integration/m3-geometry-tests.log`.
+- Native oracle compiles unchanged pinned full-sm64ex `surface_load.c` and
+  `surface_collision.c`, using linker GC for unrelated code, Linux
+  `-fsanitize=address,undefined -fno-sanitize-recover=all`. Six authored type/yaw
+  cases verify mapped integer vertices, floor height 20, upward native normal,
+  DEFAULT/BURNING type retention and signed room metadata, exact node fan-out,
+  no-insertion control, capacity refusal with existing contact retained,
+  time-stop retention and dynamic cleanup. No character simulation or burning
+  gameplay tested. Malformed/truncated/oversized inputs rejected; no sanitizer
+  findings. Pool sizes belong only to the fixture (2 surfaces/256 nodes).
+- `bash tools/check_integration.sh`: **27 checks PASS, exit 0**, .NET 10.0.401;
+  log `.cache/integration/m3-event-regression.log`. Original M2 C sender / native
+  compiler / pad-event fixture regression remains passing.
+- PowerShell 7.5.4 parser: **10 ASTs PASS**, including Test-Geometry.ps1,
+  on Linux. New Windows script execution **NOT_TESTED**; no game launched.
+- CMW1 deterministic tests: raw native pose/state types and packet lengths,
+  malformed/nonfinite rejection, session/frame identity, ordering, pause and
+  receiver-age expiry, independent native tick wrap, two-slot storage over
+  2000 accepted observations. No live emitters or cross-clock freshness claim.
+- Read-only gate QA: PASS. Fresh explicit gpt-6-astra architectural review
+  returned conditional boundary-replica recommendation; evidence/limits in D006.
+  Authoritative Crash collision volume units, guest query layout/material
+  semantics and actual Mario pool availability are not inferred by this proof.
+
+All new results **VERIFIED_SYNTHETIC**. Live native geometry/collision/rendering,
+pose synchronization and gameplay **NOT_TESTED/UNIMPLEMENTED**. Original
+commercial files and private Windows traces remain off Git; no remote PC used.
+Hosted workflow now checks pinned public sm64ex and runs the native oracle;
+explicitly configured missing sources/compiler fail rather than skip.
+
+Published code commit **857a6a13260678ac9cdeda3d290320177821d3e8**; draft
+[PR #2](https://github.com/kauankelvin7/crash-mario-fusion/pull/2) updated via
+REST after the local gh editor hit the deprecated Projects-classic query.
+[Hosted CI 37959761599](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37959761599)
+conclusion **success**, with public-source checkout and test steps successful
+according to the jobs API. Individual hosted logs could not be downloaded:
+proxy denied `results-receiver.actions.githubusercontent.com`; exact test
+counts above come from the Cloud-local log, not that unavailable archive.
+No merge, remote Windows execution or release performed.
+
+## M3 native Windows geometry oracle and source-only regression — 2026-10-09
+
+On the user's connected Windows 11 machine, checked out exact feature commit `cbaa67a` in an isolated clean Git worktree (`crash-mario-fusion-m3`) without changing the original checkout or starting either game. First execution of `tools/windows/Test-Geometry.ps1` failed at MinGW/PE-COFF link time: unrelated full-game references from pinned `surface_load.c` and `surface_collision.c` were not eliminated by section GC as they were on Linux. The captured linker output included `main_pool_alloc`, object/terrain helpers, debug helpers, vector helpers and engine globals. This is a Windows test-harness portability issue, not evidence of an original-game collision failure.
+
+Added Windows-only **fail-fast, unreachable dependency stubs** in `tests/native_geometry_probe.c` for unrelated full-game entry points. Any accidental call aborts the fixture rather than supplying simulated collision behavior. The original `read_surface_data`, `add_surface`, `find_floor`, partition and dynamic cleanup implementations remain compiled from the exact pinned upstream source. No game executable or upstream source was patched.
+
+After the fix, `Test-Geometry.ps1`: **17/17 PASS, exit 0** (including 2 native original-code oracle tests); `Test-Integration.ps1`: **27/27 PASS, exit 0** (fixture RAM); complete MSYS2 Python source suite with `CM64_SM64EX_ROOT` pinned: **34/34 PASS, exit 0**, no skips. All **VERIFIED_SYNTHETIC on native Windows**, not real geometry/physics in the games. Original M2 real jump evidence is unchanged. Authentic M3 XYZ, operator-chosen calibration, source collider semantics, native pool occupancy, real collision injection and shared renderer remain NOT_TESTED or UNIMPLEMENTED. No commercial data was uploaded; no game was started. Keep PR #2 draft.
+
+## M3 live Windows XYZ capture — 2026-10-09 (post-Windows oracle)
+An authorized paired game session ran the private native Start-Integration.ps1 runner with Apply/KeyboardArm enabled on Windows. Both original game processes were alive and responsive when inspected. The private log remains under LOCALAPPDATA/CrashMarioFusion/M0/logs and MUST NOT be uploaded; only redacted conclusions follow.
+
+The actual Crash receiver recorded two native Mario coin events (seq=1, seq=2) with distinct ticks/coin counts. The first was armed and recorded one native Cross application; the second did not record another input application. Real guest memory for seq=1 produced 22 motion samples, rising and falling native Y, 17 AIR samples, and grounded state after air movement with sustained GROUNDLAND. Native summary: rise_and_landing_candidate=True, classification OBSERVATION_ONLY. These data corroborate the M2 event-triggered jump. No new independent video was taken; do not claim a fresh visual confirmation.
+
+This is a real signed XYZ/Crash-level read: all 22 native samples carried x_raw, y_raw, z_raw and crash_level=9. However X and Z each had ONLY ONE DISTINCT VALUE throughout the 3.5-second sampling window. Authentic native fields are observed, but varied horizontal movement and source units are NOT_VERIFIED. Mario level/area and separate landmarks were not observed, so cross-engine frame placement, scale and yaw remain UNCALIBRATED; Test-WorldCoordinates.ps1 was not run against a real calibrated pair. Neither original collision geometry nor native pool occupancy nor a collider insertion was tested.
+
+Classification: VERIFIED_REAL for native coin receipt, signed XYZ field sampling and the recorded guest-memory rise/air/landing sequence. NOT_VERIFIED for horizontal movement, calibrated frame, geometry/collision equivalence or shared playable game. No local logs, game data or private artifacts were committed. PR stays draft.
+
+## M3 second live Windows movement check — 2026-10-09
+Same authorized native paired Windows session as previous entry, with additional user-directed gameplay. Inspecting both private Crash stdout and Mario stderr yielded four actual native Mario coin event emissions/receipts, sequences 1 through 4. Under explicit keyboard arming, only seq=1 and seq=3 logged input_applied; seq=2 and seq=4 explicitly logged observe-only/drop. Therefore 4 real receipts and 2 guarded original-game Cross applications. This documents gating behavior, not simultaneous shared-world collision.
+
+For seq=1, the prior 22 samples showed Y rise/air/ground transition from player native X=2091776, Z=33844480. For seq=3, 20 additional genuine guest-memory XYZ samples also displayed Y rise, AIR and ground-after-air transition: initial X=1985280, Y=1086699, Z=31528192; final X=1987328, Z=31528192, with one in-window X change by +2048 native raw units after the air-to-ground transition. Comparing initial seq=1 vs seq=3: delta X=-106496, delta Z=-2316288 in native raw units. Three distinct XZ observations exist across the captures. This supports **VERIFIED_REAL varied horizontal coordinates across gameplay** and an X field change during active observation; no continuous walk trajectory or conversion of raw units to world metric units was proven. Crash level stayed 9 in all 42 samples.
+
+The Mario native observer's stderr recorded the same four coin events with changing Mario XYZ (seq=1 to seq=4). These do not determine level/area identity or any shared landmark. Native calibration, relative axis/scale/yaw, Crash octree geometry provenance, original Mario pool occupancy, collider injection and shared rendering/gameplay remain NOT_VERIFIED or UNIMPLEMENTED. No new independent visual capture. Logs and ROM/disc assets remain locally private. PR is draft, no merge.
+
+## M3.1 native Mario spatial observer: source, Windows build and synthetic QA — 2026-10-09
+On the isolated Windows worktree, Codex CLI with explicit gpt-6-astra produced new opt-in CMW1 Mario pose emitter (integration/sm64/cm64_pose.[ch]), privacy-bounded loopback collector (tools/collect_pose.py), test fixture sender and protocol/source tests, plus private pinned-sm64ex generated-source hooks (tools/prepare_integration.py). Separate reviewer repaired Windows cp1252 default-decoding by making file reads/writes explicit UTF-8 in the source preparation workflow. The original pinned upstream Git checkout was untouched, and no game was launched for this M3.1 test. The existing CMJ1 coin behavior was left intact. Generated private runtime source under LOCALAPPDATA was updated by its existing source-preparation script, never uploaded.
+
+Test commands from isolated worktree (MSYS2 MINGW64 Python, CM64_SM64EX_ROOT pointing to the clean pinned public sm64ex) yielded: python -m unittest tests.test_live_pose -v, **8/8 PASS**, including actual production C pose sender and native pinned game source compilation; python -m unittest discover -s tests -v, **42/42 PASS**. PowerShell 7 tools/windows/Test-Integration.ps1 yielded **27/27 PASS** (fixture RAM), and tools/windows/Test-Geometry.ps1 yielded **17/17 PASS** (original pinned collision code in fixture harness). tools/windows/Build-Integration.ps1 exited 0 on Windows: original Crash .NET Release built with 0 errors/0 warnings, private generated sm64ex updated and linked into the executable with both cm64_coin.o and **cm64_pose.o**. A non-fatal upstream Makefile git HEAD warning appeared in an archived non-Git source tree; make nevertheless completed successfully. The executable exists in the private cache, but **new native gameplay/pose packets NOT_TESTED**. Tests against faked clocks, source builds and synthetic geometry are VERIFIED_SYNTHETIC only; the live-game original M2 event/XYZ findings remain separately VERIFIED_REAL, not M3.1 evidence.
+
+The CMW1 frame descriptor encodes native Mario level/area and an **observer epoch**, explicitly NOT the Mario engine's authoritative frame generation. Automatic world-coordinate calibration remains prohibited without real operator-chosen shared landmarks. Continuous Crash post-update capture was intentionally deferred: controller sampling is not established as a coherent physical tick. No collision ingestion or player memory write; no retail data or telemetry log in Git.
+
+## M3.1 REAL Windows Mario continuous-pose validation — 2026-10-09 (supersedes new-pose NOT_TESTED)
+After the successful native Mario Windows build at commit db30c5b, the user ran the documented opt-in private collector with the game during actual gameplay. Independently inspected private per-session JSONL and summary under LOCALAPPDATA/CrashMarioFusion/telemetry (NOT in Git): 1,137 accepted original-engine CMW1 Mario post-update packets, 0 rejected / 1,137 attempts, 1 current 16-byte session, contiguous sequences 1..1137, strictly increasing native ticks (468..4859) and receiver monotonic times, finite XYZ throughout; no paused=true frame was emitted. Elapsed time between first/last accepted packets 147.824 s of the 180-s bounded collector operation. Native level 16, native area 1 for the entire sampled run; observer-local generations 1..5, with sizes 480/57/84/252/264. These are NOT engine-authoritative generation IDs and do NOT prove an area change. All five frames corresponded to the same native level+area, so real area switching is still NOT_TESTED.
+
+Distinct XYZ positions=441. Native player coordinate extents X [-3944.2393,6949.1470] (408 distinct X); Y [-1169.4817,1030.9401] (234 distinct Y); Z [-1683.9216,4778.2520] (399 distinct Z), all numeric units uncalibrated. 21 distinct native Mario action values, including the pinned-original labels ACT_WALKING=0x04000440, ACT_JUMP=0x03000880, ACT_DOUBLE_JUMP=0x03000881, ACT_TRIPLE_JUMP=0x01000882; this supports real walking/jumping observation. Never assume these native Mario coordinates are numerically aligned to Crash raw coordinates.
+
+Arrival timing: overall 7.69 accepted packets/second during 147.824 s (including gaps); median interarrival approx 0.133 s; max observed count in any sliding 1-second arrival window 9 (<=10 Hz intended bound); source monotonic rate limiter independently covered by the previously green C tests. Four >0.5-s gaps observed near observer-epoch changes, of which the largest was 4.700 s, consistent with the operator's requested ~5-s pause. This absence of emitted records suggests gating, but is NOT direct proof of pause-button causality, because paused frames are intentionally never emitted; requires a time-marked manual pause control before claiming verified suppression. No native area transition was observed. The private mario.log has one SDL_OpenAudio WASAPI error (requested audio endpoint unavailable) but no telemetry failure; pose packets continued successfully. Collector's original machine summary deliberately says live_gameplay_verified=false / calibration_ready=false because the collector cannot itself perform independent visual certification; the separate evidence review verifies REAL native packets but makes NO new visual claim.
+
+Classification: VERIFIED_REAL = native Mario CMW1 pose packets, valid XYZ changes, native original actions and level/area identity, delivery/sequence/frequency. PARTIALLY_OBSERVED = pause-like 4.7-s gap/observer invalidation. NOT_VERIFIED = actual area transition, visually verified pause gating, absolute world frame/time synchronization with Crash. NOT_IMPLEMENTED = continuous native Crash emitter or shared physics/geometry/rendering. Keep exact session identifier, session tokens, full JSONL, any private file contents and ROM out of Git; only aggregate conclusions are committed.
+
+## M3.2 Crash diagnostic CMW1 observer — Windows implementation gate, 2026-10-09
+In isolated source worktree feat/m3-local-validation, Codex CLI authored integration/crash_pose/CrashPoseMod.cs and mod.json, source-only private launcher preparation tools/prepare_crash_pose.py, tools/windows/Build-CrashPose.ps1 and Test-CrashPose.ps1, finite localhost-only tools/collect_crash_pose.py, Python tests/test_crash_pose.py and actual upstream mod fixture integration tests/crash_pose. Independent reviewer verified no replacement or change to pinned private original checkout, and repaired an idempotent private staging blocker by requiring a recognized pinned source and an incomplete/not-sealed private build before allowing resumption. No user game disc, ROM, retail files, telemetry JSONL, private full logs or tokens included in Git or uploaded.
+
+Actual native seam: pinned RecompOne.Runtime.Events.PadReadEvent occurs during controller polling and is NOT verified as post-Crash-physics. Crash CMW1 phase=0 UNKNOWN_DIAGNOSTIC; observer callback ordinal, NOT simulated/native physics frame tick. The emitter reads pinned SCUS-94900 addresses from PSMemory.Ram direct read-only span to avoid IMemory.ReadU32 count-access/VBlank side effects, and tests confirm no RAM/input mutation. Signed native translation +0x80/+0x84/+0x88, signed native rotation +0x8c/+0x90/+0x94, state +0x2c and flags +0x120. Frame descriptor M32D+native level+observer epoch+reserved zero is an observer identity, NOT authentic physics generation. Calibration_ready is permanently false for this diagnostic workflow; original source geometry, collision insertion and cross-engine mapping remain NOT_VERIFIED.
+
+Windows verification with MSYS2 MINGW64 Python, PowerShell 7, cached pinned public-source RecompOne launcher: python -m unittest tests.test_crash_pose -v passed 7/7; python -m unittest discover -s tests -v passed **49/49**; tools/windows/Test-CrashPose.ps1 passed **58/58 fixture assertions** with the actual pinned mod compiler, RAM implementation, native event bus, no memory writes, unchanged physical buttons and verified no access-counter/VBlank side effects; tools/windows/Test-Integration.ps1 passed **27/27**; tools/windows/Test-Geometry.ps1 passed **17/17**; tools/windows/Build-CrashPose.ps1 built separate private Win64 .NET launcher at LOCALAPPDATA/CrashMarioFusion/M3-crash-pose with **zero errors and warnings**, sealed allowlisted SHA-256 manifest; checked_launcher() verifies correct hash and only active diagnostic mod. No Crash game launched. All results VERIFIED_SYNTHETIC or Windows native build; runtime Crash M3.2 new packet collection is NOT_TESTED. Historical Mario 1,137 live pose and M2 42 Crash samples are separate evidence and cannot be substituted.
+
+Next real gate: operator run the documented private 90–180s Crash collector, enter actual Crash level, walk and jump, pause/restart, then verify native X/Y/Z and signed rotations change coherently, scene level and observer epoch, rate<=10Hz, sequence and lifecycle, no input or physics change, and private-only logs. Do not proclaim coherent postphysics sampling from this experiment: require a real engine hook and independent correspondence landmarks before mapping two worlds. Never merge PR until authentic shared-world collision gate.

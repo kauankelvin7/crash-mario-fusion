@@ -33,3 +33,50 @@ ACCEPTED by user direction. Preserve D002. Crash uses upstream .NET/WinForms/Ope
 ## D004: Implement the proposed narrow event without changing runtime architecture
 
 Native sm64ex coin observer + Crash's supported source-mod/pad bus, loopback CMJ1 datagram, default observe-only with explicit R1-gated apply. Original engines retain consequences; no neutral physics or position injection. Actual adapters compiled/tested against the pinned code/APIs, but real gameplay remains BLOCKED. No repeat Astra review. Native Windows apphost replaces `dotnet.exe DLL` startup because upstream `AppPaths.Root` follows ProcessPath; this keeps mods/settings beside the launcher instead of the SDK. Final ZIP/Actions/Release packaging waits for real playable Windows validation and release authorization.
+# D005 — M3 read-only calibrated coordinate path (2026-10-09)
+
+Compare two next steps: (1) map native observations with explicit placement,
+or (2) inject cross-game triangles into sm64ex's native surface loader. Route 2
+would immediately require verified Crash geometry/materials, winding, local
+frame identity and ownership of moving surfaces; none is supplied by the M2
+position trace. Choose route 1 first: add signed XYZ reads to the existing
+native observer and a tested reversible map with float32 precision and native
+query-bounds guards. This is directly reusable before native surface loading;
+it neither chooses the final world owner nor replaces either physics engine.
+No new Astra review: no irreversible integration architecture is selected.
+Next material decision remains which native world owns a shared collision
+slice, after private Windows XYZ/calibration and native geometry evidence.
+
+## D006 — Native collision oracle and conditional boundary replicas
+
+New evidence: c1 `256fdcef` `ZoneQueryOctreeR`/`FindFloorY` (`src/solid.c`)
+uses volumetric leaf AABBs and can average support heights; `ProcessNode`
+type/subtype drives Crash events. Screen triangles/player coordinates do not
+establish collision units or Mario material equivalence. Launcher `224da775`
+already has physics/bound hooks, but guest query layout/lifetime is unverified.
+
+Explicit specialist call: `/root/astra_m3_geometry`, selected through
+`spawn_agent(model="gpt-6-astra", reasoning_effort="high", fork_turns="none")`;
+tool accepted selection and returned review (no separate model telemetry).
+Compared (A) validated static volume boundaries replicated into native Mario
+surfaces, each solver retaining character authority, with (B) foreign Crash
+floor queries inside Mario. Conditional recommendation A: B mixes support,
+wall/ceiling/action semantics without a demonstrated compatible solver seam.
+A also cannot generally reproduce Crash's averaged floors or event semantics.
+Neither live world ownership nor fidelity equivalence is established.
+
+Implemented next proof: authored triangles transformed by existing FrameMap,
+explicit synthetic DEFAULT/BURNING type and room, exact cell fan-out and pool
+reservation, then original full-sm64ex loader/`find_floor` in isolated pools.
+No libsm64 substitution, game hook or live insertion. Original dynamic cleanup
+and time-stop behavior are exercised; insufficient capacity fails before
+allocation. Linux ASan/UBSan checks memory and arithmetic in this fixture only.
+Real insertion still requires the gate's measured pool occupancy, atomic
+reservation/lifecycle and authentic geometry/frame/material evidence.
+Next source-only extension: one authored ordinary octree box against c1 and
+Mario reference queries, including boundary/diagonal/outside cases and overlap
+counterexamples. Live Crash extraction remains blocked by guest layout and
+private Windows observations; do not infer volume units from player XYZ.
+
+## D007 (2026-10-09): Diagnostic Crash pad-polling pose is not postphysics
+Decision: implement the first Crash continuous CMW1 read-only observer via the separately-loaded pinned RecompOne PadReadEvent adapter, with phase=0 UNKNOWN_DIAGNOSTIC, native raw signed XYZ/rotation/level and explicit observer-only epoch/callback ordinal, never mislabel that callback as native physics completion or share-world calibration proof. Reason: available pinned launcher source does not establish a guaranteed callback after native Crash physics; editing upstream core or fabricating a POST_CRASH_PHYSICS contract would make evidence misleading. The private observer reads a direct RAM span to avoid PSMemory.ReadU32 runtime count-access/VBlank catchup; source-only fixture validates byte-identical RAM and input, 58 assertions. Built isolated private launcher instead of changing pinned original M0 or commercial assets. Alternate routes: implement source-proven real Crash physics-final hook in a reversible generated overlay later, or certify a strictly bounded pre-GPU seam with lifecycle evidence; both BLOCKED until native source/time ordering is independently demonstrated. Do not inject colliders or align coordinate spaces until actual real shared landmarks and verified native postphysics capture.

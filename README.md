@@ -2,7 +2,7 @@
 
 **Status (2026-10-09, `m0-recon`):** M2 original-game interaction verified on Windows: collecting a native Mario coin triggered a guarded input pulse and a full native Crash jump/landing trace, corroborated by the user's visual observation. **The games still run in separate windows/worlds**; unified collision, camera, rendering and playable fusion are not implemented.
 
-**Continue development with Codex:** [Codex handoff](docs/CODEX_HANDOFF.md) | [Evidence](docs/EVIDENCE.md) | [Windows test instructions](docs/WINDOWS.md). Cloud-safe tests are under `tests/` and `.github/workflows/source-only-checks.yml`; those replay and validate code without commercial game assets. This remains a development probe, **not** a downloadable playable release.
+**Continue development with Codex:** [New PC migration and exact checkpoint](docs/PC_MIGRATION_HANDOFF.md) | [Codex handoff](docs/CODEX_HANDOFF.md) | [Evidence](docs/EVIDENCE.md) | [Windows test instructions](docs/WINDOWS.md). Cloud-safe tests are under `tests/` and `.github/workflows/source-only-checks.yml`; those replay and validate code without commercial game assets. This remains a development probe, **not** a downloadable playable release.
 
 Goal: preserve the actual game simulations of **Crash Bandicoot 1 (1996)** and **Super Mario 64** while studying a verifiable shared-world integration. A cosmetic skin swap is not sufficient.
 
