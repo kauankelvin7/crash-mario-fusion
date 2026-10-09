@@ -121,3 +121,13 @@ Created `tests/fixtures/windows_coin_jump_20261009.json` (sanitized transcriptio
 On the authorized Windows 11 x64 machine, after a clean fast-forward to commit `e255f74`, ran `python -m unittest discover -s tests -v` with MSYS2 MINGW64 GCC available in PATH. **12/12 passed, exit 0, in 4.678 s**: three mod-installation unit checks, three project configuration checks, five historical-trace consistency checks, and one real C sender/local UDP test. `git diff --check` exit 0 and working tree clean. **Classification: VERIFIED_SYNTHETIC** for these new tests, because this run did not execute retail game runtimes; earlier native Windows M2 validation remains separately VERIFIED_REAL.
 
 GitHub Actions workflow created for Python/GCC source-only CI, but its hosted-run status has not yet been confirmed in this evidence. No commercial file was committed. Cloud Codex must rerun tests independently in its environment and report that run's results, not attribute Windows results to Cloud.
+
+## 2026-10-09 — GitHub hosted source-only CI confirmed
+
+GitHub Actions **Asset-free integration checks** completed successfully on hosted Ubuntu, triggered by push to `m0-recon` at commit `9e052f0d7b71a7ec09cb88c477a1cdc96ded4bb6`.
+
+- [Workflow run 37952281792](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37952281792): status `completed`, conclusion `success`.
+- Job `Python tests and native C sender` (job id `113893843734`): conclusion `success`; `Checkout source only`, `Set up Python 3.12`, `Test source-only code, recorded trace, and live loopback C sender`, and `Explicitly report verification level` all individually report `success`.
+- A separate local Windows invocation of the same source-only unit suite ran **12/12**, exit 0, with MSYS2 MINGW64 GCC available.
+
+Classification: **VERIFIED_SYNTHETIC** on the hosted Linux runner, which executes the C sender and test fixture but does NOT launch original Crash/SM64 ROMs. No commercial assets or game files entered GitHub. The earlier Windows game-runtime jump telemetry remains a separate, operator-confirmed **VERIFIED_REAL** result. A future Codex Cloud session should run its own tests and report its own exit status.
