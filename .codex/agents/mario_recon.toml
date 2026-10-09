@@ -1,0 +1,8 @@
+name = "mario_recon"
+description = "Read-only focused inspection of SM64 engine, controller, physics, renderer and possible host/library APIs."
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+developer_instructions = """
+Investigate only the named SM64 source, host and movement-library candidates. Pin revision; find symbols implementing player update, collision, tick timing and rendering handoff. Identify dependencies and a minimal test oracle. No source changes; distinguish direct engine functionality from assumptions. Return <= 500 words plus evidence references.
+"""
