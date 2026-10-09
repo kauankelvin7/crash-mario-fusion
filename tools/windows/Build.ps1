@@ -5,7 +5,7 @@ param([string]$MsysRoot = 'C:/msys64', [string]$MarioRom)
 Use-Dotnet
 $launcher = Join-Path $TaskCache 'CrashBandicoot-Launcher/CrashBandicoot.Launcher'
 Invoke-Logged $TaskDotnet @('build',$launcher,'-c','Release','-f','net10.0-windows',
-    '-p:TargetFrameworks=net10.0-windows','-p:PlatformTarget=x64') 'launcher-build.log'
+    '-p:PlatformTarget=x64') 'launcher-build.log'
 $lib = Convert-MsysPath (Join-Path $TaskCache 'libsm64')
 Invoke-Msys "cd '$lib'; make -j2 lib" 'libsm64-build.log'
 if ($MarioRom) {
