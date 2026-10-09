@@ -1,6 +1,6 @@
 # Windows 10/11 x64 local workflow
 
-Native Windows status: **real local startup VERIFIED (2026-10-09)** with an optional app-local Mesa3D software OpenGL renderer. The passive paired runner starts both original/recompiled game processes and their separate windows. **Coin pickup, cross-game jump/landing and shared-world gameplay remain NOT_TESTED; no playable fusion exists yet.**
+Native Windows status: **real local startup VERIFIED (2026-10-09)** with an optional app-local Mesa3D software OpenGL renderer. The passive paired runner starts both original/recompiled game processes and their separate windows. **Native Mario coin pickup and its receipt by the real Crash runtime are VERIFIED_REAL in passive mode; an applied jump/landing and shared-world gameplay remain NOT_TESTED. No playable fusion exists yet.**
 
 Install Git, PowerShell 7 and official [MSYS2](https://www.msys2.org/). Finish MSYS2's documented update procedure before setup. Scripts use its MINGW64 x64 toolchain, and install .NET SDK 10.0.401 in `%LOCALAPPDATA%/CrashMarioFusion/M0`. Source/data/build caches and logs stay outside project Git. Existing source changes or wrong pins stop setup; no resets or replacement of user files.
 
@@ -57,3 +57,14 @@ On a Windows 11 host with Intel HD Graphics driver 9.17.10.4459, native OpenGL i
 The verified native Mario binary is `sm64ex-cm64/build/us_pc/sm64.us.f3dex2e.exe`. The build must use `WINDOWS_BUILD=1 HOST_OS=Windows`, or the MSYS2 environment can incorrectly link with Linux `-lGL -ldl`. With private Mesa, Mario stayed alive with a responsive window for a 9-second startup check. Crash's original NTSC-U disc passed identification/recompile and reported `[Host] OpenGL window ready`. Its mod reported `[cm64] receiver ready`. On Windows, `Test-Integration.ps1` passed all 14 fixture tests; project Python tests passed 6/6. The passive paired runner exited normally after 45 seconds with both processes started and both windows responding. **No real coin pickup event was observed, no automatic jump was proven and no shared-world result is claimed.** Both apps reported a missing WASAPI audio endpoint in this remote session; audio and graphical gameplay are not verified. Logs are private under `%LOCALAPPDATA%/CrashMarioFusion/M0/logs` and `mesa-soft/`.
 
 For a real manual event check, enter an actual playable level in both windows, hold Crash R1 during unpaused gameplay, and collect one yellow coin in Mario. First run without `-Apply` to inspect `coin seq=` and `received seq=` without injecting input; then repeat with `-Apply` and observe the real jump **and landing**. Do not treat `[cm64] input_applied` as proof of a native jump. If either step fails, preserve local logs and diagnose that exact failure instead of advancing the shared-world claims.
+
+## Keyboard-only one-shot jump validation
+
+On the Windows machine with both legitimate game files already configured and the optional app-local Mesa OpenGL fallback, use:
+
+```powershell
+$env:GALLIUM_DRIVER = 'llvmpipe'
+./tools/windows/Start-Integration.ps1 -CrashDisc "$HOME/Downloads/Crash Bandicoot (USA)/Crash Bandicoot (USA).cue" -Apply -KeyboardArm -Seconds 900
+```
+
+In Crash **gameplay** (not the title/menu), tap **W** once and release it. This corresponds to R1, and logs `[cm64] keyboard armed ... expires_in_ms=60000`; then move focus to Mario and collect one yellow coin within 60 seconds. The first valid event can issue one bounded native Cross pulse even after keyboard focus leaves Crash, without keeping W held. A second coin is observe-only until W is tapped again. Pausing with Start, changing Crash levels, or waiting past the expiry disables the pending authorization. Review Mario `coin seq=N`, Crash `received seq=N` and `input_applied seq=N`. The log `input_applied` is **not** proof of an actual jump; verify physical jump and landing visually before claiming gameplay success. Native Windows fixture tests: 21/21 pass. This mode requires both `-Apply` and `-KeyboardArm`; passive mode remains the default.
