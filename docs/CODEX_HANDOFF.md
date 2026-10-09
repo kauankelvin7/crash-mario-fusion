@@ -13,6 +13,15 @@ as shared collision. Next: Windows procedure in WINDOWS.md, then inspect
 native geometry/material/frame ownership for a collision slice. D005 records
 the two candidate routes and why observations precede geometry injection.
 
+
+**Next source-only M3 geometry gate:** read [M3_GEOMETRY_GATE.md](M3_GEOMETRY_GATE.md).
+It records pinned upstream collision memory/partition/lifetime constraints and
+explains the new `tools/geometry_preflight.py` / `tests/test_geometry_preflight.py`
+synthetic triangle checks. These do not access commercial assets or alter native
+collision; a future original-runtime insertion is BLOCKED on real XYZ,
+calibration, genuine source geometry, explicit pool-capacity guards and
+native ownership evidence.
+
 ## 1. Objective and actual state
 
 User goal: a playable **Crash Bandicoot 1 × Super Mario 64** fusion retaining the
