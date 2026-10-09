@@ -323,3 +323,37 @@ targets **feat/m3-coordinate-contract**, verified through GitHub API.
 [Hosted CI 37987762871](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37987762871)
 completed **success** for `1571f254c6803bb45e6962eace5dc5677cdc79d5`.
 No merge or original-game execution performed.
+
+## Issue #5 P1/P2 — executed Cloud checks, 2026-10-09
+Environment: Linux Codex Cloud; existing branch `feat/m3-offline-preflight`,
+checkpoint a43ee9b. Public sm64ex unchanged pin
+`d7ca2c04364a6dd0dac58b47151e04e26887e6f0`; no retail files or game execution.
+
+- P1 commit c6ff961: full suite **55 PASS** (six new observational tests);
+  CMW1 single-session regression preserved, independent sessions/tick wraps,
+  bounded two-slot memory, clocks, replay, phase, pause/rebind, frame, age/gap.
+- P2 commit bb2eaed: `CM64_SM64EX_ROOT=/workspace/.cache/crash-mario-m0/sm64ex
+  python -m unittest discover -s tests -v` — **65 PASS**, no skipped tests.
+  Includes production C loopback senders and original public collision source
+  in an isolated fixture oracle with Linux ASan/UBSan; no live native collider.
+- `dotnet run --project tests/crash_pose/CrashPoseChecks.csproj
+  -p:CrashRoot=/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher --
+  /workspace/crash-mario-fusion` using cached .NET 10.0.401 (private writable
+  DOTNET_CLI_HOME/NUGET_PACKAGES): **58 PASS** observer fixture assertions,
+  unchanged RAM/inputs; `bash tools/check_integration.sh`: **27 PASS** M2 fixtures.
+- `python -m tools.estimate_calibration --input
+  tests/fixtures/calibration_landmarks_synthetic.json`: scale=2, yaw=90°,
+  fit 3 / holdout 2, max/RMS residual=0 for both; maximum float32 fit error
+  1.4210854715202004e-14 Mario unit and inverse error 7.105427357601002e-15
+  Crash unit. **SYNTHETIC_MATH_ESTIMATE_ONLY**, not an inferred real-world map.
+- PowerShell 7.5.4 AST parser on Linux: **13/13 PASS**, including the new
+  Test-OfflinePreflight.ps1. Native Windows execution **NOT_TESTED**.
+- Independent read-only `qa_reviewer`: **16/16 focused tests PASS**, no blocking
+  defect in observational/math scope. No Astra invocation was needed; existing
+  architecture preserved. `git diff --check`: PASS.
+
+All new checks are **VERIFIED_SYNTHETIC**; prior Windows VERIFIED_REAL evidence
+above remains historical and is not a new run. Local transient logs stay outside
+Git. Runtime frame/landmark provenance, true Crash postphysics ownership, pause
+causality/area transitions and shared gameplay remain **BLOCKED** pending an
+operator-controlled Windows experiment on the new PC.

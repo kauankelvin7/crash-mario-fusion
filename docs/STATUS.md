@@ -125,3 +125,19 @@ coherent post-physics sampling/geometry provenance/calibration/capacity gates.
 Implementation published in [draft PR #4](https://github.com/kauankelvin7/crash-mario-fusion/pull/4),
 base feat/m3-coordinate-contract. Source-only CI 37987762871 PASS for1571f25.
 Original main, m0-recon and base feature remain unmerged.
+
+## Issue #5 P1/P2 — Cloud implementation (2026-10-09)
+On existing `feat/m3-offline-preflight` from a43ee9b: delivered two-slot read-only
+CMW1 observation correlation with independent sessions/frames, explicit common
+receiver clock, typed rejection and lifecycle gates; delivered positive uniform
+scale/Y-yaw/origin least-squares FrameMap estimator with explicit landmark
+provenance, conditioning, holdout, numeric and residual gates. **VERIFIED_SYNTHETIC**:
+65/65 Python tests (16 new), 58/58 pinned Crash observer assertions, 27/27 M2
+fixtures, 13/13 PowerShell ASTs on Linux; independent QA approved the bounded
+P1/P2 scope. PR CI now also targets `feat/m3-coordinate-contract`.
+New Windows command: `./tools/windows/Test-OfflinePreflight.ps1`; native Windows
+execution of this increment is **NOT_TESTED**. No game was launched, no commercial
+files used, no physics/input/collision modifications. Physical synchronization
+and calibration remain **BLOCKED**. M3.2 remains diagnostic; no new VERIFIED_REAL
+evidence, native collider or shared playable world. PR #4 is separate and Issue
+#3 is not declared complete. Do not merge main or publish a playable Release.

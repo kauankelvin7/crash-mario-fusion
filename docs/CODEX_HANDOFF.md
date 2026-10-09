@@ -201,3 +201,30 @@ NEXT IMPLEMENTATION BY CODEX: add Crash-only opt-in bounded continuous read-only
 
 ## M3.2 private Crash diagnostic observer handoff — 2026-10-09
 Codex produced an isolated read-only CMW1 Crash mod using a byte-span native RAM observer from RecompOne's controller polling seam, not proven postphysics. Reviewer verified 7/7 new Python, 49/49 full suite, 58/58 pinned native mod compiler/RAM/event-bus fixtures, 27/27 M2 fixtures and 17/17 native geometry fixtures, repaired the safe incomplete-private-build resumption logic and built a separate sealed Crash launcher (0 errors/warnings); only asset-free source code/tests/docs in worktree. Original pinned launcher and original M2 mod left untouched. Actual new Crash diagnostic gameplay/packets STILL NOT_TESTED. Run local operator test from WINDOWS.md to validate it, then re-audit unchanged original gameplay. Do not reclassify diagnostic pad polling as a coherent physics frame, nor infer Crash-to-Mario coordinate transform from unrelated live XYZ clouds. Future postphysics read seam, genuine frame identity, source collision geometry and engine-local pool ownership/capacity remain gates. PR draft, unmerged until proven.
+
+## Issue #5 P1/P2 handoff — 2026-10-09
+Implemented on existing `feat/m3-offline-preflight`, not PR #4's geometry branch.
+See `integration/observation_alignment.py` and `tools/estimate_calibration.py`;
+contracts and exact Cloud evidence are appended to CONTRACT/EVIDENCE/STATUS.
+65 Python tests, 58 Crash observer assertions, 27 M2 fixtures and 13 PowerShell
+ASTs pass; only source/fixture/math verification. No physics or game-state edits.
+
+On the new Windows PC, first run `./tools/windows/Test-OfflinePreflight.ps1`
+(PowerShell 7 + existing MSYS2 setup) for asset-free checks. For operator-declared
+private landmark JSON, use `python -m tools.estimate_calibration --input
+"<private-landmarks.json>"` from the repository in the configured Python shell.
+Use the tracked SYNTHETIC fixture as schema only; choose your own correspondences
+and tolerances, never reuse its scale/offsets as game facts. Keep inputs/telemetry
+and owned game files outside Git. Output must remain not-runtime-verified.
+
+Next real experiment requires explicit operator authorization: bounded separate
+Crash diagnostic and Mario post-update collections with original movement,
+pause and area/level transitions; a **single receiver clock** must timestamp both
+streams to use P1 (existing independent collector timestamps are incompatible).
+Explicitly bind sessions/observer epochs, select >=3 real noncollinear XZ
+correspondence marks plus independent holdout marks with identity/provenance,
+and inspect fitted residuals. This still cannot clear physical gates: prove
+Crash postphysics sampling and native generation ownership before declaring
+calibration valid, then observe genuine geometry provenance/occupancy/lifetime
+before any shared-world collision work. Do not restart M0/M1/M2, merge PRs or
+publish Release/ZIP while the worlds and physics remain separate.
