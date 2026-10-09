@@ -285,3 +285,37 @@ Actual native seam: pinned RecompOne.Runtime.Events.PadReadEvent occurs during c
 Windows verification with MSYS2 MINGW64 Python, PowerShell 7, cached pinned public-source RecompOne launcher: python -m unittest tests.test_crash_pose -v passed 7/7; python -m unittest discover -s tests -v passed **49/49**; tools/windows/Test-CrashPose.ps1 passed **58/58 fixture assertions** with the actual pinned mod compiler, RAM implementation, native event bus, no memory writes, unchanged physical buttons and verified no access-counter/VBlank side effects; tools/windows/Test-Integration.ps1 passed **27/27**; tools/windows/Test-Geometry.ps1 passed **17/17**; tools/windows/Build-CrashPose.ps1 built separate private Win64 .NET launcher at LOCALAPPDATA/CrashMarioFusion/M3-crash-pose with **zero errors and warnings**, sealed allowlisted SHA-256 manifest; checked_launcher() verifies correct hash and only active diagnostic mod. No Crash game launched. All results VERIFIED_SYNTHETIC or Windows native build; runtime Crash M3.2 new packet collection is NOT_TESTED. Historical Mario 1,137 live pose and M2 42 Crash samples are separate evidence and cannot be substituted.
 
 Next real gate: operator run the documented private 90–180s Crash collector, enter actual Crash level, walk and jump, pause/restart, then verify native X/Y/Z and signed rotations change coherently, scene level and observer epoch, rate<=10Hz, sequence and lifecycle, no input or physics change, and private-only logs. Do not proclaim coherent postphysics sampling from this experiment: require a real engine hook and independent correspondence landmarks before mapping two worlds. Never merge PR until authentic shared-world collision gate.
+
+## Issue #5 P1/P2 — executed Cloud checks, 2026-10-09
+Environment: Linux Codex Cloud; existing branch `feat/m3-offline-preflight`,
+checkpoint a43ee9b. Public sm64ex unchanged pin
+`d7ca2c04364a6dd0dac58b47151e04e26887e6f0`; no retail files or game execution.
+
+- P1 commit c6ff961: full suite **55 PASS** (six new observational tests);
+  CMW1 single-session regression preserved, independent sessions/tick wraps,
+  bounded two-slot memory, clocks, replay, phase, pause/rebind, frame, age/gap.
+- P2 commit bb2eaed: `CM64_SM64EX_ROOT=/workspace/.cache/crash-mario-m0/sm64ex
+  python -m unittest discover -s tests -v` — **65 PASS**, no skipped tests.
+  Includes production C loopback senders and original public collision source
+  in an isolated fixture oracle with Linux ASan/UBSan; no live native collider.
+- `dotnet run --project tests/crash_pose/CrashPoseChecks.csproj
+  -p:CrashRoot=/workspace/.cache/crash-mario-m0/CrashBandicoot-Launcher --
+  /workspace/crash-mario-fusion` using cached .NET 10.0.401 (private writable
+  DOTNET_CLI_HOME/NUGET_PACKAGES): **58 PASS** observer fixture assertions,
+  unchanged RAM/inputs; `bash tools/check_integration.sh`: **27 PASS** M2 fixtures.
+- `python -m tools.estimate_calibration --input
+  tests/fixtures/calibration_landmarks_synthetic.json`: scale=2, yaw=90°,
+  fit 3 / holdout 2, max/RMS residual=0 for both; maximum float32 fit error
+  1.4210854715202004e-14 Mario unit and inverse error 7.105427357601002e-15
+  Crash unit. **SYNTHETIC_MATH_ESTIMATE_ONLY**, not an inferred real-world map.
+- PowerShell 7.5.4 AST parser on Linux: **13/13 PASS**, including the new
+  Test-OfflinePreflight.ps1. Native Windows execution **NOT_TESTED**.
+- Independent read-only `qa_reviewer`: **16/16 focused tests PASS**, no blocking
+  defect in observational/math scope. No Astra invocation was needed; existing
+  architecture preserved. `git diff --check`: PASS.
+
+All new checks are **VERIFIED_SYNTHETIC**; prior Windows VERIFIED_REAL evidence
+above remains historical and is not a new run. Local transient logs stay outside
+Git. Runtime frame/landmark provenance, true Crash postphysics ownership, pause
+causality/area transitions and shared gameplay remain **BLOCKED** pending an
+operator-controlled Windows experiment on the new PC.
