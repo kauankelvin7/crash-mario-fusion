@@ -53,3 +53,28 @@ def top_boundary(leaf, *, frame_map, crash_level, mario_frame, calibrated_level,
     return dict(interpretation="AUTHORED_REFERENCE_TOP_BOUNDARY_ONLY",
                 source_raw_bounds=(lo,hi),query_bound_origin_raw=(0,0,0),preview=preview,plan=plan,
                 full_volume_equivalence=False,live_collision_inserted=False)
+
+
+def estimated_top_boundary(leaf, *, estimate, crash_frame, mario_frame, material,
+                           surface_capacity, node_capacity, surfaces_used, nodes_used):
+    """Offline composition of P2 and P3, preserving scope and unverified gates.
+
+    Only authored geometry + SYNTHETIC math is supported; a math estimate is not
+    permission to export a real native collider or infer volume/player equivalence.
+    """
+    from tools.estimate_calibration import Estimate,SYNTHETIC
+    from integration.observation_alignment import descriptor
+    from integration.world_snapshot import CRASH,MARIO
+    if (not isinstance(estimate,Estimate) or estimate.calibration_ready or
+            estimate.interpretation!='SYNTHETIC_MATH_ESTIMATE_ONLY'):
+        raise ValueError('Only unverified synthetic math may drive an authored boundary preview')
+    crash,mario=descriptor(CRASH,crash_frame),descriptor(MARIO,mario_frame)
+    scope=(crash.level,crash.observer_epoch,mario.level,mario.area,mario.observer_epoch,SYNTHETIC)
+    if scope!=estimate.scope: raise ValueError('Estimate and geometry observer scopes differ')
+    result=top_boundary(leaf,frame_map=estimate.frame_map,crash_level=crash.level,
+        calibrated_level=scope[0],mario_frame=f'M31A:{mario.level}:{mario.area}:{mario.observer_epoch}',
+        material=material,surface_capacity=surface_capacity,node_capacity=node_capacity,
+        surfaces_used=surfaces_used,nodes_used=nodes_used)
+    result.update(estimate_interpretation=estimate.interpretation,scope=scope,
+                  calibration_ready=False,physical_status='BLOCKED',gates=estimate.gates)
+    return result

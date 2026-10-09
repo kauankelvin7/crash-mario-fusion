@@ -41,6 +41,8 @@ class Descriptor:
 
 
 def descriptor(engine,frame):
+    if engine not in (CRASH,MARIO) or type(frame) is not bytes or len(frame)!=16:
+        raise ValueError("Explicit engine and 16-byte observer descriptor required")
     if engine==CRASH:
         level,epoch=crash_descriptor(frame)
         return Descriptor(level,None,epoch)

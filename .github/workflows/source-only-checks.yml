@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   source-only:
-    name: Python tests and native C sender
+    name: Combined CMW1, calibration and geometry checks
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:

@@ -1,6 +1,6 @@
 #Requires -Version 7.0
 [CmdletBinding()]
-param([string]$MsysRoot = 'C:/msys64')
+param([string]$MsysRoot = 'C:/msys64', [switch]$FullSuite)
 . "$PSScriptRoot/Common.ps1"
 $source = Join-Path $TaskCache 'c1'
 $pin = '256fdcef59f15a190290cc19db3fa9a707843b69'
@@ -23,5 +23,6 @@ $mario = Convert-MsysPath (Join-Path $TaskCache 'sm64ex')
 foreach ($path in @($repo,$c1,$mario)) {
     if ($path.Contains("'")) { throw 'Paths containing a single quote are unsupported.' }
 }
-Invoke-Msys "cd '$repo'; export CM64_C1_ROOT='$c1'; export CM64_SM64EX_ROOT='$mario'; python -m unittest tests/test_volume_boundary.py -v" 'reference-box-checks.log'
+$check = if ($FullSuite) { 'discover -s tests -v' } else { 'tests/test_volume_boundary.py -v' }
+Invoke-Msys "cd '$repo' && export CM64_C1_ROOT='$c1' CM64_SM64EX_ROOT='$mario' && python -m unittest $check" 'reference-box-checks.log'
 Write-Output 'VERIFIED_SYNTHETIC: authored geometry, original reference queries, no game launched. New native Windows execution is not established by Cloud results.'
