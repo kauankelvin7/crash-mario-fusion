@@ -1,0 +1,33 @@
+name: Asset-free integration checks
+
+on:
+  push:
+    branches: [m0-recon]
+  pull_request:
+    branches: [m0-recon]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-only:
+    name: Python tests and native C sender
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout source only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test source-only code, recorded trace, and live loopback C sender
+        run: python -m unittest discover -s tests -v
+      - name: Explicitly report verification level
+        run: |
+          echo "VERIFIED_SYNTHETIC only: this runner did not execute either retail game."
+          echo "Windows real-runtime evidence is preserved in docs/EVIDENCE.md."
+          echo "No ROMs, PS1 BIN/CUE, CHD, extracted assets, or commercial game data are used."
