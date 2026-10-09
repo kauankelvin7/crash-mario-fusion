@@ -1,13 +1,15 @@
 # Crash × Mario 64 — Fusion Engineering Lab
 
-**Status:** orchestration bootstrap only. No original-game runtime, assets or cross-game interaction has been tested. This repo deliberately does not claim a working mashup.
+**Status:** M0 builds validated on Cloud Linux; native SM64 coin observer and Crash controller mod implemented. Adapter tests pass with fixture RAM. Original gameplay, native Windows and a playable shared world remain unverified.
+
+Windows development and paired-runtime commands: [docs/WINDOWS.md](docs/WINDOWS.md). This is source for a development probe, not a downloadable playable release.
 
 Goal: preserve the actual game simulations of **Crash Bandicoot 1 (1996)** and **Super Mario 64** while studying a verifiable shared-world integration. A cosmetic skin swap is not sufficient.
 
 ## Getting started — Codex Cloud
 
 1. Connect this GitHub repository `kauankelvin7/crash-mario-fusion` to Codex Cloud.
-2. Open `docs/FIRST_TASK.md` and paste its task text into Codex Cloud, selecting **GPT-6.1 Sol** and Medium reasoning if the model appears in your picker.
+2. Continue the existing branch and status; read `docs/WINDOWS.md` for local execution. Select **GPT-6.1 Sol** and Medium reasoning if the model appears in your picker.
 3. Make sure the environment can access official/open-source repositories for inspection. Do not upload commercial ROMs or extracted assets.
 4. Ask the agent to report whether the **cloud** actually loaded `.codex/agents/*.toml` and whether an Astra subagent can be selected. Do not assume availability from the presence of these files.
 5. Run `python -m unittest discover -s tests -v` to check the bootstrap configuration.

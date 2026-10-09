@@ -21,6 +21,7 @@ function Use-Dotnet {
     $version = & $TaskDotnet --version
     if ($LASTEXITCODE -ne 0 -or $version -ne '10.0.401') { throw 'Expected .NET SDK 10.0.401.' }
     $env:DOTNET_CLI_HOME = Join-Path $TaskCache 'dotnet-home'
+    $env:DOTNET_ROOT = Join-Path $TaskCache 'dotnet'
     $env:NUGET_PACKAGES = Join-Path $TaskCache 'nuget'
     $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 }

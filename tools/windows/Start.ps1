@@ -9,9 +9,10 @@ if ($Game -eq 'Crash') {
     if (-not $CrashDisc) { throw 'Use -CrashDisc with your own NTSC-U SCUS-94900 CUE/BIN or CHD.' }
     $disc = (Resolve-Path -LiteralPath $CrashDisc).Path
     if ([IO.Path]::GetExtension($disc) -notin @('.cue','.chd')) { throw 'Use CUE or CHD.' }
-    $dll = Join-Path $TaskCache 'CrashBandicoot-Launcher/CrashBandicoot.Launcher/bin/Release/net10.0-windows/CrashBandicoot.dll'
+    $exe = Join-Path $TaskCache 'CrashBandicoot-Launcher/CrashBandicoot.Launcher/bin/Release/net10.0-windows/CrashBandicoot.exe'
     $mode = if ($Smoke) { '--smoke' } else { '--run' }
-    Invoke-Logged $TaskDotnet @($dll,$mode,$disc) 'crash-run.log'
+    # AppPaths.Root follows ProcessPath: launching dotnet.exe would put user data/mods in the SDK folder.
+    Invoke-Logged $exe @($mode,$disc) 'crash-run.log'
 } else {
     if ($Smoke) { throw 'sm64ex has no inspected automated smoke mode; run and observe it normally.' }
     $exe = Join-Path $TaskCache 'sm64ex/build/us_pc/sm64.us.exe'

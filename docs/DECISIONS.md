@@ -29,3 +29,7 @@ D001 runtime update: explicit `gpt-6-astra` override accepted by the available d
 ## D003: Windows x64 primary, Cloud Linux for development
 
 ACCEPTED by user direction. Preserve D002. Crash uses upstream .NET/WinForms/OpenGL; sm64ex uses its existing MinGW x64/SDL2/OpenGL backend; libsm64 uses GNU Make/MinGW. No renderer replacement or new Astra call. PowerShell local workflow is prepared; native Windows compilation/execution remains NOT_TESTED.
+
+## D004: Implement the proposed narrow event without changing runtime architecture
+
+Native sm64ex coin observer + Crash's supported source-mod/pad bus, loopback CMJ1 datagram, default observe-only with explicit R1-gated apply. Original engines retain consequences; no neutral physics or position injection. Actual adapters compiled/tested against the pinned code/APIs, but real gameplay remains BLOCKED. No repeat Astra review. Native Windows apphost replaces `dotnet.exe DLL` startup because upstream `AppPaths.Root` follows ProcessPath; this keeps mods/settings beside the launcher instead of the SDK. Final ZIP/Actions/Release packaging waits for real playable Windows validation and release authorization.

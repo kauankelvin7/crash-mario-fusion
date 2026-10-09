@@ -28,4 +28,24 @@ Crash requires an owned supported NTSC-U SCUS-94900 CUE/BIN or CHD; its existing
 
 Every command checks exit status and saves logs under the private cache. Tests prove only the scenarios they execute. `Start` writes an observation.json with gameplay/graphics/shared_event **NOT_TESTED**: upstream Crash smoke considers a 12-second running process sufficient, which is not our gameplay oracle.
 
-Local validation procedure: run the synthetic tests; start each native runtime; verify normal movement/jump/landing, pause/resume and level load. For Mario, collect one ordinary yellow coin and record count/healing/object deletion. Save logs and actual captures privately with source revision, GPU/driver and scenario. In M1 compare that baseline with passive native-event instrumentation and identify Crash logical ticks independently of presentation. Only reviewed real runtime evidence may become VERIFIED_REAL. No shared-event or playable-fusion check is implemented yet; D002 defines the next narrow interaction.
+Local validation procedure: run the synthetic tests; start each native runtime; verify normal movement/jump/landing, pause/resume and level load. For Mario, collect one ordinary yellow coin and record count/healing/object deletion. Save logs and actual captures privately with source revision, GPU/driver and scenario. In M1 compare that baseline with passive native-event instrumentation and identify Crash logical ticks independently of presentation. Only reviewed real runtime evidence may become VERIFIED_REAL. A targeted adapter check is implemented below; real shared-event gameplay and playable fusion remain unverified.
+
+## Native event adapter test (prepared, Windows NOT_TESTED)
+
+M0 sources are reused. The following prepares a private instrumented sm64ex copy; the original source checkout is untouched. Crash's source mod is installed beside the **apphost executable**, with existing settings/mods preserved and a settings backup. Use a controller for Crash's R1 gate and Mario's normal controls for the pickup; background focus/input behavior must be checked locally.
+
+```powershell
+./tools/windows/Setup.ps1
+./tools/windows/Build-Integration.ps1 -MarioRom 'D:/MyGames/SM64/baserom.us.z64'
+./tools/windows/Test-Integration.ps1
+# First compare passive instrumentation with original gameplay:
+./tools/windows/Start-Integration.ps1 -CrashDisc 'D:/MyGames/Crash/game.cue'
+# Then enter both playable levels, hold Crash R1 while unpaused, collect one yellow coin:
+./tools/windows/Start-Integration.ps1 -CrashDisc 'D:/MyGames/Crash/game.cue' -Apply -Seconds 300
+```
+
+Logs/run.json are private under `%LOCALAPPDATA%/CrashMarioFusion/M0/logs`. Correlate Mario `coin seq=N`, Crash `received seq=N`, and (only in armed apply mode) `input_applied seq=N`. Record actual Crash jump/landing and Mario's unchanged pickup consequences with Windows/GPU/driver metadata. Release R1 in pause/loading/death; native pause/grounded-state detection is not yet instrumented. A pulse may not produce a jump if Crash is airborne or blocked. Neither the runner nor synthetic tests certify gameplay. Two windows, separate worlds and cameras remain; this is not the final playable fusion.
+
+Uninstall: disable `cm64-coin-jump` in the Launcher Mods UI (or restore the matching settings backup after reviewing intervening edits); remove only its source-mod directory. The original uninstrumented sm64ex remains in the M0 cache. To compare the same instrumented Mario executable without emission, run it with CM64_SESSION/CM64_PORT unset. No game data is bundled in a distribution.
+
+Final distribution requirement recorded: once genuinely playable and validated on Windows, supply Release launcher + permitted dependencies, local owned-file import, ZIP and GitHub Actions packaging, then GitHub Releases with publication authorization. No installer/release package is being built ahead of that gate.

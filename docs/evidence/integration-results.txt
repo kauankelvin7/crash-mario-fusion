@@ -1,0 +1,36 @@
+Cloud Linux, 2026-10-09. Actual engine translation unit and adapters compiled; original gameplay/Windows NOT_TESTED.
+Prepared native coin observer: /workspace/.cache/crash-mario-integration/sm64ex; real runtime NOT_TESTED
+                 U cm64_coin
+[Catalog] levels=64 textures=2 sounds=0
+[cm64] receiver ready port=43305 apply=True; HOLD R1 only during unpaused gameplay to permit a pulse
+[cm64] native coin observer enabled, UDP loopback port=43305
+[cm64] coin seq=1 native_tick=42 coins=7 pos=1.250,2.500,-3.750 sent=52
+[cm64] received seq=1 mario_tick=42 coins=7 pos=1.25,2.5,-3.75 crash_level=9
+[cm64] input_applied seq=1; native jump/landing NOT_VERIFIED
+PASS: C sender → compiled Crash mod → active-low Cross
+PASS: duplicate does not retrigger
+PASS: pulse releases to original input
+PASS: foreign session rejected
+[cm64] drop seq=2 stale age_ms=5005
+PASS: expired event rejected
+[cm64] received seq=3 mario_tick=0 coins=0 pos=0,0,0 crash_level=9
+[cm64] observe-only/drop seq=3
+PASS: unarmed input observes but does not inject
+[cm64] received seq=4 mario_tick=0 coins=0 pos=0,0,0 crash_level=25
+[cm64] observe-only/drop seq=4
+PASS: title/menu cannot inject
+[cm64] received seq=5 mario_tick=0 coins=0 pos=0,0,0 crash_level=9
+[cm64] observe-only/drop seq=5
+PASS: Start/pause request prevents injection
+[cm64] received seq=6 mario_tick=0 coins=0 pos=0,0,0 crash_level=9
+[cm64] observe-only/drop seq=6
+PASS: physical Cross hold cannot generate another jump edge
+[cm64] received seq=7 mario_tick=0 coins=0 pos=0,0,0 crash_level=9
+[cm64] input_applied seq=7; native jump/landing NOT_VERIFIED
+PASS: oversized packet does not interrupt the next eligible event
+PASS: native sender exited successfully
+PASS: native event bus swallowed no adapter exceptions
+PASS: unload removes native pad handler
+[cm64] disabled; use the paired integration runner
+PASS: unpaired native launcher has no injected input
+VERIFIED_SYNTHETIC: 14 checks; fixture RAM, no original gameplay or shared-world validation.
