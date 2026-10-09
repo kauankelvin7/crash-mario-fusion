@@ -19,6 +19,6 @@ if ($MarioRom) {
             (Get-FileHash -LiteralPath $rom -Algorithm SHA1).Hash) { throw 'Existing ROM differs; preserve it.' }
     } else { Copy-Item -LiteralPath $rom -Destination $destination }
     $mario = Convert-MsysPath (Join-Path $TaskCache 'sm64ex')
-    Invoke-Msys "cd '$mario'; make -j2 VERSION=us TARGET_BITS=64 RENDER_API=GL" 'sm64ex-build.log'
+    Invoke-Msys "cd '$mario'; make -j2 VERSION=us TARGET_BITS=64 RENDER_API=GL WINDOWS_BUILD=1 HOST_OS=Windows" 'sm64ex-build.log'
 } else { Write-Output 'BLOCKED: full sm64ex build needs your own SM64 US ROM via -MarioRom.' }
 Write-Output "Build logs: $TaskLogs. Compilation alone does not verify gameplay."
