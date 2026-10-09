@@ -2,6 +2,10 @@
 
 Mission: establish a **real cross-engine gameplay** fusion between Crash Bandicoot 1 (PS1, 1996) and Super Mario 64 (N64, 1996), prioritizing preservation of original movement, physics, events and object behavior.
 
+## Current continuation (2026-10-09)
+
+Read **`docs/CODEX_HANDOFF.md` first** when resuming on `m0-recon`. M2 original-game coin-to-Crash jump is VERIFIED_REAL on Windows with recorded native telemetry and the user's visual confirmation. Source-only Cloud tests and an asset-free GitHub Actions workflow have been added; **they do not rerun commercial games**. Work toward the first testable M3 shared-world increment, without uploading ROMs/PS1 disc data, restarting M0/M1/M2, treating recorded telemetry as a fresh run, or merging `main` automatically. The latest sections of `docs/STATUS.md` supersede its old historical M0 flags.
+
 ## Primary platform
 
 Windows 10/11 x64 is the user's execution, graphics-test and distribution platform. Codex Cloud may run Linux; record cloud and native Windows results separately. Preserve the current architecture and milestones when adapting platforms. Prefer compatible native Windows toolchains (.NET, MSYS2/MinGW, MSVC/CMake where actually supported), keep upstream renderers, and provide PowerShell setup/build/test/start instructions. Do not claim Windows support without actual native compilation and execution. Owned-data/graphics validation runs locally on Windows; never fetch or upload retail files. Keep simple cross-platform probes; no RAM benchmarks or platform-triggered Astra calls.
