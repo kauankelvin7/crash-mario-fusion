@@ -79,6 +79,32 @@ jobs:
           gcc --version
           python -m unittest discover -s tests -v
 
+      - name: Checkout pinned public RecompOne Crash launcher sources
+        uses: actions/checkout@v4
+        with:
+          repository: Matteo842/CrashBandicoot-Launcher
+          ref: 224da7757920a817de2d9242416f657ab95782ea
+          path: .cache/native-crash-launcher
+          persist-credentials: false
+
+      - name: Install .NET SDK for original RecompOne fixture
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+
+      - name: Compile and run public Crash mod event-bus and RAM fixture on Windows
+        shell: pwsh
+        env:
+          CM64_CRASH_PUBLIC_ROOT: ${{ github.workspace }}/.cache/native-crash-launcher
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = & dotnet --version
+          if ($LASTEXITCODE -ne 0 -or $version -ne '10.0.401') {
+            throw "Expected .NET SDK 10.0.401, got $version"
+          }
+          & dotnet run --project tests/crash_pose/CrashPoseChecks.csproj "-p:CrashRoot=$env:CM64_CRASH_PUBLIC_ROOT" -- "$PWD"
+          if ($LASTEXITCODE -ne 0) { throw "Pinned native Crash fixture failed: $LASTEXITCODE" }
+
       - name: Mark exactly what Windows CI verified
         shell: pwsh
         run: |
