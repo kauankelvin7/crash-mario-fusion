@@ -173,3 +173,11 @@ Open manually at
 https://github.com/kauankelvin7/crash-mario-fusion/compare/m0-recon...feat/m3-coordinate-contract?expand=1
 or retry `gh pr create --repo kauankelvin7/crash-mario-fusion --base m0-recon
 --head feat/m3-coordinate-contract` after supported API access works. No merge.
+
+## M3 native Windows preflight — independent verification
+
+The M3 branch `748443e` was checked out separately on the authorized Windows 11 host in a clean detached worktree; the existing local `m0-recon` checkout remained unchanged. Native tests on Windows: `python -m unittest discover -s tests -v` **17/17 PASS**, `tools/windows/Test-Integration.ps1` **27/27 PASS** using upstream compiled Crash adapter and fixture RAM, PowerShell AST syntax **9/9 PASS**. `tools/windows/Build-Integration.ps1` **exit 0** after private original-runtime build and installation; the M3 Crash mod source SHA-256 matched the installed source. The source/archive `git HEAD` warning is non-fatal; no runtime success is inferred from that warning.
+
+`tools/windows/Test-WorldCoordinates.ps1` **exit 0** on two adapter-fixture samples with deliberate calibration `mario_frame=SYNTHETIC_FIXTURE_ONLY_NOT_PHYSICAL_ALIGNMENT` (scale 1, yaw 0), both roundtrip errors 0 and conservative floor range true. These anchors deliberately do **not** claim real-game spatial alignment. The calibration and all output remain in the private Windows cache. GitHub Actions pull-request [run 37955403614](https://github.com/kauankelvin7/crash-mario-fusion/actions/runs/37955403614) succeeded on hosted Linux (source-only).
+
+A fresh private paired real-game session was started with `-Apply -KeyboardArm`, native Crash receiver ready and both windows responsive. At the time of this record no native M3 XYZ sample had yet been collected; **Windows native XYZ movement/calibrated cross-game placement remain NOT_TESTED**. All listed test results are **VERIFIED_SYNTHETIC**, except original-run *startup* being VERIFIED_REAL for process/window readiness. The prior M2 live jump is separate and remains confirmed. PR [#2](https://github.com/kauankelvin7/crash-mario-fusion/pull/2) is open as a **draft** against `m0-recon`; this supersedes the earlier Codex proxy/PR-blocked note. No merge or retail data upload.
