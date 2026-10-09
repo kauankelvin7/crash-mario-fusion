@@ -161,3 +161,15 @@ No commercial files, extracted resources or generated game binaries added.
 QA review found possible float32 collapse with extreme calibrations; corrected
 with per-sample half-raw-unit inverse-error rejection and regression cases.
 No new Astra decision was necessary; D005 preserves the existing architecture.
+
+Publication: implementation **210911e** pushed successfully to
+`origin/feat/m3-coordinate-contract`. `gh pr create --base m0-recon --head
+feat/m3-coordinate-contract` failed: `Post https://api.github.com/graphql:
+Forbidden`; unauthenticated API CONNECT also returned HTTP 403 from Envoy.
+The configuration lacked `api.github.com`; an additive allowed-domain draft
+was saved (requires review/save and environment publication, not applied here).
+PR creation and this branch's PR-triggered hosted CI remain BLOCKED.
+Open manually at
+https://github.com/kauankelvin7/crash-mario-fusion/compare/m0-recon...feat/m3-coordinate-contract?expand=1
+or retry `gh pr create --repo kauankelvin7/crash-mario-fusion --base m0-recon
+--head feat/m3-coordinate-contract` after supported API access works. No merge.
