@@ -13,7 +13,7 @@ import tempfile
 import unittest
 
 from integration.world_snapshot import Snapshot, MARIO, POST_MARIO_UPDATE, decode, encode
-from tools.collect_pose import MarioCapture, frame_descriptor
+from tools.collect_pose import MarioCapture, frame_descriptor, require_valid_capture
 from tools.prepare_integration import prepare, PIN
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,6 +59,14 @@ class CaptureTests(unittest.TestCase):
                     encode(sample(frame=b'x'*16))):
             with self.subTest(packet=bad), self.assertRaises(ValueError): store.accept(bad, 1)
         with self.assertRaises(ValueError): MarioCapture(bytes(16))
+
+
+    def test_empty_capture_fails_closed_without_erasing_summary(self):
+        # A successful game process exit is not equivalent to observing CMW1.
+        for count in (0, -1, None, False, True):
+            with self.subTest(count=count), self.assertRaises(RuntimeError):
+                require_valid_capture(count)
+        self.assertIsNone(require_valid_capture(1))
 
 
 class NativePoseTests(unittest.TestCase):
