@@ -63,3 +63,7 @@ upstream mod compiler/native C/event bus with fixture RAM **27 checks PASS**;
 **9 PowerShell ASTs parsed** on Linux. These are VERIFIED_SYNTHETIC.
 New XYZ/calibration on real Windows: NOT_TESTED. Shared collision, rendering
 and playable fusion remain NOT IMPLEMENTED. See WINDOWS for next local test.
+
+## M3 Windows preflight + PR update
+
+Branch `feat/m3-coordinate-contract` is in [draft PR #2](https://github.com/kauankelvin7/crash-mario-fusion/pull/2) targeting `m0-recon`; proxy-related PR creation blockage is **RESOLVED** via the GitHub connector. Source-only GitHub Actions CI is green. On native Windows: Python 17/17, adapter fixture 27/27, PowerShell AST 9/9, private Crash/SM64 build and synthetic coordinate preflight all PASS. These M3 tests remain **VERIFIED_SYNTHETIC**, even when run on Windows, because actual XYZ game movement / landmark calibration are not yet evidenced. A paired real-game session was launched with two responsive windows; new XYZ samples not yet obtained. Shared geometry, collisions and rendering remain UNIMPLEMENTED. Keep PR draft and main unchanged until the real XYZ and operator-chosen calibration are validated.
