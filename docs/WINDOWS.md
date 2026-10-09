@@ -74,3 +74,52 @@ In Crash **gameplay** (not the title/menu), tap **W** once and release it. This 
 After a valid real `input_applied seq=N`, the authored Crash source mod now **reads** (never writes) the original NTSC-U player object for 3.5 seconds. It records `motion_sample seq=N` every ~120 ms: raw Y position, vertical velocity, state index, AIR flag and GROUNDLAND flag. The closing `motion_summary seq=N` records min/max/last Y and `rise_and_landing_candidate`. Candidate means **observational evidence to review**, not an automatically validated physical jump: inspect the timeline and game window before calling it real. Invalid/unavailable player pointers, level changes and pauses stop sampling without changing input/physics. Original upstream fields are grounded in the pinned `RecompOne.Runtime/Host/FramePacing.cs` (Crash pointer `0x800566B4`, translation Y `+0x84`, velocity Y `+0xA8`, state `+0x2C`, state flags `+0x120`, status A `+0xC8`). This is a diagnostic specific to the supported US Crash build, not a universal memory map.
 
 Use the keyboard-only `-Apply -KeyboardArm` command above. Tap W in real Crash gameplay, switch to Mario and collect a yellow coin within 60 seconds. Keep Crash unpaused and visible while it moves. Correlate `coin`, `received`, `input_applied`, `motion_sample`, `motion_summary` by sequence, and separately verify the visual jump/landing. As of this change, local Windows fixture checks **25/25 PASS**, Python **6/6 PASS**; the new native-state sampling has **not yet been observed in a live cross-game jump**, and shared-world fusion remains unimplemented.
+# Next local test: M3 XYZ and calibrated frame preflight
+
+M2 already passed on the user's Windows PC (CODEX_HANDOFF/EVIDENCE); older
+NOT_TESTED notes below are historical. This increment has only Cloud synthetic
+verification. In PowerShell 7, rebuild/install the updated source mod using
+the existing configured private game files, then run:
+
+```powershell
+./tools/windows/Build-Integration.ps1
+./tools/windows/Test-Integration.ps1  # expect 27 fixture checks
+./tools/windows/Start-Integration.ps1 -CrashDisc 'D:/MyGames/Crash/game.cue' -Apply -KeyboardArm -Seconds 300
+```
+
+Use the previously validated keyboard procedure: W in unpaused Crash gameplay,
+release, collect a Mario coin within 60 seconds. Inspect the private Crash log
+under `%LOCALAPPDATA%/CrashMarioFusion/M0/logs`: `motion_sample` must now retain
+Y/flags and add signed `x_raw`, `z_raw`, `crash_level`. Move Crash horizontally
+while sampling to verify X/Z change; verify native controls/jump/landing remain
+normal. The M3 reader itself injects nothing; this paired acquisition uses the
+existing guarded M2 input. Do not upload local logs or game files.
+
+Create an explicit calibration using local measured/chosen placement anchors,
+not arbitrary defaults. Origin XYZ inputs are JSON arrays; Crash origin is
+raw XYZ divided by 256, Mario origin is the native `received ... pos=` value.
+Scale and yaw describe the chosen world placement, not measured physics units.
+This prompt writes only operator-supplied values to the private cache:
+
+```powershell
+$calibration = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M0/world-calibration.json'
+@{
+    schema_version = 1
+    crash_level = [int](Read-Host 'Crash level from motion_sample')
+    mario_frame = Read-Host 'Confirmed Mario level and area (remain in this area)'
+    crash_origin = @(ConvertFrom-Json (Read-Host 'Crash native origin [x,y,z], raw divided by 256'))
+    mario_origin = @(ConvertFrom-Json (Read-Host 'Mario native origin [x,y,z]'))
+    scale = [double](Read-Host 'Explicit positive landmark distance ratio Mario/Crash')
+    yaw_degrees = [double](Read-Host 'Explicit XZ landmark alignment yaw in degrees')
+} | ConvertTo-Json | Set-Content -LiteralPath $calibration -Encoding utf8
+./tools/windows/Test-WorldCoordinates.ps1 -CrashLog 'C:/path/to/private/crash.log' -Calibration $calibration
+```
+
+Review `crash_native`, `mario_candidate`, `roundtrip_error` and
+`floor_query_safe` in the private report. Test a new level against the old
+calibration: it must fail. Old Y-only M2 logs must fail; do not invent XZ.
+A true bounds flag does not assert a floor exists. Mario level/area is still
+operator-confirmed, not instrumented. This test validates observations and
+placement only: neither character walks on the other's geometry yet.
+Next necessary work is verified native geometry/material extraction locally
+and a native collision insertion seam with explicit world ownership.

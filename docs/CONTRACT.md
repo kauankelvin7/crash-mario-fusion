@@ -11,3 +11,43 @@ Default is observation only. With `-Apply`, HOLD physical Crash R1 during **unpa
 Crash state accessed: level id via its public catalog and controller word via its public pad bus. Mario state accessed: native interaction arguments. No native Crash position or object behavior is guessed. Unload unregisters the handler and closes the socket. The runner stops only the two processes it starts; local game files/config/logs never enter project Git.
 
 Real oracle: baseline and observe-only pickup retain identical coin/healing/sparkle/deletion behavior. Then one pickup, one matching sequence in both logs, one input application, plus actual native Crash ground→jump→landing evidence on Windows. Logs/packet tests alone are insufficient. Shared camera/geometry/collision and combined input ownership are outside this event; two separate windows remain.
+# M3 read-only world-coordinate preflight (2026-10-09)
+
+`tools/world_coordinates.py` consumes the real adapter's `motion_sample` XYZ log
+and an explicit private calibration. It does not emit UDP, write memory, load
+geometry or replace collision/physics. CMJ1 remains unchanged. Old Y-only logs
+are rejected instead of fabricating XZ.
+
+Crash NTSC-U signed int32 translation XYZ is at object `+0x80/+0x84/+0x88`.
+Decode to fractional native view units with `raw / 256`; the pinned Launcher's
+`FramePacing.CameraTrace.cs:92–94` displays `raw >> 8`, which truncates that
+precision. `FramePacing.cs:347` defines `ObjTransOff`. The c1 reference
+`src/pc/gfx/soft.c:291–294` independently shifts camera-relative translation
+by 8 before rotation. These units imply no meters or cross-game scale.
+Mario `Vec3f pos` (`include/types.h`, `MarioState`) and CMJ1 XYZ are native f32.
+
+Chosen reversible mapping: `mario = mario_origin + scale * Ry(yaw) *
+(crash_raw/256 - crash_origin)`, with positive uniform scale and Y unchanged
+by yaw; `Ry` maps XZ to `(cos(yaw)*X + sin(yaw)*Z,
+-sin(yaw)*X + cos(yaw)*Z)`. Inverse removes translation/scale
+and applies negative yaw. This preserves up and triangle winding within the
+selected frame. Native basis alignment is a calibration input, not verified
+cross-engine alignment. Result is quantized to f32 and rejected if inverse
+error exceeds `1/512` Crash native view unit on any axis. This prevents silent
+underflow or precision collapse; it does not promise globally exact f32 mapping.
+
+Private calibration JSON fields: `schema_version: 1`, `crash_level` (integer),
+`mario_frame` (operator-confirmed level/area label), `crash_origin` and
+`mario_origin` (three native view/world numbers each), `scale` (positive),
+`yaw_degrees` (finite). No default scale/origin exists. Use explicitly chosen
+world-placement landmarks; distance ratios determine scale, XZ directions
+determine yaw. Record how the correspondence was chosen locally. Neither
+existing M2 data nor unit decoding establishes those correspondences.
+Crash level mismatches abort. Mario area identity is operator supplied and
+not runtime verified; changing either area requires a new calibration.
+
+`floor_query_safe` checks only conservative native query bounds: open X/Z
+`(-8192,8192)` and Y `[-32768,32767]`, before signed-16 casts. Grounding:
+pinned sm64ex `src/engine/surface_collision.h:8` and `surface_collision.c`
+`find_floor` (XYZ s16 casts and XZ bounds); `Surface.vertex1/2/3` are Vec3s.
+A safe coordinate does not imply any floor or shared collision exists.

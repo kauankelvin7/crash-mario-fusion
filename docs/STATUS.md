@@ -52,3 +52,14 @@ Real Windows session `20261009-151351-877`: Mario two native coin events reached
 **M2 interaction demonstration PASS (VERIFIED_REAL + operator-reported visual corroboration):** Mario coin `seq=1` was sent and received by the actual Crash runtime, applied as guarded native Cross; Crash guest memory recorded a full rise, airborne movement, fall and grounded return (22 samples). The user confirmed they saw Crash jump concurrently with the Mario coin pickup. The visual part is a firsthand user report, not video evidence; latency was not independently measured. The second coin did not trigger an additional jump.
 
 **Not yet the requested fusion:** worlds, geometry, collisions, camera and renderer remain separate. Recommended next engineering gate is a brief no-Apply control scenario, then design a minimal shared-coordinate, visibility and collision prototype with native-world authority and explicit ownership; do not claim a unified game until validated. Keep `main` unchanged until authorized.
+# Current M3 increment — 2026-10-09
+
+M2 Windows result remains confirmed as recorded in CODEX_HANDOFF/EVIDENCE.
+Feature `feat/m3-coordinate-contract`, based on `m0-recon` at `38bb594`:
+signed native Crash XYZ + level observation, explicit calibrated read-only
+Crash-to-Mario mapping, inverse precision check, native floor-query bounds,
+and private Windows preflight command. Cloud Python **17/17 PASS**;
+upstream mod compiler/native C/event bus with fixture RAM **27 checks PASS**;
+**9 PowerShell ASTs parsed** on Linux. These are VERIFIED_SYNTHETIC.
+New XYZ/calibration on real Windows: NOT_TESTED. Shared collision, rendering
+and playable fusion remain NOT IMPLEMENTED. See WINDOWS for next local test.

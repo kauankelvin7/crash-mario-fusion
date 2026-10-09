@@ -131,3 +131,33 @@ GitHub Actions **Asset-free integration checks** completed successfully on hoste
 - A separate local Windows invocation of the same source-only unit suite ran **12/12**, exit 0, with MSYS2 MINGW64 GCC available.
 
 Classification: **VERIFIED_SYNTHETIC** on the hosted Linux runner, which executes the C sender and test fixture but does NOT launch original Crash/SM64 ROMs. No commercial assets or game files entered GitHub. The earlier Windows game-runtime jump telemetry remains a separate, operator-confirmed **VERIFIED_REAL** result. A future Codex Cloud session should run its own tests and report its own exit status.
+## M3 coordinate increment — Cloud Linux, 2026-10-09
+
+Base: `m0-recon` **38bb59413071995c921efd87bf95c8fd51d3e83b**;
+working branch `feat/m3-coordinate-contract`. Read Issue #1 through GitHub HTML
+(API blocked by proxy), canonical CODEX_HANDOFF and the relevant pinned source
+seams. Existing Windows M2 observations are retained; no games ran in Cloud.
+
+- `python -m unittest discover -s tests -v`: **17/17 PASS**, Python 3.12.14,
+  GCC 14.2.0. Includes actual C UDP wire sender plus synthetic coordinate
+  invariants, signed fixed-point extrema, f32 precision-collapse rejection,
+  floor-boundary checks, source-level guards and recorded Windows trace replay.
+- `bash tools/check_integration.sh`: **27 checks PASS**, .NET SDK 10.0.401.
+  Compiled patched pinned sm64ex `interaction.c`, production C sender and
+  Crash mod via actual upstream ModCompiler/event bus; player RAM is a fixture.
+  Signed XYZ output and preservation of horizontal player fields asserted.
+- PowerShell 7.5.4 AST parse of `tools/windows/*.ps1`: **9 PASS** on Linux,
+  including Test-WorldCoordinates. This is not native Windows execution.
+- `python tools/world_coordinates.py --log
+  /workspace/.cache/crash-mario-m0/logs/integration-checks.log --calibration
+  .cache/integration/synthetic-world-calibration.json`: **PASS**, two actual
+  compiled-adapter fixture log samples consumed, inverse error 0. Test placement
+  is explicitly SYNTHETIC_FIXTURE_ONLY, not a proposed native-game calibration.
+  Reports/logs remain in ignored local caches. `git diff --check`: PASS.
+
+All new results are **VERIFIED_SYNTHETIC**. Real Windows XYZ acquisition,
+calibration, shared geometry/collision/rendering: **NOT_TESTED / NOT IMPLEMENTED**.
+No commercial files, extracted resources or generated game binaries added.
+QA review found possible float32 collapse with extreme calibrations; corrected
+with per-sample half-raw-unit inverse-error rejection and regression cases.
+No new Astra decision was necessary; D005 preserves the existing architecture.

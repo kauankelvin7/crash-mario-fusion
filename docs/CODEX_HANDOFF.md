@@ -4,6 +4,15 @@
 > `docs/STATUS.md`, `docs/EVIDENCE.md`, `docs/CONTRACT.md`, `docs/DECISIONS.md`
 > and `docs/WINDOWS.md` before editing. Continue the existing project, not a new implementation.
 
+**M3 increment (2026-10-09):** `feat/m3-coordinate-contract` adds read-only XYZ
+observation and `tools/world_coordinates.py`, with explicit calibration,
+float32 inverse-error guard and native floor bounds. Cloud checks: 17 Python,
+27 compiled native-adapter fixtures, 9 PowerShell ASTs pass. These are synthetic;
+new live Windows XYZ/calibration is pending. Do not repeat M0/M2 or treat this
+as shared collision. Next: Windows procedure in WINDOWS.md, then inspect
+native geometry/material/frame ownership for a collision slice. D005 records
+the two candidate routes and why observations precede geometry injection.
+
 ## 1. Objective and actual state
 
 User goal: a playable **Crash Bandicoot 1 × Super Mario 64** fusion retaining the

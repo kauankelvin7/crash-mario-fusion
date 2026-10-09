@@ -22,7 +22,7 @@ public sealed class CoinJumpMod : IMod
     // NTSC-U SCUS-94900: addresses/offsets corroborated in pinned FramePacing.cs.
     // Diagnostic only: never writes Crash RAM, changes speed, or alters physics.
     private const uint CrashPointer = 0x800566B4u;
-    private const uint TranslationY = 0x84u, VelocityY = 0xA8u;
+    private const uint TranslationX = 0x80u, TranslationY = 0x84u, TranslationZ = 0x88u, VelocityY = 0xA8u;
     private const uint State = 0x2Cu, StateFlags = 0x120u, StatusA = 0xC8u;
     private long motionUntil, nextMotionSample;
     private uint motionSequence, motionObject;
@@ -141,7 +141,9 @@ public sealed class CoinJumpMod : IMod
             { FinishMotion("invalid_player_pointer"); return; }
             if (motionSamples != 0 && obj != motionObject)
             { FinishMotion("player_replaced"); return; }
+            int x = unchecked((int)e.Memory.ReadU32(obj + TranslationX));
             int y = unchecked((int)e.Memory.ReadU32(obj + TranslationY));
+            int z = unchecked((int)e.Memory.ReadU32(obj + TranslationZ));
             int vy = unchecked((int)e.Memory.ReadU32(obj + VelocityY));
             uint state = e.Memory.ReadU32(obj + State);
             uint flags = e.Memory.ReadU32(obj + StateFlags);
@@ -156,7 +158,7 @@ public sealed class CoinJumpMod : IMod
             motionAirSeen |= air;
             if (motionAirSeen && !air && (status & 0x1u) != 0)
                 motionGroundAfterAir = true;
-            Console.WriteLine($"[cm64] motion_sample seq={motionSequence} n={motionSamples} y_raw={y} vy_raw={vy} state={state} air_flag={air} groundland_flag={((status & 1u) != 0)}");
+            Console.WriteLine($"[cm64] motion_sample seq={motionSequence} n={motionSamples} y_raw={y} vy_raw={vy} state={state} air_flag={air} groundland_flag={((status & 1u) != 0)} x_raw={x} z_raw={z} crash_level={level}");
         }
         catch (Exception ex)
         {

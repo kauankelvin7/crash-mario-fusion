@@ -33,3 +33,16 @@ ACCEPTED by user direction. Preserve D002. Crash uses upstream .NET/WinForms/Ope
 ## D004: Implement the proposed narrow event without changing runtime architecture
 
 Native sm64ex coin observer + Crash's supported source-mod/pad bus, loopback CMJ1 datagram, default observe-only with explicit R1-gated apply. Original engines retain consequences; no neutral physics or position injection. Actual adapters compiled/tested against the pinned code/APIs, but real gameplay remains BLOCKED. No repeat Astra review. Native Windows apphost replaces `dotnet.exe DLL` startup because upstream `AppPaths.Root` follows ProcessPath; this keeps mods/settings beside the launcher instead of the SDK. Final ZIP/Actions/Release packaging waits for real playable Windows validation and release authorization.
+# D005 — M3 read-only calibrated coordinate path (2026-10-09)
+
+Compare two next steps: (1) map native observations with explicit placement,
+or (2) inject cross-game triangles into sm64ex's native surface loader. Route 2
+would immediately require verified Crash geometry/materials, winding, local
+frame identity and ownership of moving surfaces; none is supplied by the M2
+position trace. Choose route 1 first: add signed XYZ reads to the existing
+native observer and a tested reversible map with float32 precision and native
+query-bounds guards. This is directly reusable before native surface loading;
+it neither chooses the final world owner nor replaces either physics engine.
+No new Astra review: no irreversible integration architecture is selected.
+Next material decision remains which native world owns a shared collision
+slice, after private Windows XYZ/calibration and native geometry evidence.
