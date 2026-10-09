@@ -15,7 +15,7 @@ if ($Game -eq 'Crash') {
     Invoke-Logged $exe @($mode,$disc) 'crash-run.log'
 } else {
     if ($Smoke) { throw 'sm64ex has no inspected automated smoke mode; run and observe it normally.' }
-    $exe = Join-Path $TaskCache 'sm64ex/build/us_pc/sm64.us.exe'
+    $exe = Join-Path $TaskCache 'sm64ex/build/us_pc/sm64.us.f3dex2e.exe'
     if (-not (Test-Path -LiteralPath $exe)) { throw 'Build sm64ex with your own ROM first.' }
     # Make runtime DLLs from the chosen native MSYS2 toolchain discoverable.
     $env:PATH = (Join-Path $MsysRoot 'mingw64/bin') + ';' + $env:PATH
