@@ -28,5 +28,5 @@ if (-not (Test-Path -LiteralPath $romDestination)) {
 }
 if ((Get-FileHash -LiteralPath $romDestination -Algorithm SHA1).Hash.ToLowerInvariant() -ne
     '9bef1128717f958171a4afac3ed78ee2bb4e86ce') { throw 'Cached ROM hash mismatch.' }
-Invoke-Msys "cd '$output'; make -j2 VERSION=us TARGET_BITS=64 RENDER_API=GL WINDOWS_CONSOLE=1" 'sm64ex-native-build.log'
+Invoke-Msys "cd '$output'; make -j2 VERSION=us TARGET_BITS=64 RENDER_API=GL WINDOWS_BUILD=1 HOST_OS=Windows WINDOWS_CONSOLE=1" 'sm64ex-native-build.log'
 Write-Output "Original runtime adapters built. Native gameplay NOT_TESTED until actually run. Logs: $TaskLogs"
