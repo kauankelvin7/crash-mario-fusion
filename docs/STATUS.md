@@ -1,5 +1,9 @@
 # Execution status
 
+## GOAL #19 native GPU renderer + original-query diagnostic integration (2026-10-10)
+
+Both source-only workstreams are preserved here: depth-tested original Mario GPU FBO contract and source-verified original Crash query/NSLookup diagnostics. **They are not wired together and this is NOT PLAYABLE**. The original 25-second Crash launch loaded diagnostic mod but produced zero native query receipts. Original GTE frame, collision lifetime/materials and native scene contact remain BLOCKED. Asset-free regression only; main unchanged.
+
 ## GOAL #19 renderer continuation (2026-10-10)
 
 `feat/goal19-native-renderer`: **EXPERIMENTAL / NOT PLAYABLE**.
@@ -10,6 +14,10 @@ overlay is unchanged. Synthetic native GPU evidence is not original Mario/Crash
 gameplay evidence. Camera/GTE reprojection, retail-centre depth, authentic native
 collision, independent live controls, shared object and Windows gameplay gates
 remain unpassed. See `GOAL19_GPU_RENDERER.md` for exact blocker and commands.
+
+## Current continuation — GOAL #19 original native query gate (2026-10-10)
+
+Original c1 query/NSLookup source-observer worktree `feat/goal19-authentic-contact`: 170 Python source/synthetic tests passed; 48 .NET native-query assertions passed; 8 focused Python original-C oracle checks passed with C-to-.NET comparison; private original Crash runtime loaded the mod but returned **zero** query receipts in a bounded 25-second Windows startup. G1 and authentic collider/contact acceptance remain **BLOCKED**, G2–G6 **NOT PASSED**; assets isolated, main unchanged. See `docs/GOAL19_NATIVE_QUERY_GATE.md`. The native mod and colliders MUST remain separate from user-facing playability claims.
 
 ## Current continuation — M4.2 source collision probe (2026-10-10)
 

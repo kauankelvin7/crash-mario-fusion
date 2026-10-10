@@ -7,6 +7,8 @@ using System.Security.Cryptography;
 public sealed record CrashVolume(int Node, int Depth, int[] Min, int[] Max);
 public sealed record CrashZone(uint Entry, uint Eid, uint EntryType, uint RectAddress,
     uint RectEnd, string Digest, int[] Min, int[] Max, int[] Depths, CrashVolume[] Volumes);
+public sealed record CrashZoneRect(uint Entry, uint Eid, uint EntryType, uint RectAddress,
+    uint RectEnd, string Digest, int[] Min, int[] Max, int[] Depths);
 
 public static class CrashOctree
 {
@@ -21,7 +23,7 @@ public static class CrashOctree
             throw new InvalidDataException("RAM_ADDRESS");
         return BinaryPrimitives.ReadUInt32LittleEndian(ram.Slice((int)(address - Base), 4));
     }
-    public static CrashZone Read(ReadOnlySpan<byte> ram, uint entry)
+    public static CrashZoneRect ReadRect(ReadOnlySpan<byte> ram, uint entry)
     {
         if (U32(ram, entry) != 0x100FFFF) throw new InvalidDataException("ENTRY_MAGIC");
         uint count = U32(ram, checked(entry + 12));
@@ -52,15 +54,24 @@ public static class CrashOctree
             depths[axis] = BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(30 + axis * 2, 2));
             if (depths[axis] > 16) throw new InvalidDataException("DEPTH_LIMIT");
         }
+        return new CrashZoneRect(entry, U32(ram, entry + 4), U32(ram, entry + 8), start, end,
+            Convert.ToHexString(SHA256.HashData(data)).ToLowerInvariant(), low, high, depths);
+    }
+    public static CrashZone Read(ReadOnlySpan<byte> ram, uint entry)
+    {
+        CrashZoneRect source = ReadRect(ram, entry);
+        byte[] data = ram.Slice((int)(source.RectAddress - Base),
+            (int)(source.RectEnd - source.RectAddress)).ToArray();
+        int[] dimensions = new int[3];
+        for (int axis = 0; axis < 3; ++axis) dimensions[axis] = source.Max[axis] - source.Min[axis];
         var volumes = new List<CrashVolume>();
         var ancestors = new HashSet<int>();
         int visits = 0;
         Walk(data, BinaryPrimitives.ReadUInt16LittleEndian(data.AsSpan(28, 2)), 0,
-            low, dimensions, depths, ancestors, volumes, ref visits);
+            source.Min, dimensions, source.Depths, ancestors, volumes, ref visits);
         if (volumes.Count == 0) throw new InvalidDataException("EMPTY_OCTREE");
-        return new CrashZone(entry, U32(ram, entry + 4), U32(ram, entry + 8), start, end,
-            Convert.ToHexString(SHA256.HashData(data)).ToLowerInvariant(), low, high, depths,
-            volumes.ToArray());
+        return new CrashZone(source.Entry, source.Eid, source.EntryType, source.RectAddress,
+            source.RectEnd, source.Digest, source.Min, source.Max, source.Depths, volumes.ToArray());
     }
     private static void Walk(byte[] data, int node, int depth, int[] low, int[] size,
         int[] depths, HashSet<int> ancestors, List<CrashVolume> volumes, ref int visits)
