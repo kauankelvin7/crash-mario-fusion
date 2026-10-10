@@ -1,10 +1,11 @@
 #Requires -Version 5.1
 [CmdletBinding()]
-param([switch]$CheckOnly)
+param([switch]$CheckOnly, [switch]$NativeQuery)
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $cache = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion'
 $root = Join-Path $cache 'M42-playable/collision-probe'
+if ($NativeQuery) { $root = Join-Path $cache 'M42-playable/native-query-probe' }
 $base = Join-Path $cache 'M3-crash-pose/app'
 $pins = @{
  'c1' = '256fdcef59f15a190290cc19db3fa9a707843b69'
@@ -41,7 +42,9 @@ $settings = Get-Content (Join-Path $base 'settings.json') -Raw | ConvertFrom-Jso
 $settings.CdPath = ''; $settings.ModsConfigured = $true; $settings.ActiveMods = @('cm64-crash-collision')
 $settings.CatalogDiscovery = $false; $settings.AssetHotWatch = $false
 $settings | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $app 'settings.json') -Encoding utf8
-foreach ($name in @('CrashOctree.cs','CrashCollisionMod.cs','mod.json')) {
+$sources = if ($NativeQuery) { @('CrashOctree.cs','CrashNativeQuery.cs','CrashNativeQueryMod.cs','mod.json') }
+ else { @('CrashOctree.cs','CrashCollisionMod.cs','mod.json') }
+foreach ($name in $sources) {
  Copy-Item -LiteralPath (Join-Path $repo "integration/crash_collision/$name") -Destination $mod
 }
 $hashes = @{}
@@ -50,6 +53,6 @@ foreach ($file in Get-ChildItem -LiteralPath $app -File -Recurse) {
  $hashes[$relative] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 @{version=1;pins=$pins;hashes=$hashes;disc_copied=$false;game_cache_copied=$false;
- diagnostic_only=$true;g1_passed=$false;g2_allowed=$false} | ConvertTo-Json -Depth 6 |
+ diagnostic_only=$true;native_query=$NativeQuery.IsPresent;g1_passed=$false;g2_allowed=$false} | ConvertTo-Json -Depth 6 |
  Set-Content (Join-Path $root 'probe-build.json') -Encoding utf8
 Write-Output 'COLLISION_PRIVATE_BUILD source_grounded=true read_only=true original_binaries_unchanged=true'

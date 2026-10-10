@@ -1,5 +1,9 @@
 # Execution status
 
+## Current continuation — GOAL #19 original native query gate (2026-10-10)
+
+Original c1 query/NSLookup source-observer worktree `feat/goal19-authentic-contact`: 170 Python source/synthetic tests passed; 48 .NET native-query assertions passed; 8 focused Python original-C oracle checks passed with C-to-.NET comparison; private original Crash runtime loaded the mod but returned **zero** query receipts in a bounded 25-second Windows startup. G1 and authentic collider/contact acceptance remain **BLOCKED**, G2–G6 **NOT PASSED**; assets isolated, main unchanged. See `docs/GOAL19_NATIVE_QUERY_GATE.md`. The native mod and colliders MUST remain separate from user-facing playability claims.
+
 ## Current continuation — M4.2 source collision probe (2026-10-10)
 
 `feat/m42-authentic-crash-surfaces`: **G1 BLOCKED; G2/G3/G4/G5 not passed**.

@@ -2,7 +2,7 @@ name: Windows asset-free native checks
 
 on:
   push:
-    branches: [feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance, feat/goal19-source-integration]
+    branches: [feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance, feat/goal19-source-integration, feat/goal19-authentic-contact]
   pull_request:
     branches: [feat/m3-coordinate-contract, feat/m3-integration-observer, feat/m34-windows-source-ci]
   workflow_dispatch:
@@ -103,6 +103,21 @@ jobs:
           & dotnet run --project tests/m43_input/InputTests.csproj
           if ($LASTEXITCODE -ne 0) { throw 'Independent Mario input fixture failed' }
           Write-Output 'VERIFIED_SYNTHETIC: 27 original Crash volume fixtures and 17 input contract assertions; no original game launched.'
+
+      - name: Verify original C1 query output against strict native C# receipt decoder
+        shell: pwsh
+        env:
+          CM64_C1_ROOT: ${{ github.workspace }}/.cache/native-c1
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & dotnet run --project tests/native_query/QueryTests.csproj --configuration Release
+          if ($LASTEXITCODE -ne 0) { throw 'Native query descriptor/owner checks failed' }
+          $env:CM64_QUERY_CHECKS_DLL = (Resolve-Path '.cache/native-query-tests/bin/net10.0/QueryTests.dll').Path
+          $env:CM64_DOTNET = (Get-Command dotnet).Source
+          $env:PATH = 'C:\msys64\mingw64\bin;' + $env:PATH
+          & 'C:\msys64\mingw64\bin\python.exe' -m unittest discover -s tests -p test_native_query.py -v
+          if ($LASTEXITCODE -ne 0) { throw 'Original pinned C1 query vs C# contract failed' }
+          Write-Output 'VERIFIED_SYNTHETIC: native original C query oracle + C# memory/epoch decoder; no retail game or colliders.'
 
       - name: Compile and run public Crash mod event-bus and RAM fixture on Windows
         shell: pwsh
