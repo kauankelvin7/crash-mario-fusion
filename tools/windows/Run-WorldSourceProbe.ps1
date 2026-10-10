@@ -3,7 +3,8 @@
 param(
     [Parameter(Mandatory)][string]$CrashDisc,
     [ValidateRange(15,80)][int]$Seconds = 60,
-    [switch]$CheckOnly
+    [switch]$CheckOnly,
+    [switch]$VisibleOperatorWindow
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -90,8 +91,9 @@ Assert-Hash (Join-Path $app 'CrashBandicoot.dll') $seal.original_crash_dll
 Assert-Hash $manifest.DllPath $guestHash
 Assert-Hash (Join-Path $app 'RecompOne.Runtime.dll') $build.runtime_sha256
 $stdout = Join-Path $run 'host.log'
+$windowStyle = if ($VisibleOperatorWindow) { 'Normal' } else { 'Hidden' }
 $process = Start-Process -FilePath (Join-Path $app 'CrashBandicoot.exe') -WorkingDirectory $app `
-    -ArgumentList @('--run', ('"' + $disc + '"')) -WindowStyle Hidden `
+    -ArgumentList @('--run', ('"' + $disc + '"')) -WindowStyle $windowStyle `
     -Environment @{ CM64_WORLD_SOURCE_PROBE = '1'; CM64_EMBED_ENABLE = '0'; CM64_TEXTURE_ATLAS = '0';
         CM64_INOUTPUT = '0'; TEMP = $run; TMP = $run } `
     -RedirectStandardOutput $stdout -RedirectStandardError (Join-Path $run 'errors.log') -PassThru
@@ -111,9 +113,11 @@ try {
     $accepted = $LASTEXITCODE -eq 0
 } finally { Pop-Location }
 @{ schema = 1; g1_candidate = $accepted; verified_real = $false; owned_pid = $process.Id;
-    process_stopped = $process.HasExited; responsive = $responsive; input_sent = $false;
+    process_stopped = $process.HasExited; responsive = $responsive;
+    input_sent = $(if ($VisibleOperatorWindow) { $null } else { $false });
+    visible_operator_window = $VisibleOperatorWindow.IsPresent;
     overlay_enabled = $false; runtime_sha256 = $build.runtime_sha256; guest_sha256 = $guestHash;
     postphysics = $false; depth_complete = $false; collision_ready = $false } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $run 'summary.json') -Encoding utf8
-Write-Output "G1_ORIGINAL_ATTEMPT candidate=$accepted pid_stopped=true input_sent=false private_run=$run"
-if (-not $accepted) { throw 'G1 BLOCKED: no audited in-level source receipts; no input was guessed or injected' }
+Write-Output "G1_ORIGINAL_ATTEMPT candidate=$accepted pid_stopped=true operator_window_visible=$($VisibleOperatorWindow.IsPresent) private_run=$run"
+if (-not $accepted) { throw 'G1 BLOCKED: no audited in-level GTE/OT source receipts; operator input is not proof' }

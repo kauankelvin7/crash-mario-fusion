@@ -47,9 +47,12 @@ class WorldSourceTests(unittest.TestCase):
     def test_private_runner_keeps_observation_and_owned_process_boundary(self):
         source = (REPO / "tools/windows/Run-WorldSourceProbe.ps1").read_text(encoding="utf-8")
         for required in ("--verify-only", "--c1", "--libsm64", "Assert-Hash", "$process.Kill()",
-                         "$process.HasExited", "-WindowStyle Hidden", "CM64_EMBED_ENABLE = '0'",
+                         "$process.HasExited", "-WindowStyle $windowStyle", "CM64_EMBED_ENABLE = '0'",
                          "$settings.ActiveMods = @()", "verified_real = $false"):
             self.assertIn(required, source)
+        self.assertIn("$windowStyle = if ($VisibleOperatorWindow) { 'Normal' } else { 'Hidden' }", source)
+        self.assertIn("visible_operator_window = $VisibleOperatorWindow.IsPresent", source)
+        self.assertIn("input_sent = $(if ($VisibleOperatorWindow) { $null } else { $false })", source)
         for forbidden in ("SendInput", "PostMessage", "Stop-Process -Name", "Remove-Item", "--prepare"):
             self.assertNotIn(forbidden, source)
 
