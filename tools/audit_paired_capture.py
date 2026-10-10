@@ -5,6 +5,8 @@ Does not launch games, send packets, or access game files.
 """
 import argparse
 from collections import Counter
+from dataclasses import asdict
+from integration.observation_alignment import descriptor
 import json
 from pathlib import Path
 
@@ -109,6 +111,12 @@ def audit_rows(rows, summary):
                     require(row['snapshot'].get('frame') == frame and
                             row['snapshot'].get('session') == session,
                             'Snapshot and bound receiver identity differ')
+                    try:
+                        decoded_identity = descriptor(engine, bytes.fromhex(frame))
+                    except (ValueError, TypeError) as exc:
+                        raise AuditError('Invalid encoded observer frame') from exc
+                    require(asdict(decoded_identity) == identity,
+                            'Descriptor and observed epoch disagree')
                     current = (session, frame, identity['observer_epoch'])
                     if seen is not None:
                         require(session == seen[0], 'Session changed within receiver capture')
