@@ -80,7 +80,17 @@ public sealed class CrashNativeQueryMod : IMod
                     launcherPin = "224da7757920a817de2d9242416f657ab95782ea", receipt
                 }));
             }
-            catch (Exception error) { Reject(error); }
+            catch (Exception error)
+            {
+                if (error is InvalidDataException { Message: "QUERY_SENTINEL" } &&
+                    pending != null && memory is PSMemory source && rejects < 8)
+                {
+                    Console.WriteLine("[cm64-native-query] TRAILER_DIAGNOSTIC " +
+                        pending.DescribeTrailer(source.Ram, memory,
+                            Environment.CurrentManagedThreadId, epoch));
+                }
+                Reject(error);
+            }
         }
     }
     private bool LookupBegin(CpuContext context, IMemory memory)

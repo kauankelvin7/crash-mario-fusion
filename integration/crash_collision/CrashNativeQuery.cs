@@ -144,6 +144,25 @@ public sealed class CrashNativeQuery
                 throw new InvalidDataException("QUERY_BOUND");
         return Decode(ram, (int)count);
     }
+    // Diagnostic-only bounded trailer witness. Never authorizes colliders or
+    // bypasses Complete()'s original sentinel/owner/source validation.
+    public string DescribeTrailer(ReadOnlySpan<byte> ram, object memoryOwner,
+        int nativeThread, long observationEpoch)
+    {
+        if (!ReferenceEquals(owner, memoryOwner) || thread != nativeThread ||
+            epoch != observationEpoch || ram.Length != CrashOctree.RamSize)
+            return "STALE_OR_UNOWNED";
+        if (!CrashOctree.Fits(query, QuerySize))
+            return "INVALID_QUERY";
+        uint count = CrashOctree.U32(ram, query + CountOffset);
+        if (count >= 512)
+            return "COUNT_OUT_OF_RANGE";
+        uint first = CrashOctree.U32(ram, query + count * 8);
+        uint second = CrashOctree.U32(ram, query + count * 8 + 4);
+        uint prior = count > 0 ? CrashOctree.U32(ram, query + (count - 1) * 8) : 0;
+        return $"count={count} trailer_first=0x{first:X8} trailer_second=0x{second:X8} previous_first=0x{prior:X8}";
+    }
+
     private CrashQueryReceipt Decode(ReadOnlySpan<byte> ram, int count)
     {
         int cursor = 0;
