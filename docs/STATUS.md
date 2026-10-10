@@ -195,3 +195,31 @@ New stacked draft branch `feat/m36-operator-pose-gate`, based on M3.5 PR #9, add
 ## M3.7 — first audited dual original-game receiver capture (2026-10-09)
 
 **VERIFIED_REAL receiver-only:** on authorized native Windows, Crash and Mario were both launched with independent private sessions into a single monotonic UDP localhost receiver for a bounded 180 s. Initial strict-epoch run had 2,116 arrivals but only Crash 1 admitted (2,115 frame mismatches). Opt-in, whitelisted, increasing-epoch rebind then produced **2,204 admitted packets**: Crash **1,187**, Mario **1,017**, **0 rejects/sequence holes**, and **1,108 status rows** with both receiver slots fresh. Private audit returned **CONSISTENT** after fixing its rebind arrival-gap baseline and checking encoded frame epoch; original files/logs/tokens remained local. **94/94 native Windows source/oracle tests PASS**. See `docs/M37_LIVE_CAPTURE.md` and draft PR #11. Source-delay, Crash postphysics ownership, world-frame correspondence, calibrated geometry, merged collision and playable fusion remain **BLOCKED/NOT_TESTED**; `main` unchanged.
+
+## M3.8 — Windows window-scoped gameplay QA (2026-10-09)
+
+**VERIFIED_REAL GUI control only:** On the authorized Windows PC, an opt-in,
+bounded, Win32 HWND-scoped operator drove native original-game windows without
+operator keyboard input. Mario accepted Start, new file A and tutorial keys;
+holding its configured W direction for 1.5 s visibly moved Mario from the
+castle entrance onto the grass. Crash accepted Enter at its title, Z at the
+Sanity Beach island entry and VK_UP for 0.8 s; separate before/after private
+client screenshots show forward movement between level crates. Original
+renderers remained responsive. Images and game files remain in private local
+appdata; they were not uploaded or committed.
+
+New `tools/windows/operator_harness.py` limits targets to the two exact
+game executable filenames, verifies owner/PID/foreground, sends per-HWND
+`PostMessageW` key-down/up (not global `SendInput`) with finite <=5-second
+holds, releases on abort/focus loss, and saves cropped client-only BMPs in
+LOCALAPPDATA. Source-only tests and Win32 real-run smoke checks pass; the
+full native Windows source/oracle suite passed **102/102** with 0 failures.
+Documentation: `docs/OPERATOR_HARNESS.md`. Codex CLI was invoked locally
+but its apply_patch executable was blocked by sandbox, so implementation and
+real native validation proceeded through the explicitly authorized desktop
+terminal connection instead of claiming an autonomous Codex edit succeeded.
+
+**Still BLOCKED:** native Crash postphysics ownership, matching gameplay
+input timestamps against CMW1 in the same run, calibrated spatial landmarks,
+shared native collision and playable merged-world rendering. No release or
+main-branch merge.
