@@ -16,6 +16,7 @@ internal static class LiveMarioControls
     static Scene scene = new(0, 0, false, 0);
     static LiveMarioInput input = new();
     static int uiThread;
+    static int optInLevelReceipt;
     static volatile bool running;
     static readonly System.Reflection.PropertyInfo inputAllowed = typeof(MenuRegistry).Assembly
         .GetType("RecompOne.Runtime.Host.Window.OriginalMarioInputHost")?.GetProperty("InputAllowed");
@@ -36,6 +37,7 @@ internal static class LiveMarioControls
         input = new();
         scene = new(0, 0, false, 0);
         uiThread = 0;
+        optInLevelReceipt = 0;
         running = true;
         Event.AddListener<PadReadEvent>(ObserveScene);
     }
@@ -66,6 +68,9 @@ internal static class LiveMarioControls
         catch { valid = false; }
         int epoch = previous.Epoch + (level != previous.Level || valid != previous.Valid ? 1 : 0);
         Volatile.Write(ref scene, new Scene(Stopwatch.GetTimestamp(), level, valid, epoch));
+        if (valid && level == 9 && Environment.GetEnvironmentVariable("CM64_GOAL19_NATIVE_AUTOWARP") == "1" &&
+            Interlocked.Exchange(ref optInLevelReceipt, 1) == 0)
+            Console.WriteLine("[cm64-goal19] ORIGINAL_SCENE_OBSERVED level=9 input_poll=true postphysics=false collision=false");
     }
     internal static void Capture()
     {

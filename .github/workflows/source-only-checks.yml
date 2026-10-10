@@ -2,7 +2,7 @@ name: Asset-free integration checks
 
 on:
   push:
-    branches: [m0-recon, feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance, feat/goal19-source-integration, feat/goal19-authentic-contact, feat/goal19-unified-diagnostics]
+    branches: [m0-recon, feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance, feat/goal19-source-integration, feat/goal19-authentic-contact, feat/goal19-unified-diagnostics, feat/goal19-native-autowarp]
   pull_request:
     branches: [m0-recon, feat/m3-coordinate-contract, feat/m34-windows-source-ci, feat/goal19-source-integration]
   workflow_dispatch:

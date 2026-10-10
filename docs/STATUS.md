@@ -1,5 +1,9 @@
 # Execution status
 
+## GOAL #19 native original level + Mario movement (2026-10-10)
+
+Opt-in original developer API `CheatManager.RequestWarp(9, 1)` reliably loaded **original N. Sanity Beach** without brittle GUI input. Two separate authorized Windows sessions captured native level 9 using read-only original guest PadRead memory checks, original Mario mesh with texture atlas, 30 Hz native original libsm64 movement on both horizontal axes and full input-caused jump/landing over an **AUTHORED test floor**. The exact checked runner passed on 1,928 ticks; an earlier session passed on 1,811. Original guest gameplay level VERIFIED_REAL; **no original Crash collider, GTE camera, retail scene depth or shared-object contact**. The observed Mario is still small/screen-space anchored. G4 Mario-only PARTIAL REAL, G1/G2/G3/G5/G6 BLOCKED, G7 private asset boundary intact. Do not call playable or merge to main. See `GOAL19_NATIVE_AUTOWARP_GATE.md`.
+
 ## GOAL #19 native GPU renderer + original-query diagnostic integration (2026-10-10)
 
 Both source-only workstreams are preserved here: depth-tested original Mario GPU FBO contract and source-verified original Crash query/NSLookup diagnostics. **They are not wired together and this is NOT PLAYABLE**. The original 25-second Crash launch loaded diagnostic mod but produced zero native query receipts. Original GTE frame, collision lifetime/materials and native scene contact remain BLOCKED. Asset-free regression only; main unchanged.
