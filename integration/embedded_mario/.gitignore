@@ -1,0 +1,11 @@
+obj/
+bin/
+*.dll
+*.exe
+*.pdb
+*.z64
+*.n64
+*.v64
+*.bin
+*.cue
+*.chd
