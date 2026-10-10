@@ -2,6 +2,12 @@
 
 **Status: EXPERIMENTAL / NOT PLAYABLE.** GitHub acceptance issue: https://github.com/kauankelvin7/crash-mario-fusion/issues/19
 
+Renderer continuation: `feat/goal19-native-renderer` adds a compiled, opt-in
+GPU self-depth source contract and synthetic Windows pixel fixtures. No original
+game clip-frame producer is connected; the existing ImGui fallback is unchanged.
+This does not pass G1/G2 original-game fidelity or playability gates.
+See `GOAL19_GPU_RENDERER.md` for the exact projection blocker and proofs.
+
 This isolated integration worktree combines the independent source-only commits
 `912c37a` (M4.3 native Mario control input) and `50e373c` (M4.2 original Crash collision-source diagnostic),
 both based on the pinned camera-provenance work. It does **not** connect any original Crash collision
