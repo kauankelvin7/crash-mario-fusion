@@ -8,6 +8,7 @@ param(
     [Parameter(Mandatory)][string]$MarioRom,
     [Parameter(Mandatory)][string]$CrashDisc,
     [ValidateRange(20,120)][int]$Seconds = 40,
+    [switch]$RequirePreview,
     [switch]$CheckOnly
 )
 $ErrorActionPreference='Stop'
@@ -19,7 +20,7 @@ if($manifest.libsm64_pin -ne 'fd11813208272b4271d92bd92feb8f3fdbe61be5' -or $man
     throw 'Unknown pinned source revisions'
 }
 $source=Join-Path $repo 'integration/embedded_mario'
-foreach($n in @('Interop.cs','CrashEmbeddedMarioMod.cs','mod.json')){
+foreach($n in @('Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')){
     $h=(Get-FileHash -LiteralPath (Join-Path $source $n) -Algorithm SHA256).Hash.ToLowerInvariant()
     if($h -ne $manifest.source_hashes.PSObject.Properties[$n].Value){throw "Source differs from prepared private manifest: $n"}
     $installed=(Get-FileHash -LiteralPath (Join-Path $app "mods/cm64-embedded-mario/$n") -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -74,9 +75,10 @@ $errors=@(Get-Content (Join-Path $log 'errors.log') -ErrorAction SilentlyContinu
 $init=[bool]($lines|Where-Object {$_ -match '\[cm64-embedded\] INIT_OK'})
 $solver=[bool]($lines|Where-Object {$_ -match '\[cm64-embedded\] HOST_SOLVER frames=180 mesh_frames=180 moving_frames=101'})
 $failure=[bool]($lines|Where-Object {$_ -match '\[cm64-embedded\] FAIL_CLOSED'})
-$ok=$init -and $solver -and -not $failure -and $errors.Count -eq 0 -and $responsive
+$preview=[bool]($lines|Where-Object {$_ -match '\[cm64-embedded\] M41_PREVIEW_DREW native_mesh=true original_triangles=[1-9][0-9]* guest_window=true shared_scene=false'})
+$ok=$init -and $solver -and -not $failure -and $errors.Count -eq 0 -and $responsive -and (-not $RequirePreview -or $preview)
 @{schema_version=1;passed=$ok;host_responsive=$responsive;native_init=$init;native_solver=$solver;
-  physical_status='BLOCKED';shared_geometry=$false;shared_rendering=$false
+  guest_mesh_preview=$preview;physical_status='BLOCKED';shared_geometry=$false;shared_rendering=$false
  }|ConvertTo-Json|Set-Content (Join-Path $log 'summary.json') -Encoding utf8
-Write-Output "HOSTED_MARIO_RESULT passed=$ok init=$init solver=$solver responsive=$responsive physical=BLOCKED"
+Write-Output "HOSTED_MARIO_RESULT passed=$ok init=$init solver=$solver preview=$preview responsive=$responsive physical=BLOCKED"
 if(-not $ok){throw 'Host solver gate failed: private logs retained'}

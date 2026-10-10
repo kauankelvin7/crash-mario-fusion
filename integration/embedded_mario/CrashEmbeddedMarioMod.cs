@@ -33,14 +33,16 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
             throw new InvalidOperationException("Missing private original Mario ROM or local native DLL");
         enabled = true;
         loadedAt = Stopwatch.GetTimestamp();
+        OriginalMarioPreview.Register(); // render only through host's ImGui draw callback
         Event.AddListener<VSyncEvent>(OnHostVSync);
-        Console.WriteLine("[cm64-embedded] ARMED hosted solver only; no shared Crash collider, no drawing");
+        Console.WriteLine("[cm64-embedded] ARMED hosted solver + native CPU mesh preview; Crash collider/depth unchanged");
     }
 
     public void OnUnload()
     {
         if (enabled) Event.RemoveListener<VSyncEvent>(OnHostVSync);
         enabled = false; halted = true;
+        OriginalMarioPreview.Stop();
         if (marioId >= 0) { MarioNative.sm64_mario_delete(marioId); marioId = -1; }
         if (started) { MarioNative.sm64_global_terminate(); started = false; }
         NativeMemory.Free(texture); texture = null;
@@ -113,6 +115,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
                 geometry.NumTrianglesUsed > MarioNative.MaxTriangles)
                 throw new InvalidOperationException("Non-finite Mario state/invalid mesh count");
             if (geometry.NumTrianglesUsed > 0) geometryFrames++;
+            OriginalMarioPreview.Publish(geometry.Position, geometry.Color, geometry.NumTrianglesUsed, ticks+1);
             if (Math.Abs(state.Velocity[0]) + Math.Abs(state.Velocity[2]) > .005f)
                 movingFrames++;
             ++ticks;
@@ -120,7 +123,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
             {
                 Console.WriteLine("[cm64-embedded] HOST_SOLVER frames=180 mesh_frames=" +
                     geometryFrames + " moving_frames=" + movingFrames +
-                    " surface=AUTHORED_NOT_CRASH drawing=false physical_status=BLOCKED");
+                    " surface=AUTHORED_NOT_CRASH drawing=DIAGNOSTIC_PREVIEW_ONLY physical_status=BLOCKED");
                 halted = true;
             }
         }

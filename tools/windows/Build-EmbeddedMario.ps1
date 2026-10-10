@@ -29,6 +29,7 @@ $dotnet = Join-Path $m0 'dotnet/dotnet.exe'
 foreach ($file in @($gcc,$bash,$cygpath,$dotnet,
     (Join-Path $sourceMod 'embedded_probe.c'),
     (Join-Path $sourceMod 'CrashEmbeddedMarioMod.cs'),
+    (Join-Path $sourceMod 'OriginalMarioPreview.cs'),
     (Join-Path $sourceMod 'Interop.cs'),
     (Join-Path $sourceMod 'mod.json'))) {
     if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
@@ -103,7 +104,7 @@ if ($active.Count -gt 0 -and
 }
 $destMod = Join-Path $app 'mods/cm64-embedded-mario'
 New-Item -ItemType Directory -Force $destMod | Out-Null
-foreach ($name in @('Interop.cs','CrashEmbeddedMarioMod.cs','mod.json')) {
+foreach ($name in @('Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')) {
     Copy-Item -LiteralPath (Join-Path $sourceMod $name) -Destination (Join-Path $destMod $name) -Force
 }
 $settings.ModsConfigured=$true
@@ -117,7 +118,7 @@ $buildManifest = @{
     dll_sha256=$hash
     source_hashes=@{}
 }
-foreach ($name in @('Interop.cs','CrashEmbeddedMarioMod.cs','mod.json')) {
+foreach ($name in @('Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')) {
     $buildManifest.source_hashes[$name] = (Get-FileHash -LiteralPath (Join-Path $sourceMod $name) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $buildManifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $root 'embedded-build.json') -Encoding utf8
