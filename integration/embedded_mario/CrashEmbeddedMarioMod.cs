@@ -42,6 +42,8 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         textured = inOutput && Environment.GetEnvironmentVariable("CM64_TEXTURE_ATLAS") == "1";
         cameraProbe = Environment.GetEnvironmentVariable("CM64_CAMERA_PROBE") == "1";
         live = Environment.GetEnvironmentVariable("CM64_LIVE_CONTROLS") == "1";
+        if (Environment.GetEnvironmentVariable("CM64_GOAL19_NATIVE_AUTOWARP") == "1" && (!live || !inOutput))
+            throw new InvalidOperationException("Native auto-warp requires opt-in live image session");
         if (live)
         {
             if (!inOutput) throw new InvalidOperationException("Live input requires original OutputPanel hook");
@@ -60,6 +62,14 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         else
             OriginalMarioPreview.Register(); // original diagnostic path preserved
         Event.AddListener<VSyncEvent>(OnHostVSync);
+        // Explicit native Windows QA only: reuse the original host developer-menu warp
+        // instead of guessing GUI keys or writing guest memory from this mod.
+        // This is a menu transition, NOT evidence of Mario/Crash shared physics.
+        if (Environment.GetEnvironmentVariable("CM64_GOAL19_NATIVE_AUTOWARP") == "1")
+        {
+            RecompOne.Runtime.Host.Cheats.CheatManager.RequestWarp(9, 1);
+            Console.WriteLine("[cm64-goal19] HOST_DEV_WARP_REQUESTED level=9 map_slot=1 native_scene_unverified=true");
+        }
         Console.WriteLine("[cm64-embedded] ARMED guest geometry mode=" +
             (inOutput ? "OUTPUT_IMAGE_OVERLAY" : "DIAGNOSTIC_PREVIEW") +
             "; native Crash collider/depth unchanged");
