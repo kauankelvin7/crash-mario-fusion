@@ -50,6 +50,7 @@ def audit_rows(rows, summary):
     counted_rejections = Counter()
     states = {e: {'accepted': 0, 'last_sequence': 0, 'last_arrival_ns': None,
                   'sequence_holes': 0, 'maximum_arrival_gap_ns': 0} for e in ENGINE_NAMES}
+    observed_bindings = {e: None for e in ENGINE_NAMES}  # audit-only; no raw identities in output
     for row in rows:
         require(type(row) is dict, 'Invalid capture row')
         require(row.get('physical_status') == 'BLOCKED' and row.get('calibration_ready') is False
@@ -89,6 +90,34 @@ def audit_rows(rows, summary):
                 require(type(sequence) is int and 0 < sequence < 2**32,
                         'Invalid accepted sequence')
                 state = states[engine]
+                # M3.7's bounded native observer may explicitly rebind to a newer
+                # same-session epoch. The receiver resets only its arrival-gap
+                # baseline, never its accepted sequence/holes/aggregate counters.
+                seen = observed_bindings[engine]
+                frame = observed.get('frame')
+                if seen is not None:
+                    require(type(frame) is str, 'Missing observed frame after binding')
+                if frame is not None:
+                    identity = observed.get('identity')
+                    session = observed.get('session')
+                    require(type(frame) is str and len(frame) == 32 and
+                            type(session) is str and len(session) == 32 and
+                            type(identity) is dict and
+                            type(identity.get('observer_epoch')) is int and
+                            0 < identity['observer_epoch'] < 2**32,
+                            'Invalid receiver binding identity')
+                    require(row['snapshot'].get('frame') == frame and
+                            row['snapshot'].get('session') == session,
+                            'Snapshot and bound receiver identity differ')
+                    current = (session, frame, identity['observer_epoch'])
+                    if seen is not None:
+                        require(session == seen[0], 'Session changed within receiver capture')
+                        if frame != seen[1]:
+                            require(current[2] > seen[2], 'Non-increasing observed epoch')
+                            state['last_arrival_ns'] = None
+                        else:
+                            require(current[2] == seen[2], 'Epoch changed without frame change')
+                    observed_bindings[engine] = current
                 require(sequence > state['last_sequence'], 'Duplicate or regressed accepted sequence')
                 holes = sequence - state['last_sequence'] - 1
                 gap = None if state['last_arrival_ns'] is None else stamp - state['last_arrival_ns']
