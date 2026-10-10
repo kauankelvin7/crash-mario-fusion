@@ -11,6 +11,7 @@ param(
     [ValidateRange(1024,65535)][int]$Port = 39100,
     [ValidateRange(1,300)][int]$Seconds = 60,
     [ValidateRange(1,10000)][int]$MaxPackets = 6000,
+    [switch]$AllowNativeEpochRebind,
     [string]$MsysRoot = 'C:/msys64'
 )
 . "$PSScriptRoot/Common.ps1"
@@ -41,5 +42,7 @@ Write-Output "Emitter configuration for separate operator terminals: $config"
 Write-Output "Declare both emitter ports as $Port. Receiver only: no game is launched."
 Push-Location $TaskRepo
 try {
-    Invoke-Logged $python @('-m','tools.collect_observations','--config',$config,'--port',"$Port",'--seconds',"$Seconds",'--max-packets',"$MaxPackets") 'paired-observation-console.log'
+    $arguments = @('-m','tools.collect_observations','--config',$config,'--port',"$Port",'--seconds',"$Seconds",'--max-packets',"$MaxPackets")
+    if ($AllowNativeEpochRebind) { $arguments += '--allow-native-epoch-rebind' }
+    Invoke-Logged $python $arguments 'paired-observation-console.log'
 } finally { Pop-Location }

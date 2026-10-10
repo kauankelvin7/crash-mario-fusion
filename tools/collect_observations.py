@@ -159,12 +159,21 @@ def main():
     parser.add_argument('--port',required=True,type=int)
     parser.add_argument('--seconds',default=60,type=int)
     parser.add_argument('--max-packets',default=6000,type=int)
+    parser.add_argument('--allow-native-epoch-rebind',action='store_true',
+                        help='Explicit local operator-only whitelist for observed native epochs')
     args=parser.parse_args()
     try:
         if not 1024<=args.port<=65535: raise ValueError('Explicit localhost port 1024..65535 required')
         if not 1<=args.seconds<=300 or not 1<=args.max_packets<=MAX_ATTEMPTS: raise ValueError('Capture budget exceeded')
         bindings,age,gap=read_config(args.config)
-        observer=PairedObserver(bindings,clock_id='receiver-'+uuid.uuid4().hex,max_age_ns=age,max_gap_ns=gap)
+        if args.allow_native_epoch_rebind:
+            from tools.native_epoch_observer import NativeEpochObserver
+            # Explicitly approved locations from the independent original-game gates.
+            # Never allow UDP to choose arbitrary scene identities or mark calibration valid.
+            observer=NativeEpochObserver(bindings,{CRASH:{9},MARIO:{(6,1),(16,1)}},
+                clock_id='receiver-'+uuid.uuid4().hex,max_age_ns=age,max_gap_ns=gap)
+        else:
+            observer=PairedObserver(bindings,clock_id='receiver-'+uuid.uuid4().hex,max_age_ns=age,max_gap_ns=gap)
         folder=private_folder()
         with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as receiver, (folder/'observations.jsonl').open('x',encoding='utf-8') as output:
             receiver.bind(('127.0.0.1',args.port))

@@ -2,7 +2,7 @@ name: Windows asset-free native checks
 
 on:
   push:
-    branches: [feat/m36-operator-pose-gate]
+    branches: [feat/m36-operator-pose-gate, feat/m37-paired-native-capture]
   pull_request:
     branches: [feat/m3-coordinate-contract, feat/m3-integration-observer, feat/m34-windows-source-ci]
   workflow_dispatch:

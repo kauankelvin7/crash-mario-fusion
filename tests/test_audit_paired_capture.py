@@ -89,6 +89,33 @@ class CaptureAuditTests(unittest.TestCase):
         summary['rejection_counts']['PAUSED_REBIND_REQUIRED'] = 1
         self.assertEqual(audit_rows(rows, summary)['rejected_packets'], 2)
 
+    def test_native_epoch_rebind_gap_baseline_and_identity_integrity(self):
+        from integration.observation_alignment import Binding
+        from integration.world_snapshot import CRASH, MARIO, encode
+        from tests.test_observation_alignment import pose, frame
+        from tools.native_epoch_observer import NativeEpochObserver
+        collector = NativeEpochObserver(
+            {e: Binding(pose(e).session, frame(e)) for e in (CRASH, MARIO)},
+            {CRASH: {9}, MARIO: {(6, 1), (16, 1)}},
+            clock_id='paired-regression', max_age_ns=100, max_gap_ns=200)
+        rows = [collector.status(0),
+                collector.accept(encode(pose(CRASH)), 1),
+                collector.accept(encode(pose(MARIO)), 2),
+                collector.accept(encode(pose(CRASH, sequence=2,
+                    frame=frame(CRASH, 3))), 3),
+                collector.status(3)]
+        self.assertIsNone(rows[3]['receiver_arrival_gap_ns'])
+        summary = collector.summary()
+        self.assertEqual(audit_rows(rows, summary)['accepted_packets'], {'crash': 2, 'mario': 1})
+        tampered = json.loads(json.dumps(rows))
+        tampered[3]['receiver_arrival_gap_ns'] = 2
+        with self.assertRaises(AuditError):
+            audit_rows(tampered, summary)
+        tampered = json.loads(json.dumps(rows))
+        tampered[3]['observed']['identity']['observer_epoch'] = 2
+        with self.assertRaises(AuditError):
+            audit_rows(tampered, summary)
+
     def test_missing_and_symlinked_private_files_fail(self):
         with tempfile.TemporaryDirectory() as name:
             with self.assertRaises(AuditError):
