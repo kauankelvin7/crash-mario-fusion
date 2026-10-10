@@ -50,8 +50,13 @@ camera, render-depth or collision modification to native Crash.
   overlaid **inside the Crash title image**, then over the original **Sanity
   Beach island-selection map** after scoped keyboard inputs. The overlay
   followed the changing original Crash background without the M4.1A separate
-  preview window. **Actual playable Sanity Beach stage capture was not
-  established by this test**; the island menu is not an active level.
+  preview window. A subsequent bounded, separately recorded session entered the
+  **actual playable Sanity Beach stage** (Enter, Z, Z with PID-scoped key messages).
+  Private native 1280x720 PrintWindow screenshot was visually verified: Crash
+  stood in front of beach crates and the original colorful Mario mesh was
+  overlaid on the same displayed stage image. This is **in-level graphical
+  composition evidence only**; the authored Mario screen anchor still has
+  no physical stage-coordinate/depth or shared collision authority.
   Screenshots, logs, session paths, user ROM and Crash BIN/CUE stayed private
   on the authorized Windows device and were NOT included in Git/GitHub/CI.
 - Private rebuilt host **M41B_OVERLAY_GATE passed=True,
