@@ -1,6 +1,6 @@
 # M3.7 — same-receiver real-game capture gate
 
-**Status (2026-10-09):** local, bounded paired experiment performed; **not yet a successful two-source capture**. No native physics mutation, shared geometry, calibration, or release.
+**Status (2026-10-09):** local, bounded paired experiment performed; **paired receiver capture succeeded after the epoch fix: 1,187 Crash + 1,017 Mario packets, zero rejects/holes, private audit CONSISTENT**. No native physics mutation, shared geometry, calibration, or release.
 
 ## Original-runtime attempt (pre-fix)
 
@@ -20,7 +20,7 @@ This command **only starts the receiver** and writes a private configuration wit
 
 ## Verification and remaining gates
 
-- New native epoch policy and its deterministic tests passed with the full **93/93 local Windows source/native-oracle suite**; no game was launched by this suite.
-- **New corrected paired original-runtime capture: NOT_TESTED**. No evidence of two fresh source packets under one receiver clock yet.
+- New native epoch policy and its deterministic tests passed with the full **94/94 local Windows source/native-oracle suite**; no game was launched by this suite.
+- **Corrected real original-runtime paired receiver capture: VERIFIED_REAL receiver-only**; 2,204 accepted packets under one receiver clock and 1,108 comparable status rows. No physical synchronization verified.
 - Physical synchronization, Crash native postphysics frame ownership, unique fixed-point position interpretation, shared landmarks and actual collision-world ownership remain **BLOCKED**.
 - No release, no main merge, no commercial game files sent to GitHub.
