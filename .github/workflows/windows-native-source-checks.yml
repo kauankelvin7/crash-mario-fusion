@@ -2,7 +2,7 @@ name: Windows asset-free native checks
 
 on:
   push:
-    branches: [feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay]
+    branches: [feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance]
   pull_request:
     branches: [feat/m3-coordinate-contract, feat/m3-integration-observer, feat/m34-windows-source-ci]
   workflow_dispatch:

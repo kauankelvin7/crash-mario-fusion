@@ -13,7 +13,7 @@ using RecompOne.Runtime.Modding;
 public sealed unsafe class CrashEmbeddedMarioMod : IMod
 {
     const string OwnedMarioHash = "9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE";
-    bool enabled, started, halted, inOutput, textured;
+    bool enabled, started, halted, inOutput, textured, cameraProbe;
     int marioId = -1, ticks, geometryFrames, movingFrames;
     long lastTickTime, loadedAt;
     string ownedMarioPath = "";
@@ -35,6 +35,8 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         loadedAt = Stopwatch.GetTimestamp();
         inOutput = Environment.GetEnvironmentVariable("CM64_INOUTPUT") == "1";
         textured = inOutput && Environment.GetEnvironmentVariable("CM64_TEXTURE_ATLAS") == "1";
+        cameraProbe = Environment.GetEnvironmentVariable("CM64_CAMERA_PROBE") == "1";
+        if (cameraProbe) CrashCameraProbe.Start();
         if (inOutput)
             OriginalMarioOutputOverlay.Register();
         else
@@ -48,6 +50,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
     public void OnUnload()
     {
         if (enabled) Event.RemoveListener<VSyncEvent>(OnHostVSync);
+        if (cameraProbe) CrashCameraProbe.Stop();
         enabled = false; halted = true;
         OriginalMarioOutputOverlay.Stop();
         if (textured) RecompOne.Runtime.Host.Window.OriginalMarioAtlas.ReleaseAtlas();
