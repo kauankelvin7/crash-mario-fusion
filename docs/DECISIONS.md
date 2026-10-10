@@ -135,6 +135,20 @@ Accepted an **intermediate, strictly diagnostic SCREEN-SPACE** on-image overlay:
 ## D011 — Read-only original camera source gate before depth/3D fusion (2026-10-10)
 
 **ACCEPTED diagnostic step, not acceptance of 3D-camera reconstruction.** Codex CLI independently inspected original pinned Crash c1 and Launcher source in read-only mode. It verified actual guest `cam_trans` (0x80057864), `ms_cam_rot` render-prepared signed 3x3 (0x800577E4), `screen_proj` (0x800578D0), zone/path state; original `GfxUpdateMatrices` scales/inverts axes, so the observed matrix is not a pure 3D world camera. RecompOne's native-wide depth attachment covers selected host-synthesized side/world passes; the original PS1 center relies on ordering-table painter primitives, and a complete source-owned depth map is **not** proven. Do not insert a guest by assuming a shared depth buffer. Chose a bounded opt-in, direct read-only raw `PSMemory.Ram` camera diagnostic at PadRead with **UNKNOWN_DIAGNOSTIC** source phase, source-validated level/zone/path/epochs, per-source 48-sample/90-second cap and strict scope+numeric Python audit. Live original Sanity Beach confirmed 48 samples, 3 same-epoch source samples with 2 actual camera changes, native source gate PASS alongside original Mario textured host. Retain `postphysics=false`, `depth_complete=false`, `camera_calibrated=false`. Next decision requires an original GfxTransformWorlds same-pass camera capture and >=3 matched original GTE SXY/Z vertices with scene/OT generation identity and centre depth coverage checks before authorizing true Mario world projection. Keep `main` and original game binaries unchanged.
+## D012 — GPU self-depth contract without invented camera (2026-10-10)
+
+Use the existing private pinned OutputPanel/atlas GL seam, separate RGBA8/depth24
+target and GLSL homogeneous clip/smooth UV/RGB interpolation. Require a coherent,
+bounded source-projected frame and actual host GL owner; restore mutated state
+on success/failure and retain unchanged ImGui fallback. Do not synthesize a new
+camera from raw render-prepared matrices, authored anchors or host wide-side depth.
+No original-game adapter is connected until same-pass GTE projection is verified.
+The hidden Windows GPU oracle uses synthetic triangles/atlas only. Native source
+compilation and synthetic pixels do not pass shared-world/playability gates.
+The configured `qa_reviewer` could not start (`gpt-6.1-sol` unavailable to the agent
+runtime); no independent agent review is claimed. Local source and GPU fixtures
+provide the bounded checks; see `GOAL19_GPU_RENDERER.md`.
+
 # 2026-10-10 — independent M43 input contract
 
 Use existing original OutputPanel overlay UI seam for IJKL/U input, immutable

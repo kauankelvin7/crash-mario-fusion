@@ -1,5 +1,16 @@
 # Execution status
 
+## GOAL #19 renderer continuation (2026-10-10)
+
+`feat/goal19-native-renderer`: **EXPERIMENTAL / NOT PLAYABLE**.
+Implemented an opt-in host-owned GLSL/RGBA8/depth24 self-depth source seam with
+immutable homogeneous clip/UV/RGB frames and state/lifetime regression fixtures.
+No source-proven original-game clip-frame producer is connected; previous ImGui
+overlay is unchanged. Synthetic native GPU evidence is not original Mario/Crash
+gameplay evidence. Camera/GTE reprojection, retail-centre depth, authentic native
+collision, independent live controls, shared object and Windows gameplay gates
+remain unpassed. See `GOAL19_GPU_RENDERER.md` for exact blocker and commands.
+
 ## Current continuation — M4.2 source collision probe (2026-10-10)
 
 `feat/m42-authentic-crash-surfaces`: **G1 BLOCKED; G2/G3/G4/G5 not passed**.
