@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>annotations</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Interop.cs;LiveMarioInput.cs;LiveMarioControls.cs;CrashEmbeddedMarioMod.cs;OriginalMarioOutputOverlay.cs;OriginalMarioPreview.cs;CrashCameraProbe.cs" />
+    <Reference Include="RecompOne.Runtime"><HintPath>$(CM64HostDirectory)/RecompOne.Runtime.dll</HintPath></Reference>
+    <Reference Include="ImGui.NET"><HintPath>$(CM64HostDirectory)/ImGui.NET.dll</HintPath></Reference>
+    <Reference Include="Silk.NET.Input.Common"><HintPath>$(CM64HostDirectory)/Silk.NET.Input.Common.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

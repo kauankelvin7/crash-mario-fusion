@@ -16,7 +16,7 @@ if((& git -C $up rev-parse HEAD).Trim() -ne $pin -or (& git -C $up status --porc
  throw 'Public upstream source not pinned and clean'
 }
 foreach($name in @('OriginalMarioAtlasHost.cs','CrashEmbeddedMarioMod.cs',
- 'OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','Interop.cs','mod.json')){
+ 'OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','mod.json')){
  if(-not (Test-Path (Join-Path $repo "integration/embedded_mario/$name"))){throw "Missing $name"}
 }
 if($CheckOnly){Write-Output 'M41B2_PREFLIGHT_OK original_game_NOT_TESTED';return}
@@ -55,13 +55,13 @@ if(@($settings.ActiveMods).Count -ne 1 -or @($settings.ActiveMods)[0] -ne 'cm64-
 }
 $dest=Join-Path $app 'mods/cm64-embedded-mario'
 foreach($name in @('CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs',
- 'OriginalMarioOutputOverlay.cs','Interop.cs','mod.json')){
+ 'OriginalMarioOutputOverlay.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','mod.json')){
  Copy-Item -LiteralPath (Join-Path $repo "integration/embedded_mario/$name") -Destination (Join-Path $dest $name) -Force
 }
 Copy-Item (Join-Path $runtime 'RecompOne.Runtime.dll') (Join-Path $app 'RecompOne.Runtime.dll') -Force
 $hashes=@{}
 foreach($name in @('CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs',
- 'OriginalMarioOutputOverlay.cs','Interop.cs','mod.json')){
+ 'OriginalMarioOutputOverlay.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','mod.json')){
  $hashes[$name]=(Get-FileHash (Join-Path $dest $name) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $manifest=@{

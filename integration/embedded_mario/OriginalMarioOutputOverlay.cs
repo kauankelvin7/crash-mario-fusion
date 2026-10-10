@@ -27,6 +27,8 @@ internal static class OriginalMarioOutputOverlay
     public static void Register()
     {
         if(registered)return;
+        logged=textureLogged=false;
+        presented=firstGuestTick=lastGuestTick=0;
         MenuRegistry.RegisterOutputOverlay(Draw);
         registered=true;
         Console.WriteLine("[cm64-output] ARMED original Mario native mesh on Crash image; coordinates UNCALIBRATED");
@@ -39,6 +41,7 @@ internal static class OriginalMarioOutputOverlay
     }
     private static void Draw(Vector2 topLeft,Vector2 bottomRight)
     {
+        LiveMarioControls.Capture();
         var frame=OriginalMarioPreview.Current;
         if(frame is null||frame.Triangles==0)return;
         float w=bottomRight.X-topLeft.X,h=bottomRight.Y-topLeft.Y;
@@ -60,6 +63,22 @@ internal static class OriginalMarioOutputOverlay
         float span=Math.Max(1f,Math.Max(maxX-minX,Math.Max(maxY-minY,maxZ-minZ)));
         float scale=Math.Min(w*.23f,h*.32f)/span;
         Vector2 center=topLeft+new Vector2(w*.52f,h*.67f); // authored diagnostic anchor
+        if (LiveMarioControls.IsRunning)
+        {
+            cx=cy=cz=0;
+            scale=Math.Min(w/4600f,h/2200f);
+            var floorDraw=ImGui.GetWindowDrawList();
+            Vector2 Project(float nativeX,float nativeZ) => center+new Vector2(
+                (nativeX*.82f-nativeZ*.57f)*scale,
+                (nativeX*.57f+nativeZ*.82f)*.22f*scale);
+            floorDraw.PushClipRect(topLeft,bottomRight,true);
+            floorDraw.AddQuad(Project(-1600,-1600),Project(-1600,1600),
+                Project(1600,1600),Project(1600,-1600),0xFF80FF80,2);
+            floorDraw.AddText(topLeft+new Vector2(12,12),0xFF80FF80,
+                "M43 AUTHORED FLOOR (not Crash collision) - IJKL move / U jump" +
+                (LiveMarioControls.Input.Latest.Active ? " [INPUT LIVE]" : " [INPUT GATED: focus/scene/bindings/release]"));
+            floorDraw.PopClipRect();
+        }
         var triangles=new Tri[frame.Triangles];
         for(int t=0;t<frame.Triangles;t++)
         {

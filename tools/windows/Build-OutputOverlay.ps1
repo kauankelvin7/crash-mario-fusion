@@ -21,7 +21,7 @@ $pin=(& git -C $public rev-parse HEAD).Trim()
 if($LASTEXITCODE -ne 0 -or $pin -ne $expected -or
    (& git -C $public status --porcelain)){throw 'Unrecognized original public Crash source'}
 if(-not (Test-Path $dot) -or -not (Test-Path $python)){throw 'Private Windows build tools unavailable'}
-foreach($n in @('CrashEmbeddedMarioMod.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
+foreach($n in @('CrashEmbeddedMarioMod.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
     if(-not (Test-Path -LiteralPath (Join-Path $repo "integration/embedded_mario/$n"))){throw "Missing source $n"}
 }
 if($CheckOnly){
@@ -62,7 +62,7 @@ if(@($settings.ActiveMods).Count -ne 1 -or @($settings.ActiveMods)[0] -ne 'cm64-
     throw 'Unknown active mods in private app'
 }
 $target=Join-Path $app 'mods/cm64-embedded-mario'
-foreach($n in @('CrashEmbeddedMarioMod.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
+foreach($n in @('CrashEmbeddedMarioMod.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
     Copy-Item (Join-Path $repo "integration/embedded_mario/$n") (Join-Path $target $n) -Force
 }
 Copy-Item (Join-Path $runtime 'RecompOne.Runtime.dll') (Join-Path $app 'RecompOne.Runtime.dll') -Force
@@ -77,7 +77,7 @@ $metadata=[ordered]@{
     mario_dll_sha256=(Get-FileHash (Join-Path $app 'sm64.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
     sources=@{}
 }
-foreach($n in @('CrashEmbeddedMarioMod.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
+foreach($n in @('CrashEmbeddedMarioMod.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
     $metadata.sources[$n]=(Get-FileHash (Join-Path $repo "integration/embedded_mario/$n") -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $metadata|ConvertTo-Json -Depth 5|Set-Content (Join-Path $root 'host-verified.json') -Encoding utf8
