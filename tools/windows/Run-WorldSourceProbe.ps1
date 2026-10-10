@@ -3,7 +3,8 @@
 param(
     [Parameter(Mandatory)][string]$CrashDisc,
     [ValidateRange(15,80)][int]$Seconds = 60,
-    [switch]$CheckOnly
+    [switch]$CheckOnly,
+    [switch]$WarpSanityBeach
 )
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -81,8 +82,14 @@ Copy-Item -LiteralPath $manifest.DllPath -Destination (Join-Path $slot 'game.rec
 $manifest.DllPath = Join-Path $slot 'game.recomp.dll'
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $slot 'manifest.json') -Encoding utf8
 Copy-Item -LiteralPath $runtime -Destination (Join-Path $app 'RecompOne.Runtime.dll') -Force
+$worldMod = Join-Path $app 'mods/cm64-world-source'
+New-Item -ItemType Directory -Path $worldMod -Force | Out-Null
+foreach ($file in @('mod.json', 'CrashWorldSourceHookMod.cs')) {
+    Copy-Item -LiteralPath (Join-Path $repo "integration/world_probe/$file") -Destination (Join-Path $worldMod $file)
+    Assert-Hash (Join-Path $worldMod $file) (Get-FileHash -LiteralPath (Join-Path $repo "integration/world_probe/$file") -Algorithm SHA256).Hash.ToLowerInvariant()
+}
 $settings = Get-Content -LiteralPath (Join-Path $app 'settings.json') -Raw | ConvertFrom-Json
-$settings.CdPath = $disc; $settings.ActiveMods = @(); $settings.ModsConfigured = $true
+$settings.CdPath = $disc; $settings.ActiveMods = @('cm64-world-source'); $settings.ModsConfigured = $true
 $settings.AssetHotWatch = $false; $settings.Muted = $true
 $settings | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $app 'settings.json') -Encoding utf8
 Assert-Hash (Join-Path $app 'CrashBandicoot.exe') $seal.original_exe
@@ -90,10 +97,13 @@ Assert-Hash (Join-Path $app 'CrashBandicoot.dll') $seal.original_crash_dll
 Assert-Hash $manifest.DllPath $guestHash
 Assert-Hash (Join-Path $app 'RecompOne.Runtime.dll') $build.runtime_sha256
 $stdout = Join-Path $run 'host.log'
+$privateEnv = @{ CM64_WORLD_SOURCE_PROBE = '1'; CM64_EMBED_ENABLE = '0'; CM64_TEXTURE_ATLAS = '0';
+    CM64_INOUTPUT = '0'; CM64_WORLD_WARP_SANITY = $(if ($WarpSanityBeach) { '1' } else { '0' });
+    CM64_WORLD_SOURCE_DEBUG = $(if ($WarpSanityBeach) { '1' } else { '0' });
+    TEMP = $run; TMP = $run }
 $process = Start-Process -FilePath (Join-Path $app 'CrashBandicoot.exe') -WorkingDirectory $app `
-    -ArgumentList @('--run', ('"' + $disc + '"')) -WindowStyle Hidden `
-    -Environment @{ CM64_WORLD_SOURCE_PROBE = '1'; CM64_EMBED_ENABLE = '0'; CM64_TEXTURE_ATLAS = '0';
-        CM64_INOUTPUT = '0'; TEMP = $run; TMP = $run } `
+    -ArgumentList @('--run', ('"' + $disc + '"')) -WindowStyle $(if ($WarpSanityBeach) { 'Normal' } else { 'Hidden' }) `
+    -Environment $privateEnv `
     -RedirectStandardOutput $stdout -RedirectStandardError (Join-Path $run 'errors.log') -PassThru
 $responsive = $false
 try {

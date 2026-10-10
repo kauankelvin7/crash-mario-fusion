@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
 using RecompOne.Runtime.Catalogs;
+using RecompOne.Runtime.Host.Cheats;
 using RecompOne.Runtime.Context;
 using RecompOne.Runtime.Memory;
 
 namespace RecompOne.Runtime;
 
-internal static class CrashWorldSourceProbe
+public static class CrashWorldSourceProbe
 {
     const uint WorldCall = 0x80019508;
     const uint ZoneAddress = 0x80057914, PathAddress = 0x8005791C, DrawAddress = 0x80057960;
@@ -17,8 +18,11 @@ internal static class CrashWorldSourceProbe
     static readonly long Started = Stopwatch.GetTimestamp();
     static long lastSample, lastAttempt;
     static int samples, epoch, generation;
+    static int debugWorldCalls, debugOtCalls, debugRtptCalls;
     static uint clearedOt, previousLevel, previousZone, previousPath, previousDraw;
+    static uint guestOtDraw = uint.MaxValue;
     static bool stopped;
+    static bool warpRequested;
     static Scope? active;
 
     sealed class Scope
@@ -27,6 +31,7 @@ internal static class CrashWorldSourceProbe
         public required PSMemory Memory;
         public uint Level, Zone, Path, Draw, Ot;
         public int Generation;
+        public string OtSource = "UNKNOWN";
         public Sample? Candidate;
     }
 
@@ -65,6 +70,8 @@ internal static class CrashWorldSourceProbe
         if (!Live) return;
         try
         {
+            if (Environment.GetEnvironmentVariable("CM64_WORLD_SOURCE_DEBUG") == "1" && debugOtCalls++ < 3)
+                Console.WriteLine($"[cm64-world-gate] OT_VISIT count={count} last={last:X8} generation={generation}");
             active = null;
             generation++;
             clearedOt = 0;
@@ -74,31 +81,69 @@ internal static class CrashWorldSourceProbe
         catch { Disable(); }
     }
 
+    // Pinned c1 src/psx/r3000a.s RGpuResetOT writes 2047 forward
+    // 24-bit pointers followed by the 0xFFFFFF end tag. The original
+    // retail executable uses that guest routine, not necessarily DMA6.
+    // Verify all 2048 source-owned RAM tags BEFORE world geometry modifies OT.
+    static bool OriginalGuestOtReset(PSMemory ram, uint pointer)
+    {
+        if (!Fits(pointer, 8192)) return false;
+        uint baseAddress = Physical(pointer);
+        for (uint index = 0; index < 2047; ++index)
+        {
+            if (Word(ram, pointer + index * 4) != ((baseAddress + (index + 1) * 4) & 0xFFFFFF))
+                return false;
+        }
+        return Word(ram, pointer + 8188) == 0x00FFFFFF;
+    }
+
     public static void Enter(uint address, CpuContext cpu, IMemory memory)
     {
+        // Dispatcher enters for regular guest calls before the level is loaded;
+        // the OT callback itself does not run at the title screen. Request only
+        // the official host developer-menu warp, once, in a private opt-in run.
+        if (Enabled && !warpRequested && Environment.GetEnvironmentVariable("CM64_WORLD_WARP_SANITY") == "1")
+        {
+            warpRequested = true;
+            CheatManager.RequestWarp(9, 1);
+            Console.WriteLine("[cm64-world-warp] ORIGINAL_HOST_WARP_REQUESTED level=9 map_slot=1 authenticated=false");
+        }
+        if (Environment.GetEnvironmentVariable("CM64_WORLD_SOURCE_DEBUG") == "1" && address == WorldCall && debugWorldCalls++ < 3)
+            Console.WriteLine($"[cm64-world-gate] WORLD_CALL_ENTER gen={generation} ot={clearedOt:X8} a0={cpu.A0:X8} live={Live}");
         if (address != WorldCall || !Live) return;
         try
         {
             if (active != null) { Disable(); return; }
             if (lastAttempt != 0 && Stopwatch.GetElapsedTime(lastAttempt).TotalMilliseconds < 900) return;
             lastAttempt = Stopwatch.GetTimestamp();
-            if (memory is not PSMemory ram || ram.Ram.Length != 0x200000 || generation == 0 ||
-                Physical(cpu.A0) != clearedOt || !Fits(cpu.A0, 8192)) return;
+            if (memory is not PSMemory ram || ram.Ram.Length != 0x200000 ||
+                !Fits(cpu.A0, 8192)) return;
             uint level = Word(ram, Catalog.LevelIdAddr);
             if (!Catalog.Levels.TryGet(level, out var info) || info.Kind != LevelKind.Gameplay ||
                 Word(ram, 0x80056400) != 0 || Word(ram, 0x8005640C) != 0) return;
             uint zone = Word(ram, ZoneAddress), path = Word(ram, PathAddress), draw = Word(ram, DrawAddress);
+            if (generation == 0 || (guestOtDraw != uint.MaxValue && guestOtDraw != draw))
+            {
+                if (!OriginalGuestOtReset(ram, cpu.A0)) return;
+                generation++;
+                clearedOt = Physical(cpu.A0);
+                guestOtDraw = draw;
+            }
+            if (Physical(cpu.A0) != clearedOt) return;
             if (!Fits(zone, 20) || !Fits(path, 4) || Word(ram, zone) != 0x0100FFFF) return;
             if (samples == 0 || level != previousLevel || zone != previousZone || path != previousPath ||
                 draw <= previousDraw || (lastSample != 0 && Stopwatch.GetElapsedTime(lastSample).TotalSeconds > 2)) epoch++;
             active = new Scope { Cpu = cpu, Memory = ram, Level = level, Zone = zone,
-                Path = path, Draw = draw, Ot = cpu.A0, Generation = generation };
+                Path = path, Draw = draw, Ot = cpu.A0, Generation = generation,
+                OtSource = guestOtDraw == uint.MaxValue ? "DMA6_CLEAR" : "GUEST_RGPU_RESET_CHAIN" };
         }
         catch { Disable(); }
     }
 
     public static void BeforeGte(uint command)
     {
+        if (command == 0x4A280030 && Environment.GetEnvironmentVariable("CM64_WORLD_SOURCE_DEBUG") == "1" && debugRtptCalls++ < 3)
+            Console.WriteLine($"[cm64-world-gate] RTPT_ENTER active={active != null} live={Live} candidate={active?.Candidate != null}");
         if (!Live || active == null || active.Candidate != null || command != 0x4A280030) return;
         try
         {
@@ -251,7 +296,7 @@ internal static class CrashWorldSourceProbe
                 source_pin = "224da7757920a817de2d9242416f657ab95782ea",
                 c1_pin = "256fdcef59f15a190290cc19db3fa9a707843b69",
                 level = scope.Level, zone = scope.Zone, path = scope.Path, draw = scope.Draw,
-                epoch, ot_generation = generation, ot = scope.Ot, world = sample.World,
+                epoch, ot_generation = generation, ot = scope.Ot, ot_source = scope.OtSource, world = sample.World,
                 world_key = sample.WorldKey, header = sample.Header, origin = sample.Origin,
                 zone_header = sample.ZoneHeader, world_descriptor = sample.Descriptor, poly_id = sample.PolyId,
                 zone_magic = 0x0100FFFFu, world_count = sample.WorldCount,

@@ -1,5 +1,9 @@
 # Execution status
 
+## GOAL #19 — original Windows GTE/OT source receipts (2026-10-10)
+
+New isolated branch `feat/goal19-world-gte-inlevel` adds read-only original `GfxTransformWorlds` method hook and exact PSX `RGpuResetOT` ascending table validation. A sealed **original game on Windows** entered Sanity Beach by original host opt-in warp and emitted **24 authenticated-by-runner, source-consistent original GTE/OT receipts, 72 vertex projections**. The independent projection auditor reported **0 pixel / 0 Z error** but intentionally returns only `RECORDED_G1_CANDIDATE_ONLY` (no complete centre depth/camera-calibrated Mario frame). GPU/physics common-world gameplay not proven; do not merge main or close #19. See `GOAL19_G1_NATIVE_GTE_INLEVEL.md`.
+
 Date: 2026-10-09. Branch: `m0-recon`. Project base: `d45ffef659f606a779e158275e098947ba2ecd7c`.
 
 - M0 reconnaissance: completed; six pinned upstream sources inspected. See [EVIDENCE.md](EVIDENCE.md).

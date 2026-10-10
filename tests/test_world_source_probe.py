@@ -34,6 +34,19 @@ def receipt():
 
 
 class WorldSourceTests(unittest.TestCase):
+    def test_guest_psx_ot_requires_exact_original_2048_link_chain(self):
+        probe = (REPO / 'integration/embedded_mario/CrashWorldSourceProbe.cs').read_text()
+        fixture = (REPO / 'tests/native_world_probe/Fixture.cs').read_text()
+        hook = (REPO / 'integration/world_probe/CrashWorldSourceHookMod.cs').read_text()
+        self.assertIn('OriginalGuestOtReset(PSMemory ram, uint pointer)', probe)
+        self.assertIn('index < 2047', probe)
+        self.assertIn('Word(ram, pointer + 8188) == 0x00FFFFFF', probe)
+        self.assertIn('GUEST_RGPU_RESET_CHAIN', probe)
+        self.assertIn('scenario == "guest-ot"', fixture)
+        self.assertIn('HookManager.AddPre(method, Before)', hook)
+        self.assertIn('HookManager.AddPost(method, After)', hook)
+        self.assertNotIn('AddReplace', hook)
+
     def test_native_oem_noise_never_weakens_utf8_receipts(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "native.log"
@@ -47,8 +60,8 @@ class WorldSourceTests(unittest.TestCase):
     def test_private_runner_keeps_observation_and_owned_process_boundary(self):
         source = (REPO / "tools/windows/Run-WorldSourceProbe.ps1").read_text(encoding="utf-8")
         for required in ("--verify-only", "--c1", "--libsm64", "Assert-Hash", "$process.Kill()",
-                         "$process.HasExited", "-WindowStyle Hidden", "CM64_EMBED_ENABLE = '0'",
-                         "$settings.ActiveMods = @()", "verified_real = $false"):
+                         "$process.HasExited", "-WindowStyle $(if ($WarpSanityBeach)", "CM64_EMBED_ENABLE = '0'",
+                         "$settings.ActiveMods = @('cm64-world-source')", "verified_real = $false"):
             self.assertIn(required, source)
         for forbidden in ("SendInput", "PostMessage", "Stop-Process -Name", "Remove-Item", "--prepare"):
             self.assertNotIn(forbidden, source)
