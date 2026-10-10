@@ -54,11 +54,24 @@ class NativeQueryOracleTests(unittest.TestCase):
     def test_original_query_bytes_pass_native_dotnet_contract(self):
         checks = Path(os.environ["CM64_QUERY_CHECKS_DLL"])
         self.assertTrue(checks.is_file(), "Configured .NET fixture missing; no silent skip")
-        for mode in (0, 2):
-            result = subprocess.run([os.environ.get("CM64_DOTNET", "dotnet"), str(checks), "--oracle"],
+        for mode in (0, 1, 2, 3):
+            result = subprocess.run([os.environ.get("CM64_DOTNET", "dotnet"), str(checks), "--oracle", str(mode)],
                 input=self.query_bytes(mode).hex(), capture_output=True, text=True, timeout=30)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("VERIFIED_SYNTHETIC native_query_checks=", result.stdout)
+
+
+    @unittest.skipUnless(os.environ.get("CM64_QUERY_CHECKS_DLL"), "Set CM64_QUERY_CHECKS_DLL for C-to-.NET comparison")
+    def test_native_results_reject_mismatched_recorded_roots(self):
+        checks = Path(os.environ["CM64_QUERY_CHECKS_DLL"])
+        self.assertTrue(checks.is_file())
+        for output_mode, source_mode in ((0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)):
+            with self.subTest(output=output_mode, source=source_mode):
+                result = subprocess.run([os.environ.get("CM64_DOTNET", "dotnet"), str(checks),
+                    "--oracle", str(source_mode)], input=self.query_bytes(output_mode).hex(),
+                    capture_output=True, text=True, timeout=30)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("ROOT_RESULT", result.stdout + result.stderr)
 
 
     def test_original_neighbor_order_bounds_descriptor_and_sentinel(self):
@@ -70,6 +83,11 @@ class NativeQueryOracleTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from("<4h", payload, 16), (8, 4288, 4280, 4800))
         self.assertEqual(struct.unpack_from("<4h", payload, 40), (8, 4800, 4536, 4800))
         self.assertEqual(struct.unpack_from("<I", payload, 48)[0], 0xFFFFFFFF)
+
+    def test_native_negative_shift_and_nonmultiple_bounds(self):
+        payload = self.query_bytes(3)
+        self.assertEqual(struct.unpack_from("<3i", payload, 0x1008), (-6799, -68477, -76795))
+        self.assertEqual(struct.unpack_from("<4h", payload, 16), (8, -88, 4279, 4799))
 
     def test_empty_nodes_are_descriptors_not_manufactured_ground(self):
         payload = self.query_bytes(1)

@@ -219,6 +219,35 @@ public sealed class CrashNativeQuery
                 relative, minimum, maximum));
             ++cursor;
         }
+        // The pinned producer emits no leaf for root 0, and exactly one
+        // level-zero leaf for an odd root. Stable source bytes alone do not
+        // establish that decoded rows came from that source.
+        ushort root = unchecked((ushort)Half(ram, source.RectAddress + 28));
+        if (root == 0)
+        {
+            if (nodes.Count != 0) throw new InvalidDataException("ROOT_RESULT");
+        }
+        else if ((root & 1) != 0)
+        {
+            // The source result has a 13-bit node field; zero compact words
+            // alias descriptors. Do not claim an unambiguous reconstructed ID.
+            if (root == 1 || (root >> 1) > 0x1FFF)
+                throw new InvalidDataException("ROOT_ENCODING");
+            if (nodes.Count != 1 || nodes[0].Depth != 0 ||
+                nodes[0].ReconstructedNode != root)
+                throw new InvalidDataException("ROOT_RESULT");
+            for (int axis = 0; axis < 3; ++axis)
+            {
+                long delta = (long)source.Min[axis] - low[axis];
+                long relative = delta >> 4; // producer's arithmetic fixed-point shift
+                if (delta < int.MinValue || delta > int.MaxValue ||
+                    relative < short.MinValue || relative > short.MaxValue ||
+                    nodes[0].Relative16[axis] != relative)
+                    throw new InvalidDataException("ROOT_RESULT");
+            }
+        }
+        // Internal-root traversal membership is NOT certified here. All
+        // receipt surface/frame/lifetime/material authorization remains false.
         return neighbor with { Nodes = nodes.ToArray() };
     }
     private static short Half(ReadOnlySpan<byte> ram, uint address)

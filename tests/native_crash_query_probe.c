@@ -24,7 +24,7 @@ entry *NSLookup(void *reference) {
 int main(int argc, char **argv) {
     if (argc != 2) return 2;
     int mode = atoi(argv[1]);
-    if (mode < 0 || mode > 2) return 2;
+    if (mode < 0 || mode > 3) return 2;
     zone_header header = {0};
     zone_rect rectangles[3] = {0};
     for (int index = 0; index < 3; ++index) {
@@ -43,6 +43,8 @@ int main(int argc, char **argv) {
     }
     header.neighbor_count = 3; cur_zone = fixtures[0];
     zone_query query = {0}; vec position = {0};
+    /* Authored negative relative X plus nonmultiple-of-16 bound offsets. */
+    if (mode == 3) { position.x = 70001; position.y = 3; position.z = 5; }
     int count = ZoneQueryOctrees(&position, NULL, &query);
     assert(lookups == 3 && query.once == 1 && count == query.result_count);
     assert(count == (mode == 1 ? 4 : 6));
