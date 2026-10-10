@@ -11,10 +11,11 @@ internal sealed class OriginalMarioMeshFrame
 {
     public readonly float[] Position;
     public readonly float[] Color;
+    public readonly float[] Uv;
     public readonly int Triangles;
     public readonly int Tick;
-    public OriginalMarioMeshFrame(float[] position, float[] color, int triangles, int tick)
-        => (Position, Color, Triangles, Tick) = (position, color, triangles, tick);
+    public OriginalMarioMeshFrame(float[] position, float[] color, float[] uv, int triangles, int tick)
+        => (Position, Color, Uv, Triangles, Tick) = (position, color, uv, triangles, tick);
 }
 
 internal static unsafe class OriginalMarioPreview
@@ -28,12 +29,13 @@ internal static unsafe class OriginalMarioPreview
 
     // Called only by the already-bounded native Mario solver callback.
     // A complete immutable snapshot prevents render/physics pointer races.
-    public static void Publish(float* positions, float* colors, ushort triangleCount, int tick)
+    public static void Publish(float* positions, float* colors, float* uv, ushort triangleCount, int tick)
     {
-        if (positions == null || colors == null || triangleCount > 1024 || tick <= 0)
+        if (positions == null || colors == null || uv == null || triangleCount > 1024 || tick <= 0)
             throw new InvalidOperationException("Invalid guest CPU mesh snapshot");
         int components = checked(triangleCount * 9);
         float[] vertex = new float[components], rgb = new float[components];
+        float[] coords = new float[checked(triangleCount * 6)];
         for (int i = 0; i < components; ++i)
         {
             float p = positions[i], c = colors[i];
@@ -42,7 +44,14 @@ internal static unsafe class OriginalMarioPreview
             vertex[i] = p;
             rgb[i] = Math.Clamp(c, 0f, 1f);
         }
-        Volatile.Write(ref current, new OriginalMarioMeshFrame(vertex, rgb, triangleCount, tick));
+        for (int i=0; i<coords.Length; ++i)
+        {
+            float value=uv[i];
+            if (!float.IsFinite(value) || Math.Abs(value)>10000f)
+                throw new InvalidOperationException("Native guest UV malformed");
+            coords[i]=value;
+        }
+        Volatile.Write(ref current, new OriginalMarioMeshFrame(vertex, rgb, coords, triangleCount, tick));
     }
 
     public static void Register()

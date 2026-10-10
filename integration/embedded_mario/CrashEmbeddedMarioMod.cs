@@ -13,7 +13,7 @@ using RecompOne.Runtime.Modding;
 public sealed unsafe class CrashEmbeddedMarioMod : IMod
 {
     const string OwnedMarioHash = "9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE";
-    bool enabled, started, halted, inOutput;
+    bool enabled, started, halted, inOutput, textured;
     int marioId = -1, ticks, geometryFrames, movingFrames;
     long lastTickTime, loadedAt;
     string ownedMarioPath = "";
@@ -34,6 +34,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         enabled = true;
         loadedAt = Stopwatch.GetTimestamp();
         inOutput = Environment.GetEnvironmentVariable("CM64_INOUTPUT") == "1";
+        textured = inOutput && Environment.GetEnvironmentVariable("CM64_TEXTURE_ATLAS") == "1";
         if (inOutput)
             OriginalMarioOutputOverlay.Register();
         else
@@ -49,6 +50,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         if (enabled) Event.RemoveListener<VSyncEvent>(OnHostVSync);
         enabled = false; halted = true;
         OriginalMarioOutputOverlay.Stop();
+        if (textured) RecompOne.Runtime.Host.Window.OriginalMarioAtlas.ReleaseAtlas();
         OriginalMarioPreview.Stop();
         if (marioId >= 0) { MarioNative.sm64_mario_delete(marioId); marioId = -1; }
         if (started) { MarioNative.sm64_global_terminate(); started = false; }
@@ -79,6 +81,13 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
                 throw new OutOfMemoryException();
             fixed (byte* rom = owned) MarioNative.sm64_global_init(rom, texture);
             started = true;
+            if (textured)
+            {
+                byte[] rgba=new byte[MarioNative.TextureBytes];
+                Marshal.Copy((nint)texture,rgba,0,rgba.Length);
+                try { RecompOne.Runtime.Host.Window.OriginalMarioAtlas.QueueAtlas(rgba); }
+                finally { CryptographicOperations.ZeroMemory(rgba); }
+            }
         }
         finally { CryptographicOperations.ZeroMemory(owned); }
 
@@ -122,7 +131,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
                 geometry.NumTrianglesUsed > MarioNative.MaxTriangles)
                 throw new InvalidOperationException("Non-finite Mario state/invalid mesh count");
             if (geometry.NumTrianglesUsed > 0) geometryFrames++;
-            OriginalMarioPreview.Publish(geometry.Position, geometry.Color, geometry.NumTrianglesUsed, ticks+1);
+            OriginalMarioPreview.Publish(geometry.Position, geometry.Color, geometry.Uv, geometry.NumTrianglesUsed, ticks+1);
             if (Math.Abs(state.Velocity[0]) + Math.Abs(state.Velocity[2]) > .005f)
                 movingFrames++;
             ++ticks;
