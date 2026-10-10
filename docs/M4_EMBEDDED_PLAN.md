@@ -33,7 +33,7 @@ Replace example local paths with owned originals. Build keeps a separate copy of
 | Gate | Definition | Status |
 |---|---|---|
 | M4.0 | Original Mario movement/geometry solver runs inside genuine Crash Windows host without modifying Crash control/physics | **VERIFIED_REAL host + AUTHORED geometry** |
-| M4.1 | Mario visible: **M4.1A separate debug preview VERIFIED_REAL; M4.1B1 original Mario triangles on actual Crash OutputPanel game image VERIFIED_REAL**, authored screen-space anchor; M4.1B2 textured, calibrated shared-camera/depth-composited renderer still **BLOCKED** | **PARTIAL** |
+| M4.1 | Mario visible: **M4.1A separate debug preview VERIFIED_REAL; M4.1B1 original Mario triangles on actual Crash OutputPanel game image VERIFIED_REAL**, authored screen-space anchor; M4.1B2A original Mario UV/textures and M4.1B2B0 raw Crash camera source/variation VERIFIED_REAL; calibrated native shared-camera/depth-composited renderer M4.1B2B1 still **BLOCKED** | **PARTIAL** |
 | M4.2 | Authentic Crash collision/source-volume ownership, identity and scene lifecycle measured; reviewed volumes mapped into native Mario surfaces preserving native Mario solver authority | **BLOCKED** |
 | M4.3 | Both playable native characters and shared physical object interactions, one world/renderer, repeatable ground-jump-landing and collision regressions | **BLOCKED** |
 | M4.4 | Full original SM64 object/events, warps, HUD, enemies and Crash behaviors preserved in chosen hybrid architecture, then Windows release checks | **BLOCKED** |
