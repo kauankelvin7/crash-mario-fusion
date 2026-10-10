@@ -29,6 +29,15 @@ namespace RecompOne.Runtime.Catalogs
         public static readonly Levels Levels = new();
     }
 }
+namespace RecompOne.Runtime.Host.Cheats
+{
+    // Original host dev-menu warp is never used by asset-free GTE fixtures.
+    public static class CheatManager
+    {
+        public static void RequestWarp(uint levelId, uint mapSlot) =>
+            throw new InvalidOperationException("Private game warp not available in synthetic fixture");
+    }
+}
 namespace RecompOne.Runtime.Hle { public static class GpuHle { public static bool Active => false; } }
 namespace RecompOne.Runtime
 {
@@ -108,7 +117,15 @@ public static class Fixture
             Gte.WriteControl(26, 317); Gte.WriteControl(24, (160 << 16) + 123); Gte.WriteControl(25, (120 << 16) + 456);
         }
         var cpu = new CpuContext { A0 = ot, T2 = ids + 2, T3 = primitive, T4 = 0, S7 = polygons, T8 = vertices };
-        if (scenario != "no-ot") CrashWorldSourceProbe.OrderingTable(ot + 8188, 2048);
+        if (scenario == "guest-ot")
+        {
+            // Original pinned PSX RGpuResetOT (c1/r3000a.s) writes a complete
+            // ascending 24-bit link chain, not a DMA6 ClearOTagR callback.
+            for (uint i = 0; i < 2047; ++i)
+                memory.WriteU32(ot + i * 4, ((ot & 0x1FFFFFFF) + (i + 1) * 4) & 0xFFFFFF);
+            memory.WriteU32(ot + 8188, 0x00FFFFFF);
+        }
+        else if (scenario != "no-ot") CrashWorldSourceProbe.OrderingTable(ot + 8188, 2048);
         if (scenario == "bad-ot") cpu.A0 += 4;
         if (scenario == "paused") memory.WriteU32(0x80056400, 1);
         if (scenario == "wrong-call") cpu.A0 = ot;
