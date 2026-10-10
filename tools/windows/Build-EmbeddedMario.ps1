@@ -104,7 +104,7 @@ if ($active.Count -gt 0 -and
 }
 $destMod = Join-Path $app 'mods/cm64-embedded-mario'
 New-Item -ItemType Directory -Force $destMod | Out-Null
-foreach ($name in @('Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')) {
+foreach ($name in @('LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')) {
     Copy-Item -LiteralPath (Join-Path $sourceMod $name) -Destination (Join-Path $destMod $name) -Force
 }
 $settings.ModsConfigured=$true
@@ -118,7 +118,7 @@ $buildManifest = @{
     dll_sha256=$hash
     source_hashes=@{}
 }
-foreach ($name in @('Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')) {
+foreach ($name in @('LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')) {
     $buildManifest.source_hashes[$name] = (Get-FileHash -LiteralPath (Join-Path $sourceMod $name) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 $buildManifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $root 'embedded-build.json') -Encoding utf8

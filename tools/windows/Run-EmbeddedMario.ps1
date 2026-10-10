@@ -20,7 +20,7 @@ if($manifest.libsm64_pin -ne 'fd11813208272b4271d92bd92feb8f3fdbe61be5' -or $man
     throw 'Unknown pinned source revisions'
 }
 $source=Join-Path $repo 'integration/embedded_mario'
-foreach($n in @('Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')){
+foreach($n in @('LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','CrashEmbeddedMarioMod.cs','OriginalMarioPreview.cs','mod.json')){
     $h=(Get-FileHash -LiteralPath (Join-Path $source $n) -Algorithm SHA256).Hash.ToLowerInvariant()
     if($h -ne $manifest.source_hashes.PSObject.Properties[$n].Value){throw "Source differs from prepared private manifest: $n"}
     $installed=(Get-FileHash -LiteralPath (Join-Path $app "mods/cm64-embedded-mario/$n") -Algorithm SHA256).Hash.ToLowerInvariant()

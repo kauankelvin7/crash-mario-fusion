@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Text.Json;
 using CrashMarioFusion.Embedded;
 using RecompOne.Runtime.Events;
 using RecompOne.Runtime.Modding;
@@ -22,6 +23,10 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
     MarioState state;
     MarioInputs input;
     MarioGeometry geometry;
+    readonly object nativeLock = new();
+    bool live;
+    int nativeThread, liveEpoch = -1, liveActorEpoch;
+    StreamWriter liveTrace;
 
     public void OnLoad()
     {
@@ -36,6 +41,19 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         inOutput = Environment.GetEnvironmentVariable("CM64_INOUTPUT") == "1";
         textured = inOutput && Environment.GetEnvironmentVariable("CM64_TEXTURE_ATLAS") == "1";
         cameraProbe = Environment.GetEnvironmentVariable("CM64_CAMERA_PROBE") == "1";
+        live = Environment.GetEnvironmentVariable("CM64_LIVE_CONTROLS") == "1";
+        if (live)
+        {
+            if (!inOutput) throw new InvalidOperationException("Live input requires original OutputPanel hook");
+            LiveMarioControls.VerifyHost();
+            string trace = Environment.GetEnvironmentVariable("CM64_LIVE_TRACE") ?? "";
+            string root = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData), "CrashMarioFusion", "M43-input")) + Path.DirectorySeparatorChar;
+            if (!Path.GetFullPath(trace).StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Live telemetry must remain private in M43-input");
+            liveTrace = new StreamWriter(new FileStream(trace, FileMode.CreateNew, FileAccess.Write, FileShare.Read)) { AutoFlush = true };
+            LiveMarioControls.Start();
+        }
         if (cameraProbe) CrashCameraProbe.Start();
         if (inOutput)
             OriginalMarioOutputOverlay.Register();
@@ -49,12 +67,24 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
 
     public void OnUnload()
     {
+        lock (nativeLock) UnloadOwned();
+    }
+
+    void UnloadOwned()
+    {
+        if (live) LiveMarioControls.Stop();
+        liveTrace?.Dispose(); liveTrace = null;
         if (enabled) Event.RemoveListener<VSyncEvent>(OnHostVSync);
         if (cameraProbe) CrashCameraProbe.Stop();
         enabled = false; halted = true;
         OriginalMarioOutputOverlay.Stop();
         if (textured) RecompOne.Runtime.Host.Window.OriginalMarioAtlas.ReleaseAtlas();
         OriginalMarioPreview.Stop();
+        if (started && nativeThread != Environment.CurrentManagedThreadId)
+        {
+            Console.Error.WriteLine("[cm64-live] cleanup deferred to process exit: wrong native owner");
+            return;
+        }
         if (marioId >= 0) { MarioNative.sm64_mario_delete(marioId); marioId = -1; }
         if (started) { MarioNative.sm64_global_terminate(); started = false; }
         NativeMemory.Free(texture); texture = null;
@@ -66,6 +96,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
 
     void Initialize()
     {
+        nativeThread = Environment.CurrentManagedThreadId;
         var info = new FileInfo(ownedMarioPath);
         if (info.Length != MarioNative.RomBytes)
             throw new InvalidOperationException("Mario ROM size rejected");
@@ -109,6 +140,11 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
 
     void OnHostVSync(VSyncEvent host)
     {
+        lock (nativeLock) TickOwned(host);
+    }
+
+    void TickOwned(VSyncEvent host)
+    {
         if (!enabled || halted) return;
         try
         {
@@ -118,12 +154,32 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
                 Initialize();
             }
             long now = Stopwatch.GetTimestamp();
-            if (now - lastTickTime < Stopwatch.Frequency / 30) return;
-            lastTickTime = now;
-            if (ticks >= 180) { halted = true; return; }
+            if (nativeThread != Environment.CurrentManagedThreadId)
+                throw new InvalidOperationException("Native Mario owner changed");
+            MarioInputSnapshot snapshot = null;
+            if (live)
+            {
+                if (ticks >= LiveMarioInput.MaxTicks) { halted = true; return; }
+                if (!LiveMarioControls.SceneValid(now)) return;
+                if (!LiveMarioControls.Input.TryTick(now, Stopwatch.Frequency, out input, out snapshot)) return;
+                if (liveEpoch != snapshot.Epoch)
+                {
+                    MarioNative.sm64_mario_delete(marioId);
+                    marioId = MarioNative.sm64_mario_create(0, 250, 0);
+                    if (marioId < 0) throw new InvalidOperationException("Mario reset rejected");
+                    liveEpoch = snapshot.Epoch;
+                    ++liveActorEpoch;
+                }
+            }
+            else
+            {
+                if (now - lastTickTime < Stopwatch.Frequency / 30) return;
+                lastTickTime = now;
+                if (ticks >= 180) { halted = true; return; }
             // Dedicated bounded original Mario simulation. No Crash input mutation.
             input.StickY = ticks >= 70 && ticks < 155 ? .75f : 0f;
             input.ButtonA = (byte)(ticks == 125 ? 1 : 0);
+            }
             geometry.NumTrianglesUsed = 0;
             fixed (MarioInputs* inputs = &input)
             fixed (MarioState* output = &state)
@@ -138,7 +194,20 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
             if (Math.Abs(state.Velocity[0]) + Math.Abs(state.Velocity[2]) > .005f)
                 movingFrames++;
             ++ticks;
-            if (ticks == 180)
+            if (live)
+            {
+                liveTrace.WriteLine(JsonSerializer.Serialize(new { schema = 1, tick = ticks,
+                    hostFrame = host.Frame, timestamp = now, frequency = Stopwatch.Frequency,
+                    sequence = snapshot.Sequence, epoch = snapshot.Epoch, actorEpoch = liveActorEpoch,
+                    stickX = input.StickX, stickY = input.StickY, jump = input.ButtonA != 0,
+                    x = state.Position[0], y = state.Position[1], z = state.Position[2],
+                    vx = state.Velocity[0], vy = state.Velocity[1], vz = state.Velocity[2],
+                    action = state.Action, surface = "AUTHORED_NOT_CRASH" }));
+                if (state.Position[1] < -500 || Math.Abs(state.Position[0]) > 1500 ||
+                    Math.Abs(state.Position[2]) > 1500)
+                    liveEpoch = -1;
+            }
+            if (!live && ticks == 180)
             {
                 Console.WriteLine("[cm64-embedded] HOST_SOLVER frames=180 mesh_frames=" +
                     geometryFrames + " moving_frames=" + movingFrames +
@@ -152,6 +221,7 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
         {
             Console.Error.WriteLine("[cm64-embedded] FAIL_CLOSED " + e.GetType().Name);
             halted = true;
+            if (live) UnloadOwned();
             // Cleanup on mod unloading; never throw into Crash's game event bus.
         }
     }

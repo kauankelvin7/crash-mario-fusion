@@ -26,7 +26,7 @@ foreach($pair in @(
  $h=(Get-FileHash (Join-Path $app $pair[0]) -Algorithm SHA256).Hash.ToLowerInvariant()
  if($h -ne $pair[1]){throw "Private binary hash changed: $($pair[0])"}
 }
-foreach($n in @('CrashEmbeddedMarioMod.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
+foreach($n in @('CrashEmbeddedMarioMod.cs','LiveMarioInput.cs','LiveMarioControls.cs','Interop.cs','OriginalMarioPreview.cs','OriginalMarioOutputOverlay.cs','mod.json')){
  $sha=(Get-FileHash (Join-Path $repo "integration/embedded_mario/$n") -Algorithm SHA256).Hash.ToLowerInvariant()
  $live=(Get-FileHash (Join-Path $app "mods/cm64-embedded-mario/$n") -Algorithm SHA256).Hash.ToLowerInvariant()
  if($sha -ne $m.sources.PSObject.Properties[$n].Value -or $sha -ne $live){throw "Private mod source changed: $n"}

@@ -1,5 +1,25 @@
 # Execution status
 
+## Current continuation — M4.2 source collision probe (2026-10-10)
+
+`feat/m42-authentic-crash-surfaces`: **G1 BLOCKED; G2/G3/G4/G5 not passed**.
+Verified all four existing public pins and original sealed host hashes. Added
+read-only source-octree decoder/mod, strict private build/run/audit and tests;
+no triangles, authored floor, Mario solver, renderer or physics changes.
+**VERIFIED_SYNTHETIC:** native .NET decoder 27 checks; focused source-oracle/audit
+suite 14 tests and full 149-test Python suite passed, including unchanged
+c1-versus-sm64ex support mismatch.
+**VERIFIED_REAL, extraction only:** fresh 90-second Windows original Crash run,
+1/1 mod, responsive, stderr empty; one level-9 volume record passed schema.
+Subsequent source trees hit unchanged TRAVERSAL_LIMIT; no stable moving-scene
+or contact proof. Corrected unrelated OEM log parsing; saved-run re-audit exits
+2/SAMPLE_COUNT, not a second real run. No budgets/criteria lowered.
+Next native seam: original ZoneQueryOctrees/query bounds and resident neighbor
+identities, exact frame/lifetime correlation, then material/contact equivalence
+and matched real landmarks. Keep visuals worktree, main, source pins, sealed
+builds and owned disc untouched. See `M42_COLLISION_SOURCE_GATE.md` for commands,
+source evidence and limits. Historical status follows, not current acceptance.
+
 Date: 2026-10-09. Branch: `m0-recon`. Project base: `d45ffef659f606a779e158275e098947ba2ecd7c`.
 
 - M0 reconnaissance: completed; six pinned upstream sources inspected. See [EVIDENCE.md](EVIDENCE.md).
@@ -245,3 +265,12 @@ A separate private copy of sealed Crash Launcher `224da775` loaded exactly one o
 ## M4.1B2B0 — raw original Crash camera provenance verified in actual Sanity Beach gameplay (2026-10-10)
 
 **VERIFIED_REAL Windows original-game diagnostic only**. Codex CLI (gpt-6.1-sol, read-only) reviewed pinned original Crash `c1` camera `GfxUpdateMatrices`, original runtime `FramePacing.NativeWideRenderer`, `GlDisplayRt` and original PS1 OT pipeline: original rendering matrix and projection are available from guest source, but the host's wide-only depth renderbuffer is **not** a complete retail centre-scene depth buffer. No code/game actions attributed to read-only Codex. On-device implementation adds an opt-in, bounded, **direct RAM-only PadRead UNKNOWN_DIAGNOSTIC** camera probe (source-only outside modified original launcher) to the already opt-in private Mario host: 3×3 original **render-prepared** signed matrix (not pure camera orientation), raw camera translation, projection, level/zone/path/progress and conservative pause/epoch filters. The camera values are **NOT applied to Mario**. Private original Windows Sanity Beach **level 9** logged **24 raw samples over five diagnostic epochs**, with 3 same-scope successive samples and 2 camera changes; a separate public-script **90s end-to-end Windows run** recorded **48 raw original guest camera samples**, host overlay+texturing remained responsive, and passed `CAMERA_SOURCE_GATE verified=True ... scope_samples=3 changed=2 level=9 ... postphysics=False depth_complete=False camera_calibrated=False`, plus `M41B2B_CAMERA_GATE passed=True camera_source_varied=True mario_mesh=True texture_gpu=True responsive=True depth_complete=false`. Both runs exited on their finite budget, no private ROM/disc/captures/logs/binaries uploaded. **140/140** full native Windows asset-free/reference Python source tests passed (130 previous + 10 new). The original Mario physics/UV simulation, Crash native physics and renderer remain unchanged. **M4.1B2B world-space shared camera, per-pixel original full depth/occlusion, true in-game 3D Mario, M4.2 real collider and M4.3 playable fusion remain BLOCKED.** See `docs/M41B2B_CAMERA_PROVENANCE.md`.
+# M43 independent-input branch — 2026-10-10
+
+Opt-in live IJKL/U source contract and private Windows gate added; RightShift
+conflicts with original Crash Select. Source gate passed on Crash pin 224da775.
+Isolated Windows host/mod compilation and asset-free input/telemetry tests only;
+no original game launched, no new VERIFIED_REAL gameplay. See
+`docs/M43_LIVE_CONTROLS.md`. Authored floor/projection are not authentic Crash
+collision or a calibrated shared world. M4.2 and human-playability gates remain
+blocked/not tested; the separate M4.2 worktree/caches are untouched.

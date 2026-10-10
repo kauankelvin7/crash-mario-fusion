@@ -1,5 +1,20 @@
 # Engineering decisions
 
+## D012 — Reject automatic octree-to-triangle physics equivalence (2026-10-10)
+
+Accept a reversible read-only source-volume diagnostic, **not G1/G2 acceptance**.
+Pinned c1 collision is resident octree volumes with node/event-specific handling,
+neighbor queries, wall filtering and floor-height averaging. Original unchanged
+Windows c1/sm64ex source oracles still disagree on authored overlapping supports
+(40 versus 48); copying top faces or boxing every leaf would hide this mismatch.
+New native original Crash probe produced one valid source record and rejected
+larger traversals without relaxing limits. PadRead has no query/frame/lifetime
+authority. Keep the strict audit permanently unable to authorize G2 from these
+records; implement and separately prove the original query boundary, native
+neighbor ownership and contact semantics first. No renderer-derived collision,
+invented scale/material constants or authored fallback in the authentic mode.
+Details and exact Windows commands: `M42_COLLISION_SOURCE_GATE.md`.
+
 ## D000: Preserve original gameplay; do not assume a winning implementation route
 
 Status: ACCEPTED as project goal, not an implementation claim.
@@ -120,3 +135,12 @@ Accepted an **intermediate, strictly diagnostic SCREEN-SPACE** on-image overlay:
 ## D011 — Read-only original camera source gate before depth/3D fusion (2026-10-10)
 
 **ACCEPTED diagnostic step, not acceptance of 3D-camera reconstruction.** Codex CLI independently inspected original pinned Crash c1 and Launcher source in read-only mode. It verified actual guest `cam_trans` (0x80057864), `ms_cam_rot` render-prepared signed 3x3 (0x800577E4), `screen_proj` (0x800578D0), zone/path state; original `GfxUpdateMatrices` scales/inverts axes, so the observed matrix is not a pure 3D world camera. RecompOne's native-wide depth attachment covers selected host-synthesized side/world passes; the original PS1 center relies on ordering-table painter primitives, and a complete source-owned depth map is **not** proven. Do not insert a guest by assuming a shared depth buffer. Chose a bounded opt-in, direct read-only raw `PSMemory.Ram` camera diagnostic at PadRead with **UNKNOWN_DIAGNOSTIC** source phase, source-validated level/zone/path/epochs, per-source 48-sample/90-second cap and strict scope+numeric Python audit. Live original Sanity Beach confirmed 48 samples, 3 same-epoch source samples with 2 actual camera changes, native source gate PASS alongside original Mario textured host. Retain `postphysics=false`, `depth_complete=false`, `camera_calibrated=false`. Next decision requires an original GfxTransformWorlds same-pass camera capture and >=3 matched original GTE SXY/Z vertices with scene/OT generation identity and centre depth coverage checks before authorizing true Mario world projection. Keep `main` and original game binaries unchanged.
+# 2026-10-10 — independent M43 input contract
+
+Use existing original OutputPanel overlay UI seam for IJKL/U input, immutable
+bounded snapshots and original VSync native solver at guarded 30Hz. RightShift
+is original Crash Select, so cannot be Mario jump. Read-only original scene
+observation gates pause/reset; never alter Crash bindings, RAM or pad state.
+Private host exposes only focus/pause eligibility in M43-input. Preserve finite
+smoke and keep authored floor/render explicitly non-Crash. Native human gameplay
+and M4.2 integration are unpassed gates, not inferred from source tests.
