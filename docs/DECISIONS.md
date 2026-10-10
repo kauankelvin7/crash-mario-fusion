@@ -100,3 +100,11 @@ alone drops identity metadata, so the optional P2→authored-P3 composition chec
 complete observer scope and synthetic provenance, then reuses existing native
 numeric/material/capacity preflight. Operator estimates do not authorize real
 geometry. No new engine architectural decision or equivalent Astra review needed.
+
+## D007: Embedded native libsm64 as a reversible Mario-character slice (2026-10-09)
+
+**Status: ACCEPTED AS EXPERIMENT, NOT FINAL FULL-FIDELITY ARCHITECTURE.** Evidence-backed alternatives are the existing full-sm64ex + Crash passthrough (M2 coin→jump VERIFIED_REAL; M3.7 paired receiver VERIFIED_REAL) versus a minimal Mario-character solver from pinned libsm64 hosted within Crash. Source review confirms libsm64 provides Mario physics, geometry buffers, imported texture data and static/dynamic surface functions; it also maps many original SM64 interactions to `interact_noop`. Codex CLI read-only review on the authorized Windows PC concurred with a bounded native-host diagnostic and cautioned about single-thread global state, guest rendering and collision provenance.
+
+Implementation M4.0: C#/.NET 10 Cdecl ABI smoke, native Windows x64 `sm64.dll`, only one explicitly opted-in source mod on a separate copy of the original Crash Launcher. Actual Windows original-game session logged `INIT_OK` and `HOST_SOLVER frames=180 mesh_frames=180 moving_frames=101` with a responsive Crash window; privately owned and hash-pinned Mario ROM loaded in memory, no files published. A second bounded scripted run also PASS. This proves same-process guest solver invocation/CPU geometry generation ONLY. Do not infer co-rendering, Mario coin/warp semantics, authentic Crash surfaces or shared collisions from synthetic floor physics. Host VSync is a callback timing source, not proven native Crash postphysics.
+
+Next decision/test: introduce a reviewed guest render pass to the Crash host while preserving original guest OpenGL state/depth and renderer lifetime; separately measure actual Crash collision volumes and re-evaluate frame ownership before authorizing mapped Mario collision. Preserve the full-sm64ex route until full original behavior equivalence becomes demonstrable. No merge to `main` or release.
