@@ -245,3 +245,46 @@ A separate private copy of sealed Crash Launcher `224da775` loaded exactly one o
 ## M4.1B2B0 — raw original Crash camera provenance verified in actual Sanity Beach gameplay (2026-10-10)
 
 **VERIFIED_REAL Windows original-game diagnostic only**. Codex CLI (gpt-6.1-sol, read-only) reviewed pinned original Crash `c1` camera `GfxUpdateMatrices`, original runtime `FramePacing.NativeWideRenderer`, `GlDisplayRt` and original PS1 OT pipeline: original rendering matrix and projection are available from guest source, but the host's wide-only depth renderbuffer is **not** a complete retail centre-scene depth buffer. No code/game actions attributed to read-only Codex. On-device implementation adds an opt-in, bounded, **direct RAM-only PadRead UNKNOWN_DIAGNOSTIC** camera probe (source-only outside modified original launcher) to the already opt-in private Mario host: 3×3 original **render-prepared** signed matrix (not pure camera orientation), raw camera translation, projection, level/zone/path/progress and conservative pause/epoch filters. The camera values are **NOT applied to Mario**. Private original Windows Sanity Beach **level 9** logged **24 raw samples over five diagnostic epochs**, with 3 same-scope successive samples and 2 camera changes; a separate public-script **90s end-to-end Windows run** recorded **48 raw original guest camera samples**, host overlay+texturing remained responsive, and passed `CAMERA_SOURCE_GATE verified=True ... scope_samples=3 changed=2 level=9 ... postphysics=False depth_complete=False camera_calibrated=False`, plus `M41B2B_CAMERA_GATE passed=True camera_source_varied=True mario_mesh=True texture_gpu=True responsive=True depth_complete=false`. Both runs exited on their finite budget, no private ROM/disc/captures/logs/binaries uploaded. **140/140** full native Windows asset-free/reference Python source tests passed (130 previous + 10 new). The original Mario physics/UV simulation, Crash native physics and renderer remain unchanged. **M4.1B2B world-space shared camera, per-pixel original full depth/occlusion, true in-game 3D Mario, M4.2 real collider and M4.3 playable fusion remain BLOCKED.** See `docs/M41B2B_CAMERA_PROVENANCE.md`.
+
+
+## Issue #19 — G1 same-pass original world/GTE/OT source probe (2026-10-10)
+
+**Reviewed continuation (supersedes the initial counts/no-run statement below):**
+Schema 2 rechecks original zone magic/header/count and polygon-ID word at guest
+completion; pin preflight checks clean Launcher/c1/libsm64. Three actual-upstream
+GTE fixtures, **20 native rejection/opt-out checks**, **161/161 full Python/native
+source-reference tests (zero skips)**, all PowerShell parses and diff check pass.
+Private source/runtime outputs remain inside this worktree; original checkouts
+and sealed app binaries remain unchanged. The 60-second isolated original Crash
+attempt was responsive, stderr empty, own PID 1100 stopped and independently
+confirmed absent. **Zero in-level G1 receipts**; the final recorded audit rejects
+with `No source-owned original RTPT/OT receipts`. Native OEM host noise exposed
+and fixed an auditor boundary bug, not weakened receipt encoding or acceptance.
+No keys, overlay, ROM/disc copying or original game mutation. **G1 BLOCKED;
+G2-G6 unpassed; issue #19 stays OPEN.** Replay and private evidence locations:
+`docs/M42_G1_WORLD_SOURCE_GATE.md`. Source-only draft PR targets camera-provenance;
+its CI result must be checked separately, not inferred from these local tests.
+
+On `feat/m42-world-source-gate`, implements a bounded opt-in read-only original
+`GfxTransformWorlds` / RTPT / original OT instrumentation, not another overlay.
+Identifies three original WGEO input XYZ vertices, verifies same-pass guest
+render matrix/camera/world translation, captures SXY/Z and proves packet/OT
+linkage within one zone/path/draw/OT generation; rejects unsupported shaders,
+saturation, failed guest calls and stale source scopes. Asset-free parser
+independently checks integer projection and source geometry identities.
+Original Mario texture/UV pipeline remains exactly preserved.
+
+**VERIFIED_SYNTHETIC / native Windows:** derivative pinned runtime compiled;
+two fixtures execute original upstream GTE with 0 px / 0 Z error and unchanged
+memory/register state; 16 native rejection/opt-out checks pass; full
+`Test-ReferenceGeometry.ps1 -FullSuite` passes **156/156, zero skips**.
+Build/source/temp/log outputs are repo-local ignored artifacts. New optional
+`-LogRoot` prevents the reference runner from writing outside this workspace.
+No retail file accessed, no game launched, no original checkout edited, no
+commit/push/merge/PR or main change. Source-only evidence is not VERIFIED_REAL.
+
+**G1 real-game acceptance and G2-G6 remain incomplete.** Next: finite owned-game
+Sanity Beach receipt test on a separately sealed private app, then source/lifecycle
+proof for neighbor-zone octree collision and GOOL object bounds (WGEO triangles
+are not genuine collision). Independent orchestration review remains required;
+configured specialist model was unavailable. See `docs/M42_G1_WORLD_SOURCE_GATE.md`.

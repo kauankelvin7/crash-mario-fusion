@@ -32,6 +32,8 @@ assets-extracted/
 external/
 build/
 .cache/
+tests/native_world_probe/bin/
+tests/native_world_probe/obj/
 __pycache__/
 .pytest_cache/
 .env
