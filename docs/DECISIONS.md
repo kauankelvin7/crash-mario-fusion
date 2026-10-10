@@ -158,3 +158,14 @@ observation gates pause/reset; never alter Crash bindings, RAM or pad state.
 Private host exposes only focus/pause eligibility in M43-input. Preserve finite
 smoke and keep authored floor/render explicitly non-Crash. Native human gameplay
 and M4.2 integration are unpassed gates, not inferred from source tests.
+
+## 2026-10-10 — source/result root gate before new query hook machinery
+A bounded specialist review requested via explicit `gpt-6-astra` override found
+reproducible wrong source attribution in current positive fixtures: recorded
+root3 accepted empty leaves or native root19 output. Choose the narrow
+producer-derived empty/odd-root consistency gate plus aligned C-to-C# oracle,
+rather than speculative hook ABI/lifetime rewrites. Tool selection accepted;
+resolved runtime model is not separately attested. Preserve every existing
+sentinel/owner/epoch/source guard and false surface permission. Internal-root
+membership remains unverified; actual QUERY_SENTINEL still needs the authorized
+private Windows trailer witness. No architecture/physics or commercial-data change.

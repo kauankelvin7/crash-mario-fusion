@@ -73,29 +73,49 @@ public static class QueryTests
     public static void Main(string[] args)
     {
         byte[] ram = Fixture(); object owner = new();
-        if (args.Length == 1 && args[0] == "--oracle")
+        int sourceMode = 0;
+        if (args.Length != 0)
+        {
+            if (args[0] != "--oracle" || args.Length > 2 ||
+                (args.Length == 2 && (!int.TryParse(args[1], out sourceMode) || sourceMode < 0 || sourceMode > 3)))
+                throw new InvalidDataException("ORACLE_ARGUMENT");
+        }
+        if (args.Length != 0)
         {
             byte[] bytes = Convert.FromHexString(Console.In.ReadToEnd().Trim());
             Check(bytes.Length == CrashNativeQuery.QuerySize);
             bytes.CopyTo(ram, 0x2000);
+            // Match source fixture provenance, not just imported query bytes.
+            int root = sourceMode == 1 ? 0 : sourceMode == 2 ? 19 : 3;
+            for (int i = 0; i < 3; ++i) Put16(ram, 0x51C + i * 0x500, root);
+            if (sourceMode == 3)
+            {
+                Put32(ram, 0x1500, 70001); Put32(ram, 0x1504, 3); Put32(ram, 0x1508, 5);
+            }
         }
         byte[] before = (byte[])ram.Clone();
         CrashNativeQuery query = Observed(ram, owner);
-        CrashQueryReceipt receipt = query.Complete(ram, owner, 1, 1, 6);
+        CrashQueryReceipt receipt = query.Complete(ram, owner, 1, 1, CrashOctree.U32(ram, Base + 0x3004));
         Check(ram.SequenceEqual(before));
-        Check(receipt.ResultCount == 6 && receipt.Neighbors.Length == 3);
+        Check(receipt.ResultCount == (sourceMode == 1 ? 4 : 6) && receipt.Neighbors.Length == 3);
         Check(receipt.Neighbors.Select(neighbor => neighbor.Intersects).SequenceEqual(new[] { true, true, false }));
-        Check(receipt.Neighbors[0].Nodes[0].Min.SequenceEqual(new[] { -8192, 0, 0 }));
-        Check(receipt.Neighbors[1].Nodes[0].Max.SequenceEqual(new[] { 16384, 20480, 16384 }));
+        if (sourceMode == 1)
+            Check(receipt.Neighbors.All(neighbor => neighbor.Nodes.Length == 0));
+        else
+        {
+            Check(receipt.Neighbors[0].Nodes[0].Min.SequenceEqual(sourceMode == 3 ? new[] { -8207, -13, -11 } : new[] { -8192, 0, 0 }));
+            Check(receipt.Neighbors[1].Nodes[0].Max.SequenceEqual(sourceMode == 3 ? new[] { 16369, 20467, 16373 } : new[] { 16384, 20480, 16384 }));
+            Check(receipt.Neighbors[0].Nodes[0].ReconstructedNode == (sourceMode == 2 ? 19 : 3));
+        }
         Check(!receipt.SurfacesAllowed && !receipt.AllocationGenerationKnown && !receipt.NativeFrameKnown);
         Check(query.DescribeTrailer(ram, owner, 1, 1).Contains("trailer_first=0xFFFFFFFF"));
         Check(query.DescribeTrailer(ram, new object(), 1, 1) == "STALE_OR_UNOWNED");
         Check(query.DescribeTrailer(ram, owner, 2, 1) == "STALE_OR_UNOWNED");
         Check(query.DescribeTrailer(ram, owner, 1, 2) == "STALE_OR_UNOWNED");
         byte[] alteredTrailer = (byte[])ram.Clone();
-        Put32(alteredTrailer, 0x2030, 0x12345678);
+        Put32(alteredTrailer, 0x2000 + receipt.ResultCount * 8, 0x12345678);
         Check(query.DescribeTrailer(alteredTrailer, owner, 1, 1).Contains("trailer_first=0x12345678"));
-        Reject(() => query.Complete(ram, owner, 1, 1, 6), "STALE_OWNER_EPOCH");
+        Reject(() => query.Complete(ram, owner, 1, 1, (uint)receipt.ResultCount), "STALE_OWNER_EPOCH");
         NegativeChecks();
         Console.WriteLine("VERIFIED_SYNTHETIC native_query_checks=" + checks + " games=false surfaces=false");
     }
@@ -125,7 +145,30 @@ public static class QueryTests
             Buffer.BlockCopy(ram, 0xA00, ram, 0xA80, 64);
             Put32(ram, 0x614, Base + 0xA80); Put32(ram, 0x618, Base + 0xAC0);
         }, "NEIGHBOR_CHANGED");
+        RejectResult(ram => Put16(ram, 0x2010, 72), "ROOT_RESULT");
+        RejectResult(ram => Put16(ram, 0x51C, 0), "NEIGHBOR_COVERAGE");
+        RootChecks();
         OwnershipChecks();
+    }
+    private static void RootChecks()
+    {
+        byte[] ram = Fixture(); object owner = new();
+        Put16(ram, 0x51C, 0);
+        CrashNativeQuery forgedEmpty = Observed(ram, owner);
+        Reject(() => forgedEmpty.Complete(ram, owner, 1, 1, 6), "ROOT_RESULT");
+        ram = Fixture();
+        // A root node emitted at nonzero depth is not the producer's root leaf.
+        Put16(ram, 0x520, 1); Put16(ram, 0x200C, 1); Put16(ram, 0x2010, 9);
+        CrashNativeQuery deeper = Observed(ram, owner);
+        Reject(() => deeper.Complete(ram, owner, 1, 1, 6), "ROOT_RESULT");
+        ram = Fixture(); Put16(ram, 0x2012, 4289);
+        Reject(() => Observed(ram, owner).Complete(ram, owner, 1, 1, 6), "COMPACT_RANGE");
+        // Duplicate first-zone leaf: bounds/count/sentinel remain individually valid.
+        ram = Fixture(); Buffer.BlockCopy(ram, 0x2010, ram, 0x2018, 32);
+        Put32(ram, 0x3004, 7); Put32(ram, 0x2038, uint.MaxValue);
+        Reject(() => Observed(ram, owner).Complete(ram, owner, 1, 1, 7), "ROOT_RESULT");
+        ram = Fixture(); Put16(ram, 0x51C, 16387);
+        Reject(() => Observed(ram, owner).Complete(ram, owner, 1, 1, 6), "ROOT_ENCODING");
     }
     private static void OwnershipChecks()
     {
@@ -175,6 +218,11 @@ public static class QueryTests
         Put32(ram, 0x3004, 4);
         Buffer.BlockCopy(ram, 0x2018, ram, 0x2010, 16);
         Put32(ram, 0x2020, uint.MaxValue);
+        CrashNativeQuery impossibleEmpty = Observed(ram, owner);
+        byte[] emptyBefore = (byte[])ram.Clone();
+        Reject(() => impossibleEmpty.Complete(ram, owner, 1, 1, 4), "ROOT_RESULT");
+        Check(ram.SequenceEqual(emptyBefore));
+        Put16(ram, 0x51C, 0); Put16(ram, 0xA1C, 0);
         CrashQueryReceipt empty = Observed(ram, owner).Complete(ram, owner, 1, 1, 4);
         Check(empty.Neighbors.All(neighbor => neighbor.Nodes.Length == 0) && !empty.SurfacesAllowed);
         ram = Fixture(); Put16(ram, 0x51C, 36);
@@ -188,7 +236,11 @@ public static class QueryTests
     private static void Reject(Action action, string reason)
     {
         try { action(); }
-        catch (InvalidDataException error) { Check(error.Message == reason); return; }
+        catch (InvalidDataException error)
+        {
+            if (error.Message != reason) throw new Exception("Expected " + reason + ", received " + error.Message, error);
+            Check(true); return;
+        }
         throw new Exception("Expected rejection: " + reason);
     }
 }
