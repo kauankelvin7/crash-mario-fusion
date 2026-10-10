@@ -88,6 +88,13 @@ public static class QueryTests
         Check(receipt.Neighbors[0].Nodes[0].Min.SequenceEqual(new[] { -8192, 0, 0 }));
         Check(receipt.Neighbors[1].Nodes[0].Max.SequenceEqual(new[] { 16384, 20480, 16384 }));
         Check(!receipt.SurfacesAllowed && !receipt.AllocationGenerationKnown && !receipt.NativeFrameKnown);
+        Check(query.DescribeTrailer(ram, owner, 1, 1).Contains("trailer_first=0xFFFFFFFF"));
+        Check(query.DescribeTrailer(ram, new object(), 1, 1) == "STALE_OR_UNOWNED");
+        Check(query.DescribeTrailer(ram, owner, 2, 1) == "STALE_OR_UNOWNED");
+        Check(query.DescribeTrailer(ram, owner, 1, 2) == "STALE_OR_UNOWNED");
+        byte[] alteredTrailer = (byte[])ram.Clone();
+        Put32(alteredTrailer, 0x2030, 0x12345678);
+        Check(query.DescribeTrailer(alteredTrailer, owner, 1, 1).Contains("trailer_first=0x12345678"));
         Reject(() => query.Complete(ram, owner, 1, 1, 6), "STALE_OWNER_EPOCH");
         NegativeChecks();
         Console.WriteLine("VERIFIED_SYNTHETIC native_query_checks=" + checks + " games=false surfaces=false");
