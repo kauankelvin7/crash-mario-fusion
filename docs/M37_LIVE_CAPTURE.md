@@ -24,3 +24,12 @@ This command **only starts the receiver** and writes a private configuration wit
 - **Corrected real original-runtime paired receiver capture: VERIFIED_REAL receiver-only**; 2,204 accepted packets under one receiver clock and 1,108 comparable status rows. No physical synchronization verified.
 - Physical synchronization, Crash native postphysics frame ownership, unique fixed-point position interpretation, shared landmarks and actual collision-world ownership remain **BLOCKED**.
 - No release, no main merge, no commercial game files sent to GitHub.
+
+
+## Corrected original-runtime evidence (2026-10-09)
+
+Second authorized Windows original-game session: strict receiver-local clock, independent per-engine secrets, 180-second bounded observation, reviewed level/area whitelist and opt-in monotonic epoch rebinding. Windows Crash and Mario windows remained responsive; all game processes were closed after capture.
+
+The private receiver recorded **2,204 CMW1 arrivals**: **1,187 Crash**, **1,017 Mario**, **0 rejections**, **0 sequence holes**, and **1,108 status records** in which both receiver slots were fresh. The strengthened local audit returned **CONSISTENT**, verifying receiver clock identity, monotonic receipt, per-engine counters and epoch-transition arrival-gap resets. The auditor also verifies that the claimed new observer epoch matches the encoded native descriptor. New regression included; local native Windows source/oracle suite **94/94 passed**.
+
+**Scope:** VERIFIED_REAL original-runtime *receiver correlation only*, not physical simulation synchronization. Source delay unknown; Crash hook remains diagnostic PadRead rather than proved postphysics; native generation IDs, meaningful cross-game landmark pairs, calibrated coordinates, shared collision and playable fused world are BLOCKED. No retail files, tokens, private poses or game logs uploaded.
