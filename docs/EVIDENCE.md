@@ -403,3 +403,31 @@ any configuration write. Reviewer confirmed correction and final gate PASS.
 Full final suite again **82 PASS**, 15 PowerShell ASTs PASS. Full diff/ancestry/
 unchanged previous test sources checked; native Windows junction/runtime behavior
 remains NOT_TESTED. No Astra invocation or native physics change was needed.
+
+## GOAL #19 query-integrity — actual Cloud continuation, 2026-10-10
+Base remote PR #27 head 555ff79; implementation commit 1d307e1. Model-specific
+review requested with accepted `gpt-6-astra` override, read-only; runtime resolved
+model attestation unavailable. Review identified impossible source attribution
+already accepted by the old fixtures, not a conjectured explanation of Windows
+QUERY_SENTINEL. Independent QA reviewed the bounded semantic gate and oracle.
+
+Executed with cached .NET 10.0.401, official public pinned sources unchanged:
+- `dotnet run --project tests/native_query/QueryTests.csproj -c Release`:
+  **63 assertions PASS**, fixtures only, unchanged RAM / false surface permission.
+- `dotnet build integration/crash_collision/NativeQueryCompile.csproj -c Release
+  -p:CM64HostDirectory=<public-runtime-bin/Release/net10.0>`: **0 errors/warnings**.
+  Public runtime cache pin 224da775, no private original game executable loaded.
+- Full `python -m unittest discover -s tests -v` with CM64_C1_ROOT, CM64_SM64EX_ROOT,
+  CM64_CRASH_HOST_ROOT configured to unchanged public caches; CM64_DOTNET pointing
+  to cached SDK and CM64_QUERY_CHECKS_DLL to newly compiled QueryTests.dll:
+  **180 total, 179 PASS / 1 Windows guest32 ABI skip**. Actual public C-produced
+  bytes checked for modes 0/1/2/3; six mismatched source pairs reject. Negative
+  relative coordinate -88 and nonaligned bounds are authored mathematical cases.
+- `git diff --check`: PASS. No downloaded/copied commercial data, telemetry,
+  captures or game launches. All new evidence **VERIFIED_SYNTHETIC**.
+
+Two early added fixture expectations were corrected to retain existing stronger
+rejection precedence (source mutation → NEIGHBOR_COVERAGE; shifted full-size
+root → COMPACT_RANGE). No guard was weakened to make tests pass. Windows in-level
+trailer collection, semantic internal traversal, allocation/native-frame/material
+ownership and shared-world gameplay remain unverified/blocked.

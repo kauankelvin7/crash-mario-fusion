@@ -293,3 +293,15 @@ no original game launched, no new VERIFIED_REAL gameplay. See
 `docs/M43_LIVE_CONTROLS.md`. Authored floor/projection are not authentic Crash
 collision or a calibrated shared world. M4.2 and human-playability gates remain
 blocked/not tested; the separate M4.2 worktree/caches are untouched.
+
+## GOAL #19 — remote query-integrity continuation (2026-10-10)
+Current branch `feat/goal19-query-integrity`, based on remote PR #27 (555ff79).
+Implemented source-root/result consistency in the native read-only receipt
+parser: rejects empty/forged/duplicate/deeper root results and ambiguous encodings.
+Aligned native C-to-C# source fixtures and added matching/mismatching and negative
+fixed-point rounding cases. Existing sentinel/ownership and SurfacesAllowed=false
+remain intact; internal-root membership is not certified. **VERIFIED_SYNTHETIC**:
+179 passed / 1 Windows ABI skipped out of 180 Python tests, 63 C# assertions,
+mod source compilation with zero errors/warnings. Windows original runtime
+validation **NOT_TESTED**; prior QUERY_SENTINEL still **BLOCKED**. No original
+physics change, collider, commercial files, game execution or main merge.

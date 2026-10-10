@@ -250,3 +250,19 @@ retains all s16/material/capacity gates and never inserts a collider. Real
 calibration/geometry remain blocked until genuine correspondence, proven Crash
 postphysics/native-generation ownership and observed live collision provenance/
 occupancy/lifetime. No new commercial data, gameplay verification or Release.
+
+## Latest remote continuation — GOAL #19 query integrity, 2026-10-10
+Do not resume old M3.3 as if newer remote PRs were absent. This branch starts
+from PR #27 head 555ff79 and hardens root-only query/source consistency. See
+GOAL19_SENTINEL_DIAGNOSTIC.md for exact scope and evidence: 179 Python PASS +
+1 Windows ABI skip, 63 query assertions, source mod compilation zero errors.
+No physics/geometry insertion or original runtime test performed in Cloud.
+
+NEXT REAL GATE: explicitly authorized bounded local Windows in-level test from
+an independently sealed diagnostic build to obtain the still-unobserved
+TRAILER_DIAGNOSTIC for QUERY_SENTINEL, using the existing private runner. Preserve
+prior seals/data and inspect count/three words privately. Do not infer a sentinel
+fix from new root tests, auto-repair original buffers, or enable Mario surfaces.
+Internal octree traversal membership, coherent source lifetime/material/frame,
+projection and shared physical interaction remain mandatory later gates. Keep
+issue #19 and all intermediate PRs open/draft; main/m0-recon unchanged.

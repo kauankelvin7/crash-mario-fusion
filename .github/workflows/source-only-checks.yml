@@ -2,9 +2,9 @@ name: Asset-free integration checks
 
 on:
   push:
-    branches: [m0-recon, feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance, feat/goal19-source-integration, feat/goal19-authentic-contact, feat/goal19-unified-diagnostics, feat/goal19-query-sentinel-observe]
+    branches: [m0-recon, feat/m36-operator-pose-gate, feat/m37-paired-native-capture, feat/m38-operator-qa, feat/m4-embedded-sm64-spike, feat/m41-mario-mesh-preview, feat/m41b-output-overlay, feat/m41b2-mario-texture, feat/m41b2b-camera-provenance, feat/goal19-source-integration, feat/goal19-authentic-contact, feat/goal19-unified-diagnostics, feat/goal19-query-sentinel-observe, feat/goal19-query-integrity]
   pull_request:
-    branches: [m0-recon, feat/m3-coordinate-contract, feat/m34-windows-source-ci, feat/goal19-source-integration]
+    branches: [m0-recon, feat/m3-coordinate-contract, feat/m34-windows-source-ci, feat/goal19-source-integration, feat/goal19-query-sentinel-observe]
   workflow_dispatch:
 
 permissions:
@@ -39,10 +39,17 @@ jobs:
           ref: 256fdcef59f15a190290cc19db3fa9a707843b69
           path: .cache/native-c1
           persist-credentials: false
+      - name: Set up pinned .NET for original C-to-CSharp query oracle
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+      - name: Compile and exercise read-only query parser
+        run: dotnet run --project tests/native_query/QueryTests.csproj --configuration Release
       - name: Test source-only code, recorded trace, and original collision queries
         env:
           CM64_SM64EX_ROOT: ${{ github.workspace }}/.cache/native-sm64ex
           CM64_C1_ROOT: ${{ github.workspace }}/.cache/native-c1
+          CM64_QUERY_CHECKS_DLL: ${{ github.workspace }}/.cache/native-query-tests/bin/net10.0/QueryTests.dll
         run: python -m unittest discover -s tests -v
       - name: Explicitly report verification level
         run: |
