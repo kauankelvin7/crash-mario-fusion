@@ -13,7 +13,7 @@ using RecompOne.Runtime.Modding;
 public sealed unsafe class CrashEmbeddedMarioMod : IMod
 {
     const string OwnedMarioHash = "9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE";
-    bool enabled, started, halted;
+    bool enabled, started, halted, inOutput;
     int marioId = -1, ticks, geometryFrames, movingFrames;
     long lastTickTime, loadedAt;
     string ownedMarioPath = "";
@@ -33,15 +33,22 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
             throw new InvalidOperationException("Missing private original Mario ROM or local native DLL");
         enabled = true;
         loadedAt = Stopwatch.GetTimestamp();
-        OriginalMarioPreview.Register(); // render only through host's ImGui draw callback
+        inOutput = Environment.GetEnvironmentVariable("CM64_INOUTPUT") == "1";
+        if (inOutput)
+            OriginalMarioOutputOverlay.Register();
+        else
+            OriginalMarioPreview.Register(); // original diagnostic path preserved
         Event.AddListener<VSyncEvent>(OnHostVSync);
-        Console.WriteLine("[cm64-embedded] ARMED hosted solver + native CPU mesh preview; Crash collider/depth unchanged");
+        Console.WriteLine("[cm64-embedded] ARMED guest geometry mode=" +
+            (inOutput ? "OUTPUT_IMAGE_OVERLAY" : "DIAGNOSTIC_PREVIEW") +
+            "; native Crash collider/depth unchanged");
     }
 
     public void OnUnload()
     {
         if (enabled) Event.RemoveListener<VSyncEvent>(OnHostVSync);
         enabled = false; halted = true;
+        OriginalMarioOutputOverlay.Stop();
         OriginalMarioPreview.Stop();
         if (marioId >= 0) { MarioNative.sm64_mario_delete(marioId); marioId = -1; }
         if (started) { MarioNative.sm64_global_terminate(); started = false; }
@@ -123,7 +130,9 @@ public sealed unsafe class CrashEmbeddedMarioMod : IMod
             {
                 Console.WriteLine("[cm64-embedded] HOST_SOLVER frames=180 mesh_frames=" +
                     geometryFrames + " moving_frames=" + movingFrames +
-                    " surface=AUTHORED_NOT_CRASH drawing=DIAGNOSTIC_PREVIEW_ONLY physical_status=BLOCKED");
+                    " surface=AUTHORED_NOT_CRASH drawing=" +
+                    (inOutput ? "OUTPUT_IMAGE_OVERLAY" : "DIAGNOSTIC_PREVIEW_ONLY") +
+                    " physical_status=BLOCKED");
                 halted = true;
             }
         }

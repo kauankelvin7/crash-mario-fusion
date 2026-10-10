@@ -33,12 +33,12 @@ Replace example local paths with owned originals. Build keeps a separate copy of
 | Gate | Definition | Status |
 |---|---|---|
 | M4.0 | Original Mario movement/geometry solver runs inside genuine Crash Windows host without modifying Crash control/physics | **VERIFIED_REAL host + AUTHORED geometry** |
-| M4.1 | Mario visible in original Crash host: **M4.1A diagnostic native geometry preview VERIFIED_REAL**; M4.1B textured in-world camera/depth-composited render still **BLOCKED** | **PARTIAL** |
+| M4.1 | Mario visible: **M4.1A separate debug preview VERIFIED_REAL; M4.1B1 original Mario triangles on actual Crash OutputPanel game image VERIFIED_REAL**, authored screen-space anchor; M4.1B2 textured, calibrated shared-camera/depth-composited renderer still **BLOCKED** | **PARTIAL** |
 | M4.2 | Authentic Crash collision/source-volume ownership, identity and scene lifecycle measured; reviewed volumes mapped into native Mario surfaces preserving native Mario solver authority | **BLOCKED** |
 | M4.3 | Both playable native characters and shared physical object interactions, one world/renderer, repeatable ground-jump-landing and collision regressions | **BLOCKED** |
 | M4.4 | Full original SM64 object/events, warps, HUD, enemies and Crash behaviors preserved in chosen hybrid architecture, then Windows release checks | **BLOCKED** |
 
-The M4.0 mod ticks Mario on a bounded host `VSyncEvent` with a host-clock 30 Hz guard; VSync is **not** a proved Crash postphysics seam. Mario is now visible in a **separate in-host diagnostic geometry window** (M4.1A), not composited in Crash's game camera/depth; the original Mario collision surface is synthetic, not Sanity Beach. Mario's interaction `interact_noop` in the pinned libsm64 deliberately omits full-game interactions. The original Crash physics, memory and `PadReadEvent` remain untouched. DLL and caller are not asserted thread-safe; initialize and tick only on the same callback path. Game-frame ownership, cross-world calibration, Crash level mesh/volume material equivalence and full-render depth remain unsolved.
+The M4.0 mod ticks Mario on a bounded host `VSyncEvent` with a host-clock 30 Hz guard; VSync is **not** a proved Crash postphysics seam. Mario is visible both in a **separate diagnostic window** (M4.1A) and **directly over the original Crash displayed image** (M4.1B1). Neither version uses a calibrated Crash camera/depth nor authentic Crash collision; the original Mario collision surface is AUTHORED, not Sanity Beach. Mario's interaction `interact_noop` in the pinned libsm64 deliberately omits full-game interactions. The original Crash physics, memory and `PadReadEvent` remain untouched. DLL and caller are not asserted thread-safe; initialize and tick only on the same callback path. Game-frame ownership, cross-world calibration, Crash level mesh/volume material equivalence and full-render depth remain unsolved.
 
 ## Stop conditions
 

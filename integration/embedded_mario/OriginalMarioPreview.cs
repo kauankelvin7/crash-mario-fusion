@@ -20,6 +20,7 @@ internal sealed class OriginalMarioMeshFrame
 internal static unsafe class OriginalMarioPreview
 {
     private static OriginalMarioMeshFrame? current;
+    internal static OriginalMarioMeshFrame? Current => Volatile.Read(ref current);
     private static bool windowOpen = true;
     private static bool registered;
     private static bool renderLogged;
