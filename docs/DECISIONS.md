@@ -1,5 +1,20 @@
 # Engineering decisions
 
+## D012 — Reject automatic octree-to-triangle physics equivalence (2026-10-10)
+
+Accept a reversible read-only source-volume diagnostic, **not G1/G2 acceptance**.
+Pinned c1 collision is resident octree volumes with node/event-specific handling,
+neighbor queries, wall filtering and floor-height averaging. Original unchanged
+Windows c1/sm64ex source oracles still disagree on authored overlapping supports
+(40 versus 48); copying top faces or boxing every leaf would hide this mismatch.
+New native original Crash probe produced one valid source record and rejected
+larger traversals without relaxing limits. PadRead has no query/frame/lifetime
+authority. Keep the strict audit permanently unable to authorize G2 from these
+records; implement and separately prove the original query boundary, native
+neighbor ownership and contact semantics first. No renderer-derived collision,
+invented scale/material constants or authored fallback in the authentic mode.
+Details and exact Windows commands: `M42_COLLISION_SOURCE_GATE.md`.
+
 ## D000: Preserve original gameplay; do not assume a winning implementation route
 
 Status: ACCEPTED as project goal, not an implementation claim.

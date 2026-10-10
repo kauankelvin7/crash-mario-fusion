@@ -1,5 +1,25 @@
 # Execution status
 
+## Current continuation — M4.2 source collision probe (2026-10-10)
+
+`feat/m42-authentic-crash-surfaces`: **G1 BLOCKED; G2/G3/G4/G5 not passed**.
+Verified all four existing public pins and original sealed host hashes. Added
+read-only source-octree decoder/mod, strict private build/run/audit and tests;
+no triangles, authored floor, Mario solver, renderer or physics changes.
+**VERIFIED_SYNTHETIC:** native .NET decoder 27 checks; focused source-oracle/audit
+suite 14 tests and full 149-test Python suite passed, including unchanged
+c1-versus-sm64ex support mismatch.
+**VERIFIED_REAL, extraction only:** fresh 90-second Windows original Crash run,
+1/1 mod, responsive, stderr empty; one level-9 volume record passed schema.
+Subsequent source trees hit unchanged TRAVERSAL_LIMIT; no stable moving-scene
+or contact proof. Corrected unrelated OEM log parsing; saved-run re-audit exits
+2/SAMPLE_COUNT, not a second real run. No budgets/criteria lowered.
+Next native seam: original ZoneQueryOctrees/query bounds and resident neighbor
+identities, exact frame/lifetime correlation, then material/contact equivalence
+and matched real landmarks. Keep visuals worktree, main, source pins, sealed
+builds and owned disc untouched. See `M42_COLLISION_SOURCE_GATE.md` for commands,
+source evidence and limits. Historical status follows, not current acceptance.
+
 Date: 2026-10-09. Branch: `m0-recon`. Project base: `d45ffef659f606a779e158275e098947ba2ecd7c`.
 
 - M0 reconnaissance: completed; six pinned upstream sources inspected. See [EVIDENCE.md](EVIDENCE.md).
