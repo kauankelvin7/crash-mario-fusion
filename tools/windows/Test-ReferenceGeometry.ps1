@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 [CmdletBinding()]
-param([string]$MsysRoot = 'C:/msys64', [switch]$FullSuite)
-. "$PSScriptRoot/Common.ps1"
+param([string]$MsysRoot = 'C:/msys64', [switch]$FullSuite, [string]$LogRoot = '')
+. "$PSScriptRoot/Common.ps1" -LogRoot $LogRoot
 $source = Join-Path $TaskCache 'c1'
 $pin = '256fdcef59f15a190290cc19db3fa9a707843b69'
 if (-not (Test-Path -LiteralPath $source)) {

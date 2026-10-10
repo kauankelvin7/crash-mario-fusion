@@ -120,3 +120,39 @@ Accepted an **intermediate, strictly diagnostic SCREEN-SPACE** on-image overlay:
 ## D011 — Read-only original camera source gate before depth/3D fusion (2026-10-10)
 
 **ACCEPTED diagnostic step, not acceptance of 3D-camera reconstruction.** Codex CLI independently inspected original pinned Crash c1 and Launcher source in read-only mode. It verified actual guest `cam_trans` (0x80057864), `ms_cam_rot` render-prepared signed 3x3 (0x800577E4), `screen_proj` (0x800578D0), zone/path state; original `GfxUpdateMatrices` scales/inverts axes, so the observed matrix is not a pure 3D world camera. RecompOne's native-wide depth attachment covers selected host-synthesized side/world passes; the original PS1 center relies on ordering-table painter primitives, and a complete source-owned depth map is **not** proven. Do not insert a guest by assuming a shared depth buffer. Chose a bounded opt-in, direct read-only raw `PSMemory.Ram` camera diagnostic at PadRead with **UNKNOWN_DIAGNOSTIC** source phase, source-validated level/zone/path/epochs, per-source 48-sample/90-second cap and strict scope+numeric Python audit. Live original Sanity Beach confirmed 48 samples, 3 same-epoch source samples with 2 actual camera changes, native source gate PASS alongside original Mario textured host. Retain `postphysics=false`, `depth_complete=false`, `camera_calibrated=false`. Next decision requires an original GfxTransformWorlds same-pass camera capture and >=3 matched original GTE SXY/Z vertices with scene/OT generation identity and centre depth coverage checks before authorizing true Mario world projection. Keep `main` and original game binaries unchanged.
+
+
+## D012 — Source-owned G1 RTPT/OT receipt before world/collision mapping (2026-10-10)
+
+**Reviewed continuation:** keep this an unaccepted real-game gate. Require schema
+2 original zone magic/header/count and raw polygon-ID word coherence, complete
+clean public source pins, and strict UTF-8 only for actual receipt lines (unrelated
+native OEM noise is not a receipt). Three upstream-GTE positive fixtures, 20
+native negative/opt-out cases and 161/161 full reference tests pass. The isolated
+60-second original Crash attempt produced **no G1 receipts**, not native geometry
+or playable-fusion evidence. Its owned PID was stopped. Do not advance Mario
+physical placement from a receipt-free run, nor feed WGEO triangles as terrain.
+Use the source-only draft and operator replay documented in the G1 gate report.
+
+**ACCEPTED as a source-only engineering increment, NOT a real-game gate pass.**
+Pinned original `GfxTransformWorlds` prepares `ms_cam_rot` and world descriptors;
+its original assembly exposes packed polygon/vertex identities immediately
+before RTPT and links matching SXY packet words into the original OT. Reuse
+Dispatcher, actual GTE execution and DMA-clear ownership in a repo-local private
+runtime. Do not sample PadRead/VSync, infer source identity from repeated screen
+pixels, use host-wide projection, or promote these callbacks to postphysics.
+
+Limit the first capture to the normal shader, one three-vertex RTPT per sampled
+pass, zero saturation/reprojection error and validated immutable source/scene
+scope through successful completion. Check world-camera translation using
+original `GfxLoadWorlds` arithmetic; label the resolved world-key union honestly.
+Instrumented OT serials and diagnostic scene epochs are not guest allocation
+lifetimes. Keep exact original libsm64 texture/UV and host atlas ownership.
+
+Two actual-upstream-GTE synthetic fixtures, 16 native negative/opt-out checks
+and 156/156 native full reference tests pass. No commercial-game execution
+was performed. A parser cannot authenticate a run; G1 VERIFIED_REAL acceptance,
+complete depth and shared gameplay remain unapproved. Static solids come from
+neighbor-zone octree queries; GOOL object bounds/collision are separate again.
+Do not feed the sampled render triangle directly to Mario as authentic terrain.
+See `docs/M42_G1_WORLD_SOURCE_GATE.md` for exact source seams, proof and next test.

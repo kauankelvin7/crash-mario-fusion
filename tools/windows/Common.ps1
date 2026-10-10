@@ -1,4 +1,5 @@
 # Requires PowerShell 7; changes affect this process and a private local cache only.
+param([string]$LogRoot = '')
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -7,7 +8,8 @@ if (-not $IsWindows -or -not [Environment]::Is64BitOperatingSystem) {
 }
 $TaskRepo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $TaskCache = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M0'
-$TaskLogs = Join-Path $TaskCache ('logs/' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff'))
+$logBase = if ($LogRoot) { [IO.Path]::GetFullPath($LogRoot) } else { Join-Path $TaskCache 'logs' }
+$TaskLogs = Join-Path $logBase ([DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff'))
 New-Item -ItemType Directory -Force $TaskLogs | Out-Null
 function Invoke-Logged {
     param([string]$Command, [string[]]$Arguments, [string]$LogName)
