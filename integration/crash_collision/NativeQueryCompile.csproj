@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup><BaseIntermediateOutputPath>../../.cache/native-query-compile/obj/</BaseIntermediateOutputPath></PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <OutputPath>../../.cache/native-query-compile/bin/</OutputPath>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CrashOctree.cs;CrashNativeQuery.cs;CrashNativeQueryMod.cs" />
+    <Reference Include="RecompOne.Runtime"><HintPath>$(CM64HostDirectory)/RecompOne.Runtime.dll</HintPath></Reference>
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>
