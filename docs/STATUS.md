@@ -316,3 +316,9 @@ helper refused capture after the window lost foreground focus and sent no keys.
 The next attempt must wait for the title/menu and preserve verified foreground
 focus before driving into Sanity Beach; do not infer the ZINK warning caused the
 missing receipts.
+
+The 90-second follow-up launched Crash visibly and observed its window become
+responsive, but the helper again refused capture because the game was not in the
+foreground. No input was sent; the runner stopped its owned process and audited
+zero G1 receipts. The required operator click did not occur during this run, so
+G1 remains **BLOCKED** pending a foreground-confirmed operator session.

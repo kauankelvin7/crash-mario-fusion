@@ -171,3 +171,9 @@ splash; the previous input timing was premature. A later attempt was stopped
 without input because the foreground guard refused the window. The next native
 run should wait for the title/menu, verify foreground again, then enter the level
 and capture there. The ZINK warning is a diagnostic item, not a proven root cause.
+
+**2026-10-13 — foreground click required for next G1 attempt.** A visible,
+responsive Crash window did not become foreground; the harness correctly refused
+capture and sent no keys before the 90-second bound. Preserve that guard. Start
+the bounded run only when the operator can click the Crash window and confirm
+focus, then inspect the captured screen before entering Sanity Beach.

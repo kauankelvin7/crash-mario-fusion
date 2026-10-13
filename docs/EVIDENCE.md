@@ -429,3 +429,9 @@ unknown. A third 80-second runner process was responsive and stopped, but the
 foreground guard refused capture and no key events were sent. The Mesa ZINK
 warning is logged but has not been established as the cause of missing G1
 receipts. No new G1 evidence was obtained.
+
+On the next 90-second native attempt, `CrashBandicoot.exe` reached a responsive
+visible window, but `operator_harness.py crash --capture-client` refused because
+the window did not own foreground focus. No key input or capture was performed.
+The owned process exited at the runner bound; the audit again found zero
+`[cm64-world]` receipts. This is **BLOCKED**, not evidence of a renderer failure.
