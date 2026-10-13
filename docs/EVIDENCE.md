@@ -435,3 +435,12 @@ visible window, but `operator_harness.py crash --capture-client` refused because
 the window did not own foreground focus. No key input or capture was performed.
 The owned process exited at the runner bound; the audit again found zero
 `[cm64-world]` receipts. This is **BLOCKED**, not evidence of a renderer failure.
+
+Latest 90-second attempt (2026-10-13): after the user confirmed clicking the
+window, the helper verified `CrashBandicoot.exe` in foreground and captured its
+client. The private image shows the Naughty Dog startup splash, not the title or
+level, so no keys were sent. The owned process exited with `responsive=true`,
+`input_sent=null`, `g1_candidate=false`; the audit rejected it with
+`No source-owned original RTPT/OT receipts`. Classification: **BLOCKED / NOT
+VERIFIED_REAL**. This confirms the operator-focus step only, not G1 gameplay or
+geometry. Capture and run logs remain local/private.

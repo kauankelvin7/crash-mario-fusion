@@ -177,3 +177,11 @@ responsive Crash window did not become foreground; the harness correctly refused
 capture and sent no keys before the 90-second bound. Preserve that guard. Start
 the bounded run only when the operator can click the Crash window and confirm
 focus, then inspect the captured screen before entering Sanity Beach.
+
+**2026-10-13 — click confirmed; startup splash captured.** The user clicked the
+visible Crash window and the helper verified foreground, but the client image
+was still the Naughty Dog splash. No keys were sent; the run ended at its 90-second
+bound with zero source-owned RTPT/OT receipts. The next attempt should start after
+the operator has advanced to the Crash title or level, then re-verify foreground
+and inspect before sending any control input. This changes the focus blocker but
+does not change G1's **BLOCKED** status.

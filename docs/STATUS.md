@@ -318,7 +318,7 @@ focus before driving into Sanity Beach; do not infer the ZINK warning caused the
 missing receipts.
 
 The 90-second follow-up launched Crash visibly and observed its window become
-responsive, but the helper again refused capture because the game was not in the
-foreground. No input was sent; the runner stopped its owned process and audited
-zero G1 receipts. The required operator click did not occur during this run, so
-G1 remains **BLOCKED** pending a foreground-confirmed operator session.
+responsive. After the user clicked, the helper verified foreground and captured
+the Naughty Dog startup splash; no input was sent before the title appeared. The
+runner stopped its owned process and audited zero G1 receipts. G1 remains
+**BLOCKED** pending an in-level capture with source-owned RTPT/OT receipts.
