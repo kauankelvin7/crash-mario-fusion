@@ -296,7 +296,8 @@ runner. `Build-WorldSourceProbe.ps1` compiled successfully and passed its three
 upstream GTE positive fixtures and 20 rejection/opt-out fixtures;
 classification is **VERIFIED_SYNTHETIC**. The runner now accepts the already
 sealed private M3 Crash app and the user's existing disc under Downloads without
-copying disc data. Its `-CheckOnly` preflight passes with `baseline=M3`.
+copying disc data. Its `-Seconds 90 -CheckOnly` preflight passes with
+`baseline=M3` and starts no game, matching the gate's operator budget.
 
 Two bounded native attempts were made against the private M3 app. The second
 used window-scoped input against the verified Crash process; the window remained
