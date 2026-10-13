@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$CrashDisc,
-    [ValidateRange(15,80)][int]$Seconds = 60,
+    [ValidateRange(15,90)][int]$Seconds = 60,
     [switch]$CheckOnly,
     [switch]$VisibleOperatorWindow
 )
