@@ -322,3 +322,9 @@ responsive. After the user clicked, the helper verified foreground and captured
 the Naughty Dog startup splash; no input was sent before the title appeared. The
 runner stopped its owned process and audited zero G1 receipts. G1 remains
 **BLOCKED** pending an in-level capture with source-owned RTPT/OT receipts.
+
+A further 90-second visible attempt ended with no usable capture: the helper
+first refused lost foreground and later found no visible game window. The user
+said they would click when it appeared, but no focus-confirmed capture occurred
+before the runner stopped. `input_sent=null`; zero RTPT/OT receipts. This is an
+operator-session limitation, not a graphics result. See `docs/EVIDENCE.md`.

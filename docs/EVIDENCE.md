@@ -444,3 +444,12 @@ level, so no keys were sent. The owned process exited with `responsive=true`,
 `No source-owned original RTPT/OT receipts`. Classification: **BLOCKED / NOT
 VERIFIED_REAL**. This confirms the operator-focus step only, not G1 gameplay or
 geometry. Capture and run logs remain local/private.
+
+Next bounded attempt (2026-10-13) used the same sealed baseline and 90-second
+visible runner. The first operator-helper capture refused because the target
+lost foreground; a later check found no visible `CrashBandicoot.exe` window. The
+user said they would click when it appeared, but the runner ended before a
+foreground-confirmed capture. Summary: `responsive=true`, `input_sent=null`,
+`g1_candidate=false`, `process_stopped=true`; audit again rejected zero source-
+owned RTPT/OT receipts. No keys or screenshot were obtained. **BLOCKED / NOT
+VERIFIED_REAL**; this does not indicate a graphics failure.

@@ -185,3 +185,9 @@ bound with zero source-owned RTPT/OT receipts. The next attempt should start aft
 the operator has advanced to the Crash title or level, then re-verify foreground
 and inspect before sending any control input. This changes the focus blocker but
 does not change G1's **BLOCKED** status.
+
+**2026-10-13 — visible runner ended before a confirmed click.** On the next
+90-second attempt the helper refused lost foreground, then found no visible
+Crash window. No keys or capture were produced; the runner audited zero receipts
+and stopped. Keep the focus guard. Resume only when the operator can click and
+confirm the game window during the live bound; G1 remains **BLOCKED**.
