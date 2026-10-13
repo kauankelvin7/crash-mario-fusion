@@ -156,3 +156,18 @@ complete depth and shared gameplay remain unapproved. Static solids come from
 neighbor-zone octree queries; GOOL object bounds/collision are separate again.
 Do not feed the sampled render triangle directly to Mario as authentic terrain.
 See `docs/M42_G1_WORLD_SOURCE_GATE.md` for exact source seams, proof and next test.
+
+**2026-10-13 — G1 native continuation remains blocked.** Reuse the sealed M3
+private app as the host baseline and permit the user's existing Downloads disc
+path; neither choice copies or bundles game data. Do not treat a responsive
+window or input delivery as proof of in-level execution. The two bounded attempts
+produced no original RTPT/OT receipts, so do not proceed to geometry promotion,
+Mario placement or collision work on the assumption that G1 passed. Diagnose the
+Mesa ZINK `vulkan-1.dll` issue and confirm the correct in-level state before the
+next bounded source-receipt attempt.
+
+Follow-up observation: the reviewed client capture is still at the Sony startup
+splash; the previous input timing was premature. A later attempt was stopped
+without input because the foreground guard refused the window. The next native
+run should wait for the title/menu, verify foreground again, then enter the level
+and capture there. The ZINK warning is a diagnostic item, not a proven root cause.

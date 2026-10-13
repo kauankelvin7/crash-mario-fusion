@@ -403,3 +403,29 @@ any configuration write. Reviewer confirmed correction and final gate PASS.
 Full final suite again **82 PASS**, 15 PowerShell ASTs PASS. Full diff/ancestry/
 unchanged previous test sources checked; native Windows junction/runtime behavior
 remains NOT_TESTED. No Astra invocation or native physics change was needed.
+
+## Goal 19 — Windows continuation (2026-10-13)
+
+`Setup.ps1` now pins the same `wurlyfox/c1` commit as the source build probe.
+Native build output passed three actual-upstream-GTE positive fixtures and 20
+negative/opt-out fixtures (**VERIFIED_SYNTHETIC**). The run wrapper accepted the
+sealed private M3 Crash baseline and the existing user-owned CUE in Downloads;
+`-CheckOnly` passed. CUE metadata and local track presence were checked without
+copying or reading track contents.
+
+Two bounded native launches remained responsive and were stopped by the runner.
+The second received verified window-targeted input. The captured host log had 12
+lines, zero `[cm64-world]` receipts and no receipt parse failures. The audit
+rejected the run with `No source-owned original RTPT/OT receipts`; `errors.log`
+contains `MESA: error: ZINK: failed to load vulkan-1.dll`. Classification:
+**BLOCKED / NOT VERIFIED_REAL**. There is no evidence here that gameplay reached
+Sanity Beach or that any native geometry, collision, or fused gameplay works.
+Evidence artifacts and commercial game data remain in ignored/private locations.
+
+Follow-up review of the second attempt's local client capture shows the Sony
+startup splash, not the Crash title or gameplay. The subsequent key events were
+sent while startup was still in progress, so acceptance of those inputs is
+unknown. A third 80-second runner process was responsive and stopped, but the
+foreground guard refused capture and no key events were sent. The Mesa ZINK
+warning is logged but has not been established as the cause of missing G1
+receipts. No new G1 evidence was obtained.

@@ -9,16 +9,56 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $root = Join-Path $repo '.cache/m42-g1'
-$baselineRoot = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M41B2-texture'
+$m41BaselineRoot = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M41B2-texture'
+$m3BaselineRoot = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M3-crash-pose'
+if (Test-Path -LiteralPath (Join-Path $m41BaselineRoot 'sealed-host.json')) {
+    $baselineRoot = $m41BaselineRoot
+    $baselineKind = 'M41B2'
+    $sealPath = Join-Path $baselineRoot 'sealed-host.json'
+} elseif (Test-Path -LiteralPath (Join-Path $m3BaselineRoot 'observer-build.json')) {
+    $baselineRoot = $m3BaselineRoot
+    $baselineKind = 'M3'
+    $sealPath = Join-Path $baselineRoot 'observer-build.json'
+} else {
+    throw 'Require a sealed M41B2 or M3 private Crash baseline'
+}
 $baseline = Join-Path $baselineRoot 'app'
 $m0 = Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/M0'
 $fusionRoot = (Split-Path $m0 -Parent) + [IO.Path]::DirectorySeparatorChar
 $python = 'C:/msys64/mingw64/bin/python.exe'
 $disc = (Resolve-Path -LiteralPath $CrashDisc).Path
-$ownedRoot = (Resolve-Path -LiteralPath (Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/owned')).Path
-if (-not $disc.StartsWith($ownedRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
-    [IO.Path]::GetExtension($disc).ToLowerInvariant() -notin @('.cue', '.chd')) {
-    throw 'Use only the existing private owned Crash disc; no asset copying'
+$allowedDiscRoots = @()
+foreach ($candidate in @((Join-Path $env:LOCALAPPDATA 'CrashMarioFusion/owned'), (Join-Path $env:USERPROFILE 'Downloads'))) {
+    if (Test-Path -LiteralPath $candidate -PathType Container) {
+        $allowedDiscRoots += (Resolve-Path -LiteralPath $candidate).Path.TrimEnd([IO.Path]::DirectorySeparatorChar)
+    }
+}
+$discIsPrivate = $false
+foreach ($allowedRoot in $allowedDiscRoots) {
+    if ($disc.StartsWith($allowedRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        $discIsPrivate = $true
+    }
+}
+if (-not $discIsPrivate -or [IO.Path]::GetExtension($disc).ToLowerInvariant() -notin @('.cue', '.chd')) {
+    throw 'Use an existing local owned or Downloads Crash disc; media is never copied by this runner'
+}
+if ([IO.Path]::GetExtension($disc).ToLowerInvariant() -eq '.cue') {
+    $discDirectory = [IO.Path]::GetFullPath((Split-Path -Parent $disc)).TrimEnd([IO.Path]::DirectorySeparatorChar)
+    $trackNames = @(Get-Content -LiteralPath $disc | ForEach-Object {
+        if ($_ -match '^\s*FILE\s+(?:"([^"]+)"|(\S+))\s+(?:BINARY|MOTOROLA)\s*$') {
+            if ($Matches[1]) { $Matches[1] } else { $Matches[2] }
+        }
+    })
+    if (-not $trackNames.Count) { throw 'Crash CUE has no supported local data track' }
+    foreach ($trackName in $trackNames) {
+        $track = Join-Path $discDirectory $trackName
+        if (-not (Test-Path -LiteralPath $track -PathType Leaf)) { throw 'Crash CUE references a missing local track' }
+        $resolvedTrack = (Resolve-Path -LiteralPath $track).Path
+        if (-not $resolvedTrack.StartsWith($discDirectory + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+            ((Get-Item -LiteralPath $resolvedTrack).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            throw 'Crash CUE track must be a regular file beside its CUE'
+        }
+    }
 }
 foreach ($path in @((Join-Path $repo '.cache'), $root, $baseline)) {
     if ((Get-Item -LiteralPath $path).Attributes -band [IO.FileAttributes]::ReparsePoint) {
@@ -35,7 +75,20 @@ try {
         --libsm64 (Join-Path $m0 'libsm64') --verify-only
     if ($LASTEXITCODE -ne 0) { throw 'G1 private source or complete public pins drifted' }
 } finally { Pop-Location }
-$seal = Get-Content -LiteralPath (Join-Path $baselineRoot 'sealed-host.json') -Raw | ConvertFrom-Json
+$storedSeal = Get-Content -LiteralPath $sealPath -Raw | ConvertFrom-Json
+if ($baselineKind -eq 'M3') {
+    if ($storedSeal.pin -ne '224da7757920a817de2d9242416f657ab95782ea') {
+        throw 'M3 baseline source pin mismatch'
+    }
+    $seal = [pscustomobject]@{
+        public_pin = $storedSeal.pin
+        original_exe = $storedSeal.hashes.'CrashBandicoot.exe'
+        original_crash_dll = $storedSeal.hashes.'CrashBandicoot.dll'
+        patched_runtime = $storedSeal.hashes.'RecompOne.Runtime.dll'
+    }
+} else {
+    $seal = $storedSeal
+}
 $build = Get-Content -LiteralPath (Join-Path $root 'build-evidence.json') -Raw | ConvertFrom-Json
 if ($seal.public_pin -ne $build.source_pin -or $build.positive_fixtures -ne 3 -or
     $build.negative_optout_fixtures -ne 20 -or $build.original_game_run -ne $false) {
@@ -46,8 +99,10 @@ function Assert-Hash([string]$Path, [string]$Expected) {
         throw "Private source/binary hash drift: $([IO.Path]::GetFileName($Path))"
     }
 }
-foreach ($pair in @(@('CrashBandicoot.exe', $seal.original_exe), @('CrashBandicoot.dll', $seal.original_crash_dll),
-    @('RecompOne.Runtime.dll', $seal.patched_runtime), @('sm64.dll', $seal.original_libsm64))) {
+ $sealedFiles = @(@('CrashBandicoot.exe', $seal.original_exe), @('CrashBandicoot.dll', $seal.original_crash_dll),
+    @('RecompOne.Runtime.dll', $seal.patched_runtime))
+if ($baselineKind -eq 'M41B2') { $sealedFiles += ,@('sm64.dll', $seal.original_libsm64) }
+foreach ($pair in $sealedFiles) {
     Assert-Hash (Join-Path $baseline $pair[0]) $pair[1]
 }
 Assert-Hash (Join-Path $repo 'integration/embedded_mario/CrashWorldSourceProbe.cs') $build.probe_sha256
@@ -66,7 +121,7 @@ if ($manifest.PipelineVersion -ne '8' -or $manifest.Fingerprint -ne $slots[0].Na
 }
 $guestHash = (Get-FileHash -LiteralPath $manifest.DllPath -Algorithm SHA256).Hash.ToLowerInvariant()
 Assert-Hash (Join-Path $slots[0].FullName 'game.recomp.dll') $guestHash
-if ($CheckOnly) { Write-Output 'G1_RUN_PREFLIGHT_OK no_game_started=true'; return }
+if ($CheckOnly) { Write-Output "G1_RUN_PREFLIGHT_OK baseline=$baselineKind no_game_started=true"; return }
 $run = Join-Path $root ('original-' + [guid]::NewGuid().ToString('N'))
 $app = Join-Path $run 'app'
 New-Item -ItemType Directory -Path $app -Force | Out-Null

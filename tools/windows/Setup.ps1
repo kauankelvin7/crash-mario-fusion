@@ -9,7 +9,8 @@ if (-not (Test-Path -LiteralPath (Join-Path $MsysRoot 'usr/bin/bash.exe'))) {
 $pins = @(
     @('Matteo842/CrashBandicoot-Launcher','224da7757920a817de2d9242416f657ab95782ea'),
     @('sm64pc/sm64ex','d7ca2c04364a6dd0dac58b47151e04e26887e6f0'),
-    @('libsm64/libsm64','fd11813208272b4271d92bd92feb8f3fdbe61be5')
+    @('libsm64/libsm64','fd11813208272b4271d92bd92feb8f3fdbe61be5'),
+    @('wurlyfox/c1','256fdcef59f15a190290cc19db3fa9a707843b69')
 )
 foreach ($pin in $pins) {
     $directory = Join-Path $TaskCache ($pin[0].Split('/')[-1])

@@ -288,3 +288,30 @@ Sanity Beach receipt test on a separately sealed private app, then source/lifecy
 proof for neighbor-zone octree collision and GOOL object bounds (WGEO triangles
 are not genuine collision). Independent orchestration review remains required;
 configured specialist model was unavailable. See `docs/M42_G1_WORLD_SOURCE_GATE.md`.
+
+## Goal 19 native continuation — 2026-10-13
+
+Windows setup now fetches the pinned public `c1` source required by the G1
+runner. `Build-WorldSourceProbe.ps1` compiled successfully and passed its three
+upstream GTE positive fixtures and 20 rejection/opt-out fixtures;
+classification is **VERIFIED_SYNTHETIC**. The runner now accepts the already
+sealed private M3 Crash app and the user's existing disc under Downloads without
+copying disc data. Its `-CheckOnly` preflight passes with `baseline=M3`.
+
+Two bounded native attempts were made against the private M3 app. The second
+used window-scoped input against the verified Crash process; the window remained
+responsive and the runner stopped its owned process. Both produced zero original
+RTPT/OT receipts. The audit result remains `No source-owned original RTPT/OT
+receipts`; a Mesa ZINK log also reports that `vulkan-1.dll` could not load. This
+is **not** evidence of entering the target level, real source geometry, collision
+or fusion. G1 remains **BLOCKED**; G2-G6 remain unpassed and issue #19 stays OPEN.
+Private logs, captures, game files and binaries were not committed or uploaded.
+
+Follow-up: review of the prior private client capture shows the Sony startup
+splash, so its Enter/Z/Up sequence occurred before confirmed gameplay; the
+windowed input calls alone do not establish that those keys were accepted. A
+third bounded run was responsive and stopped its owned process, but the operator
+helper refused capture after the window lost foreground focus and sent no keys.
+The next attempt must wait for the title/menu and preserve verified foreground
+focus before driving into Sanity Beach; do not infer the ZINK warning caused the
+missing receipts.
