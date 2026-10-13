@@ -10,6 +10,7 @@ python tools/windows/operator_harness.py mario
 python tools/windows/operator_harness.py mario --action jump --vk 0x20
 python tools/windows/operator_harness.py mario --action jump --vk 0x20 --seconds 0.2 --execute
 python tools/windows/operator_harness.py crash --capture-client
+python tools/windows/operator_harness.py crash --capture-client --watch-seconds 55
 ```
 
 Dry-run is the default. `--execute` is required to send a key. The operator
@@ -45,6 +46,16 @@ These source-only tests cannot prove original gameplay. The helper uses
 `SendInput`. It verifies the process owner/path, tries to foreground only that
 window, confirms focus, limits held keys to five seconds, and releases keys
 even on focus-loss or operator abort. If Windows refuses focus, it stops.
+
+For a startup timeline, `--capture-client --watch-seconds 55` waits for the
+operator to focus the already identified game window, then captures its client
+every five seconds in the same helper process. It does not request foreground or
+send keys. Window/PID/executable identity is checked while waiting; after the
+first focus confirmation, losing focus stops observation. The observation lasts
+at most 60 seconds including the wait, and expiry without any capture fails.
+This capture-only mode cannot be combined with an action or `--execute`. Keep
+the game focused until the helper ends. Paths are emitted as each private BMP
+is saved; inspect these images before choosing any menu input.
 
 ## Native Windows operator experiment (2026-10-09)
 

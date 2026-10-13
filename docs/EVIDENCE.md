@@ -453,3 +453,21 @@ foreground-confirmed capture. Summary: `responsive=true`, `input_sent=null`,
 `g1_candidate=false`, `process_stopped=true`; audit again rejected zero source-
 owned RTPT/OT receipts. No keys or screenshot were obtained. **BLOCKED / NOT
 VERIFIED_REAL**; this does not indicate a graphics failure.
+
+2026-10-13 source change: `operator_harness.py --capture-client --watch-seconds`
+adds a passive, 60-second maximum observation with five-second client captures
+after actual foreground confirmation. It never invokes key input or foreground
+activation, checks identity throughout the wait and stops on focus loss after
+confirmation. `C:/msys64/mingw64/bin/python.exe -m unittest
+tests.test_windows_operator_harness` exited 0: **14 tests pass** (eight existing,
+six new observation checks). Classification: **VERIFIED_SYNTHETIC**. Native
+observation mode and G1 acceptance remain **NOT_TESTED / BLOCKED** respectively.
+
+Read-only Astra High review (`g1_startup_diagnosis`, `astra_debugger` role) traced
+the fixed runner lifetime (`Run-WorldSourceProbe.ps1:150-162`), upstream host
+presentation/input and startup frame pacing at Launcher pin `224da775`. No
+callers of `FrameClock.PauseTiming/ResumeTiming` were found. `FramePacing.IsActive`
+requires level readiness and `NeedsOriginalVblank` retains startup throttling.
+Pacing settings live in `interface.ini`, not `settings.json`; neither settings
+nor a single splash image demonstrate a stalled guest. Recommendation: one
+continuous, focused client timeline before changing runtime or issuing controls.

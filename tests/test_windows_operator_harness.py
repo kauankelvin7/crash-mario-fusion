@@ -1,8 +1,10 @@
 import unittest
 import ctypes
+import io
 from ctypes import wintypes
+from unittest.mock import patch
 
-from tools.windows.operator_harness import MAX_SECONDS, SAFE_VKS, SafetyError, TARGETS, WindowTarget, Win32, run_action
+from tools.windows.operator_harness import MAX_SECONDS, SAFE_VKS, SafetyError, TARGETS, WindowTarget, Win32, main, observe_client, run_action
 
 
 class FakeWin32:
@@ -10,11 +12,19 @@ class FakeWin32:
         self.fail_at = fail_at
         self.verifications = 0
         self.events = []
+        self.clock = lambda: 0
+        self.focus_after = 0
+        self.focus_lost_at = float("inf")
 
-    def verify(self, game, target):
+    def verify(self, game, target, require_focus=True):
         self.verifications += 1
         if self.fail_at == self.verifications:
             raise SafetyError("focus lost")
+        if require_focus and not self.is_foreground(target):
+            raise SafetyError("focus lost")
+
+    def is_foreground(self, target):
+        return self.focus_after <= self.clock() < self.focus_lost_at
 
     def key_event(self, vk, key_up=False):
         self.events.append((vk, key_up))
@@ -60,6 +70,72 @@ class OperatorHarnessTests(unittest.TestCase):
         with self.assertRaisesRegex(SafetyError, "Aborted"):
             run_action(api, "mario", self.target, 0x20, 0.1, abort_check=lambda: True)
         self.assertEqual(api.events, [(0x20, False), (0x20, True)])
+
+    def observation(self, api, seconds, captures):
+        class Clock:
+            now = 0
+            def __call__(self):
+                return self.now
+            def sleep(self, seconds):
+                self.now += seconds
+        clock = Clock()
+        api.clock = clock
+        return observe_client(api, "mario", self.target, seconds,
+                              lambda: captures.append(clock()),
+                              clock=clock, sleep=clock.sleep)
+
+    def test_observation_waits_for_actual_focus_and_sends_no_keys(self):
+        api = FakeWin32()
+        api.focus_after = 0.3
+        captures = []
+        self.assertEqual(self.observation(api, 6, captures), 2)
+        self.assertGreaterEqual(captures[0], 0.3)
+        self.assertGreaterEqual(captures[1] - captures[0], 5)
+        self.assertEqual(api.events, [])
+
+    def test_observation_timeout_never_captures_unfocused_window(self):
+        api = FakeWin32()
+        api.focus_after = float("inf")
+        captures = []
+        with self.assertRaisesRegex(SafetyError, "expired"):
+            self.observation(api, 1, captures)
+        self.assertEqual(captures, [])
+        self.assertEqual(api.events, [])
+
+    def test_observation_rechecks_identity_while_waiting_for_focus(self):
+        api = FakeWin32(fail_at=2)
+        api.focus_after = 0.5
+        captures = []
+        with self.assertRaises(SafetyError):
+            self.observation(api, 1, captures)
+        self.assertEqual(captures, [])
+
+    def test_observation_stops_on_focus_loss_after_first_capture(self):
+        api = FakeWin32()
+        api.focus_lost_at = 0.2
+        captures = []
+        with self.assertRaisesRegex(SafetyError, "focus lost"):
+            self.observation(api, 10, captures)
+        self.assertEqual(captures, [0])
+        self.assertEqual(api.events, [])
+
+    def test_observation_rejects_invalid_or_unbounded_duration(self):
+        for seconds in (0, -1, 60.01, float("nan"), float("inf")):
+            with self.subTest(seconds=seconds), self.assertRaises(SafetyError):
+                self.observation(FakeWin32(), seconds, [])
+
+    def test_cli_rejects_watch_with_input_or_without_capture_before_native_access(self):
+        invalid = [
+            ["crash", "--watch-seconds", "10"],
+            ["crash", "--watch-seconds", "nan", "--capture-client"],
+            ["crash", "--watch-seconds", "10", "--capture-client",
+             "--action", "menu", "--vk", "0x0D", "--execute"],
+        ]
+        for args in invalid:
+            with self.subTest(args=args), patch("tools.windows.operator_harness.Win32") as native, \
+                    patch("sys.stderr", new_callable=io.StringIO):
+                self.assertEqual(main(args), 2)
+                native.assert_not_called()
 
     def test_native_messages_are_scoped_to_verified_game_hwnd(self):
         class FakeUser32:

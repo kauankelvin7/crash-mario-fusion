@@ -191,3 +191,16 @@ does not change G1's **BLOCKED** status.
 Crash window. No keys or capture were produced; the runner audited zero receipts
 and stopped. Keep the focus guard. Resume only when the operator can click and
 confirm the game window during the live bound; G1 remains **BLOCKED**.
+
+**2026-10-13 — observe startup without per-capture tool round trips.** Add a
+capture-only, maximum 60-second watch that detects the operator's actual focus
+and samples the client every five seconds. No text confirmation is needed to
+start captures; keep exact window/PID/path validation and stop after subsequent
+focus loss. Source-only tests pass; this is preparation for native timing
+evidence, not G1 acceptance. Inspect the timeline before issuing menu controls.
+
+Astra High's read-only startup review supports this probe: the runner's fixed
+lifetime begins at process launch, with no menu-readiness gate. Upstream input
+focus guards do not establish paused simulation; no pause-clock call sites were
+found. Preserve current runtime/pacing until a focused timeline distinguishes
+normal startup progression from a reproducible stall.

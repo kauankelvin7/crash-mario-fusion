@@ -319,7 +319,7 @@ missing receipts.
 
 The 90-second follow-up launched Crash visibly and observed its window become
 responsive. After the user clicked, the helper verified foreground and captured
-the Naughty Dog startup splash; no input was sent before the title appeared. The
+the Naughty Dog startup splash; the title was not captured and no input was sent. The
 runner stopped its owned process and audited zero G1 receipts. G1 remains
 **BLOCKED** pending an in-level capture with source-owned RTPT/OT receipts.
 
@@ -328,3 +328,10 @@ first refused lost foreground and later found no visible game window. The user
 said they would click when it appeared, but no focus-confirmed capture occurred
 before the runner stopped. `input_sent=null`; zero RTPT/OT receipts. This is an
 operator-session limitation, not a graphics result. See `docs/EVIDENCE.md`.
+
+Startup observation now has a capture-only `--watch-seconds` mode: wait for
+actual foreground, then capture every five seconds in one process (maximum
+60 seconds). It preserves window ownership checks and stops on subsequent focus
+loss. **VERIFIED_SYNTHETIC: 14/14 operator tests pass** including delayed focus,
+timeout, identity drift and focus-loss rejection. Native watch mode is
+**NOT_TESTED**; G1 still requires in-level RTPT/OT receipts and reprojection.

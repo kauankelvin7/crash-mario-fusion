@@ -21,6 +21,7 @@ SAFE_VKS = frozenset((*range(0x30, 0x3A), *range(0x41, 0x5B), 0x08, 0x09, 0x0D, 
                       0x25, 0x26, 0x27, 0x28, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
                       0x68, 0x69, 0x6A, 0x6B, 0x6D, 0x6E, 0x6F))
 MAX_SECONDS = 5.0
+MAX_OBSERVATION_SECONDS = 60.0
 CHECK_INTERVAL = 0.025
 
 
@@ -149,6 +150,9 @@ class Win32:
         time.sleep(0.12)
         self.verify(game, target)
 
+    def is_foreground(self, target):
+        return int(self.user32.GetForegroundWindow() or 0) == target.hwnd
+
     def key_event(self, vk, key_up=False):
         hwnd = getattr(self, "_verified_hwnd", None)
         expected_pid = getattr(self, "_verified_pid", None)
@@ -236,6 +240,35 @@ def local_capture_dir():
     return Path(root) / "CrashMarioFusion" / "operator-captures"
 
 
+def observe_client(api, game, target, seconds, capture, *,
+                   clock=time.monotonic, sleep=time.sleep):
+    """Wait for actual focus, then observe the same window without sending keys."""
+    if not 0 < seconds <= MAX_OBSERVATION_SECONDS:
+        raise SafetyError("Observation must be greater than 0 and at most 60 seconds.")
+    deadline = clock() + seconds
+    focused = False
+    next_capture = 0.0
+    count = 0
+    while clock() < deadline:
+        # Identity is checked even while awaiting the operator's click. After
+        # first focus, losing it terminates observation rather than reacquiring.
+        api.verify(game, target, require_focus=focused)
+        if not focused and api.is_foreground(target):
+            api.verify(game, target)
+            focused = True
+        now = clock()
+        if now >= deadline:
+            break
+        if focused and now >= next_capture:
+            capture()
+            count += 1
+            next_capture = now + 5.0
+        sleep(min(0.1, max(0.0, deadline - clock())))
+    if not count:
+        raise SafetyError("Observation expired before the operator focused the game.")
+    return count
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Bounded, local-only keyboard and client-window capture helper.")
     parser.add_argument("game", choices=TARGETS)
@@ -244,6 +277,8 @@ def main(argv=None):
     parser.add_argument("--seconds", type=float, default=0.15)
     parser.add_argument("--execute", action="store_true", help="Required to send input; dry-run is the default")
     parser.add_argument("--capture-client", action="store_true", help="Save only this game's client image under LOCALAPPDATA")
+    parser.add_argument("--watch-seconds", type=float, default=0,
+                        help="Capture-only observation up to 60s; wait for actual foreground, then capture every 5s")
     args = parser.parse_args(argv)
     try:
         if (args.action is None) != (args.vk is None):
@@ -254,8 +289,22 @@ def main(argv=None):
             raise SafetyError("Virtual-key code is not in the allowlist of ordinary game keys.")
         if args.execute and args.action is None:
             raise SafetyError("--execute requires --action and --vk.")
+        if args.watch_seconds and (not args.capture_client or args.action or args.execute):
+            raise SafetyError("--watch-seconds requires capture-only mode with no action or --execute.")
+        if not 0 <= args.watch_seconds <= MAX_OBSERVATION_SECONDS:
+            raise SafetyError("Observation duration must be between 0 and 60 seconds.")
         api = Win32()
         target = api.find_target(args.game)
+        if args.watch_seconds:
+            api.verify(args.game, target, require_focus=False)
+            print(f"WAITING FOR OPERATOR FOCUS: {args.game} pid={target.pid} hwnd=0x{target.hwnd:x}", flush=True)
+            def capture():
+                name = f"{args.game}-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')}.bmp"
+                path = api.capture_client_bmp(target, local_capture_dir() / name)
+                print(f"CLIENT-ONLY IMAGE saved locally: {path}", flush=True)
+            count = observe_client(api, args.game, target, args.watch_seconds, capture)
+            print(f"OBSERVATION ENDED: captures={count}; no input sent; gameplay outcome NOT_VERIFIED.")
+            return 0
         if args.execute or args.capture_client:
             api.focus_target(args.game, target)
         else:
