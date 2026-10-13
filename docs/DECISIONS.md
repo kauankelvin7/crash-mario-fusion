@@ -204,3 +204,10 @@ lifetime begins at process launch, with no menu-readiness gate. Upstream input
 focus guards do not establish paused simulation; no pause-clock call sites were
 found. Preserve current runtime/pacing until a focused timeline distinguishes
 normal startup progression from a reproducible stall.
+
+Native replay detected foreground and saved one black client image, then stopped
+on focus loss before the next five-second sample. No controls were sent and no
+title/level was established; the owned game process stopped with zero receipts.
+The capture alone does not justify runtime/graphics changes. Next observation
+requires keeping the game foreground through the capture interval and confirming
+that captured frames agree with the visible game before menu input.

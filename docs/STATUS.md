@@ -334,4 +334,8 @@ actual foreground, then capture every five seconds in one process (maximum
 60 seconds). It preserves window ownership checks and stops on subsequent focus
 loss. **VERIFIED_SYNTHETIC: 14/14 operator tests pass** including delayed focus,
 timeout, identity drift and focus-loss rejection. Native watch mode is
-**NOT_TESTED**; G1 still requires in-level RTPT/OT receipts and reprojection.
+now **attempted**: one client capture after foreground confirmation, then
+fail-closed focus-loss refusal. The inspected image is black; no title or level
+is established. The 90-second runner stopped PID 34344; zero RTPT/OT receipts.
+Native operator behavior was exercised, but a startup timeline and G1 remain
+**BLOCKED**. G1 still requires in-level receipts and reprojection.

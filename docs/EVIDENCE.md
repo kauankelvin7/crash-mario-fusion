@@ -471,3 +471,20 @@ requires level readiness and `NeedsOriginalVblank` retains startup throttling.
 Pacing settings live in `interface.ini`, not `settings.json`; neither settings
 nor a single splash image demonstrate a stalled guest. Recommendation: one
 continuous, focused client timeline before changing runtime or issuing controls.
+
+Native watch attempt (2026-10-13, source checkpoint `72e4241`): concurrently
+launched the sealed runner with `-Seconds 90 -VisibleOperatorWindow`, waited
+for one visible game window, then ran `C:/msys64/mingw64/bin/python.exe -u
+tools/windows/operator_harness.py crash --capture-client --watch-seconds 55`.
+The watcher identified PID 34344 / HWND `0x2f05d8`, detected actual foreground,
+saved one private BMP at `2026-10-13T17:14:43.229520Z`, then refused lost focus
+before a second capture (`watch_exit=2`). The inspected client image is black;
+it cannot establish title/level progress or distinguish stale capture from a
+black game frame. No key input was sent. Runner audit rejected zero receipts;
+summary reports `responsive=true`, `process_stopped=true`, `g1_candidate=false`.
+An independent `Get-Process -Id 34344` query confirmed the process stopped.
+Private records: `.cache/m42-g1/startup-watch-a1ee688154134abb9b2008da9c960c7b/`
+and `.cache/m42-g1/original-bb20bfe305da477195c1a2313e807d2a/`.
+**VERIFIED_REAL operator behavior only:** focus detection, client capture and
+fail-closed termination were exercised against the original process. Continuous
+startup observation is incomplete; G1 remains **BLOCKED**, not accepted.
